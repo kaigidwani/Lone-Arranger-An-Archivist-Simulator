@@ -1,0 +1,33 @@
+.inventory-slot {
+    border-top-width: 1px;
+    border-right-width: 1px;
+    border-bottom-width: 1px;
+    border-left-width: 1px;
+    border-left-color: rgb(0, 0, 0);
+    border-right-color: rgb(0, 0, 0);
+    border-top-color: rgb(0, 0, 0);
+    border-bottom-color: rgb(0, 0, 0);
+    flex-shrink: 0;
+    flex-grow: 0;
+    min-width: auto;
+    max-width: none;
+    min-height: auto;
+    width: auto;
+    height: auto;
+    max-height: none;
+    padding-top: 20%;
+    flex-basis: 20%;
+    background-color: rgba(99, 99, 99, 0.55);
+}
+
+.inventory-slot-red {
+    background-color: rgba(120, 24, 24, 0.55);
+}
+
+.inventory-slot-green {
+    background-color: rgba(34, 99, 28, 0.55);
+}
+
+.inventory-slot-blue {
+    background-color: rgba(0, 32, 108, 0.55);
+}
