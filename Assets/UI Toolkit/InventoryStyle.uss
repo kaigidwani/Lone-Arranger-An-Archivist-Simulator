@@ -15,9 +15,16 @@
     width: auto;
     height: auto;
     max-height: none;
-    padding-top: 20%;
-    flex-basis: 20%;
     background-color: rgba(99, 99, 99, 0.55);
+    padding-top: 16%;
+    flex-basis: 16%;
+    position: relative;
+    top: auto;
+    left: auto;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    align-content: center;
 }
 
 .inventory-slot-red {
@@ -30,4 +37,54 @@
 
 .inventory-slot-blue {
     background-color: rgba(0, 32, 108, 0.55);
+}
+
+.inventory-slot:hover {
+    transition-duration: 0.2s;
+    border-left-color: rgb(255, 255, 255);
+    border-right-color: rgb(255, 255, 255);
+    border-top-color: rgb(255, 255, 255);
+    border-bottom-color: rgb(255, 255, 255);
+}
+
+.debug-bttn {
+    width: 350px;
+    height: 150px;
+    font-size: 18px;
+}
+
+.item {
+    flex-grow: 1;
+    width: 50%;
+    height: 50%;
+    background-color: rgb(253, 253, 253);
+    align-self: center;
+    position: absolute;
+}
+
+.item-red {
+    flex-grow: 1;
+    width: 50%;
+    height: 50%;
+    align-self: center;
+    position: absolute;
+    background-color: rgb(248, 139, 139);
+}
+
+.item-blue {
+    flex-grow: 1;
+    width: 50%;
+    height: 50%;
+    align-self: center;
+    position: absolute;
+    background-color: rgb(143, 172, 231);
+}
+
+.item-green {
+    width: 50%;
+    height: 50%;
+    background-color: rgb(129, 209, 117);
+    align-self: center;
+    position: absolute;
+    flex-grow: 1;
 }

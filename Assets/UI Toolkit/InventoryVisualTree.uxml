@@ -1,39 +1,49 @@
 <ui:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
     <Style src="project://database/Assets/UI%20Toolkit/InventoryStyle.uss?fileID=7433441132597879392&amp;guid=8b41c21d683bf894884c559a7034be59&amp;type=3#InventoryStyle" />
-    <ui:VisualElement name="Container" style="flex-grow: 1; -unity-background-image-tint-color: rgb(0, 0, 0); background-color: rgba(0, 0, 0, 0); align-items: flex-start; align-self: auto; align-content: auto; border-left-color: rgba(0, 0, 0, 0); border-right-color: rgba(0, 0, 0, 0); border-top-color: rgba(0, 0, 0, 0); border-bottom-color: rgba(0, 0, 0, 0); flex-direction: row;">
-        <ui:VisualElement style="width: 70%; height: 100%; align-self: auto; align-items: center; align-content: center; justify-content: center;">
-            <ui:VisualElement name="Inventory" style="align-content: auto; width: 65%; height: 80%; flex-direction: row; flex-wrap: wrap; justify-content: flex-start; padding-top: 0; flex-shrink: 0; flex-grow: 0;">
+    <ui:VisualElement name="Container" style="flex-grow: 1; -unity-background-image-tint-color: rgb(0, 0, 0); background-color: rgba(0, 0, 0, 0); align-items: center; align-self: auto; align-content: auto; border-left-color: rgba(0, 0, 0, 0); border-right-color: rgba(0, 0, 0, 0); border-top-color: rgba(0, 0, 0, 0); border-bottom-color: rgba(0, 0, 0, 0); flex-direction: column;">
+        <ui:VisualElement style="width: 100%; height: 80%; align-self: auto; align-items: center; align-content: center; justify-content: center;">
+            <ui:VisualElement name="Inventory" style="align-content: center; width: 40%; height: 70%; flex-direction: row; flex-wrap: wrap; justify-content: space-around; flex-shrink: 0; flex-grow: 0; align-items: center; align-self: auto;">
                 <ui:VisualElement name="Slot" class="inventory-slot inventory-slot-red" />
-                <ui:VisualElement name="Slot" class="inventory-slot" />
+                <ui:VisualElement name="Slot" enabled="true" class="inventory-slot" style="display: flex;" />
                 <ui:VisualElement name="Slot" class="inventory-slot" />
                 <ui:VisualElement name="Slot" class="inventory-slot inventory-slot-blue" />
+                <ui:VisualElement name="Slot" class="inventory-slot inventory-slot-green" />
                 <ui:VisualElement name="Slot" class="inventory-slot inventory-slot-green" />
                 <ui:VisualElement name="Slot" class="inventory-slot inventory-slot-red" />
                 <ui:VisualElement name="Slot" class="inventory-slot" />
                 <ui:VisualElement name="Slot" class="inventory-slot" />
                 <ui:VisualElement name="Slot" class="inventory-slot inventory-slot-blue" />
                 <ui:VisualElement name="Slot" class="inventory-slot inventory-slot-green" />
-                <ui:VisualElement name="Slot" class="inventory-slot inventory-slot-red" />
-                <ui:VisualElement name="Slot" class="inventory-slot" />
-                <ui:VisualElement name="Slot" class="inventory-slot" />
-                <ui:VisualElement name="Slot" class="inventory-slot inventory-slot-blue" />
                 <ui:VisualElement name="Slot" class="inventory-slot inventory-slot-green" />
                 <ui:VisualElement name="Slot" class="inventory-slot inventory-slot-red" />
                 <ui:VisualElement name="Slot" class="inventory-slot" />
                 <ui:VisualElement name="Slot" class="inventory-slot" />
                 <ui:VisualElement name="Slot" class="inventory-slot inventory-slot-blue" />
                 <ui:VisualElement name="Slot" class="inventory-slot inventory-slot-green" />
+                <ui:VisualElement name="Slot" class="inventory-slot inventory-slot-green" />
                 <ui:VisualElement name="Slot" class="inventory-slot inventory-slot-red" />
                 <ui:VisualElement name="Slot" class="inventory-slot" />
                 <ui:VisualElement name="Slot" class="inventory-slot" />
                 <ui:VisualElement name="Slot" class="inventory-slot inventory-slot-blue" />
+                <ui:VisualElement name="Slot" class="inventory-slot inventory-slot-green" />
+                <ui:VisualElement name="Slot" class="inventory-slot inventory-slot-green" />
+                <ui:VisualElement name="Slot" class="inventory-slot inventory-slot-red" />
+                <ui:VisualElement name="Slot" class="inventory-slot" />
+                <ui:VisualElement name="Slot" class="inventory-slot" />
+                <ui:VisualElement name="Slot" class="inventory-slot inventory-slot-blue" />
+                <ui:VisualElement name="Slot" class="inventory-slot inventory-slot-green" />
+                <ui:VisualElement name="Slot" class="inventory-slot inventory-slot-green" />
+                <ui:VisualElement name="Slot" class="inventory-slot inventory-slot-red" />
+                <ui:VisualElement name="Slot" class="inventory-slot" />
+                <ui:VisualElement name="Slot" class="inventory-slot" />
+                <ui:VisualElement name="Slot" class="inventory-slot inventory-slot-blue" />
+                <ui:VisualElement name="Slot" class="inventory-slot inventory-slot-green" />
                 <ui:VisualElement name="Slot" class="inventory-slot inventory-slot-green" />
             </ui:VisualElement>
+            <ui:VisualElement name="Ghost" style="flex-grow: 0; flex-shrink: 0;" />
         </ui:VisualElement>
-        <ui:VisualElement style="flex-grow: 1; width: 30%; height: 100%;">
-            <ui:VisualElement name="RequestBox">
-                <ui:VisualElement name="Slot" style="flex-grow: 1; width: 100px; height: 100px; min-width: 100px; max-width: 100px; min-height: 100px; max-height: 100px; border-top-width: 1px; border-right-width: 1px; border-bottom-width: 1px; border-left-width: 1px; border-left-color: rgb(0, 0, 0); border-right-color: rgb(0, 0, 0); border-top-color: rgb(0, 0, 0); border-bottom-color: rgb(0, 0, 0); background-color: rgba(84, 81, 81, 0.55);" />
-            </ui:VisualElement>
+        <ui:VisualElement name="Debug" style="flex-grow: 1; width: 100%; height: 20%; align-self: auto; align-content: center; align-items: center; justify-content: center;">
+            <ui:Button text="Spawn Test Item&#10;" name="SpawnItem" class="debug-bttn" />
         </ui:VisualElement>
     </ui:VisualElement>
 </ui:UXML>
