@@ -54,37 +54,49 @@
 }
 
 .item {
-    flex-grow: 1;
     width: 50%;
     height: 50%;
-    background-color: rgb(253, 253, 253);
-    align-self: center;
+    align-self: flex-start;
+    transition-duration: 0.1s;
+    background-image: url("project://database/Assets/Art/1x1-Item-Placeholder.png?fileID=-4887920078848588157&guid=c21a549ca20da654b99c87471f113503&type=3#1x1-Item-Placeholder_0");
+    flex-shrink: 1;
+    align-items: auto;
+    scale: 1 1;
+    background-size: 200px 200px;
+    flex-grow: 0;
     position: absolute;
+    max-width: 200px;
+    max-height: 200px;
+    top: auto;
+    left: auto;
+    right: auto;
+    bottom: auto;
+}
+
+.item:hover {
+    width: 60%;
+    height: 60%;
+    transition-duration: 0.1s;
+    transition-timing-function: ease-in;
+}
+
+.item:active {
 }
 
 .item-red {
-    flex-grow: 1;
-    width: 50%;
-    height: 50%;
-    align-self: center;
-    position: absolute;
-    background-color: rgb(248, 139, 139);
+    -unity-background-image-tint-color: rgb(248, 139, 139);
 }
 
 .item-blue {
-    flex-grow: 1;
-    width: 50%;
-    height: 50%;
-    align-self: center;
-    position: absolute;
-    background-color: rgb(143, 172, 231);
+    -unity-background-image-tint-color: rgb(143, 172, 231);
 }
 
 .item-green {
-    width: 50%;
-    height: 50%;
-    background-color: rgb(129, 209, 117);
-    align-self: center;
-    position: absolute;
-    flex-grow: 1;
+    -unity-background-image-tint-color: rgb(129, 209, 117);
+}
+
+.ghost-icon {
+    flex-grow: 0;
+    flex-shrink: 0;
+    visibility: hidden;
 }

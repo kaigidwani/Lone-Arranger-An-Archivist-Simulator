@@ -5,14 +5,16 @@ using System.Linq;
 
 public class InventoryController : MonoBehaviour
 {
-    public static InventoryController Instance;
+    // Fields
+    [SerializeField] private List<Button> _debugButtons;
+    private VisualElement _root;
+    private VisualElement _accessioningBox;
 
+    // Properties
+
+    public static InventoryController Instance;
     public List<VisualElement> Slots;
     public ItemInfo[] ItemPool;
-
-    private VisualElement root;
-    [SerializeField] private List<Button> debugButtons;
-    
 
     private void Awake()
     {
@@ -30,12 +32,13 @@ public class InventoryController : MonoBehaviour
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
-        root = GetComponent<UIDocument>().rootVisualElement;
-        debugButtons = root.Q("Debug").Query<Button>().ToList();
-        Slots = root.Q("Inventory").Query("Slot").ToList();
-        Debug.Log(debugButtons.Count);
+        _root = GetComponent<UIDocument>().rootVisualElement;
+        _debugButtons = _root.Q("Debug").Query<Button>().ToList();
+        _accessioningBox = _root.Q("Accessioning");
+        Slots = _root.Q("Inventory").Query("Slot").ToList();
+        Debug.Log(_debugButtons.Count);
 
-        debugButtons[0].RegisterCallback<ClickEvent>(SpawnItem);
+        _debugButtons[0].RegisterCallback<ClickEvent>(SpawnItem);
 
     }
 
@@ -54,6 +57,13 @@ public class InventoryController : MonoBehaviour
     {
         
     }
+    void CheckSlotColor(VisualElement slot, VisualElement item, string color)
+    {
+        if (slot.ClassListContains($"inventory-slot-{color}"))
+        {
+            item.AddToClassList($"item-{color}");
+        }
+    }
 
     // Purely Debug Functions
 
@@ -61,12 +71,23 @@ public class InventoryController : MonoBehaviour
     {
         Debug.Log("button clicked!");
         Debug.Log("slot count: " + Slots.Count);
-        for (int i = 0; i < Slots.Count; i++)
+
+        Vector2 boxSize = new Vector2(_accessioningBox.resolvedStyle.width - _accessioningBox.resolvedStyle.paddingLeft*2,
+            _accessioningBox.resolvedStyle.height - _accessioningBox.resolvedStyle.paddingTop*2);
+
+        Translate randomPos = new Translate(0 + Random.Range(0, boxSize.x), 0 + Random.Range(0, boxSize.y));
+
+        VisualElement child = new VisualElement();
+        child.AddToClassList("item");
+
+        child.style.translate = new StyleTranslate(randomPos);
+        _accessioningBox.Add(child);
+
+        /*for (int i = 0; i < Slots.Count; i++)
         {
             if (Slots[i].childCount == 0)
             {
-                VisualElement child = new VisualElement();
-                child.AddToClassList("item");
+               
 
                 CheckSlotColor(Slots[i], child, "red");
                 CheckSlotColor(Slots[i], child, "blue");
@@ -75,16 +96,10 @@ public class InventoryController : MonoBehaviour
                 Slots[i].Add(child);
                 return;
             }
-        }
+        }*/
+
+
 
         Debug.Log("inventory full");
-    }
-
-    void CheckSlotColor(VisualElement slot, VisualElement item, string color)
-    {
-        if (slot.ClassListContains($"inventory-slot-{color}"))
-        {
-            item.AddToClassList($"item-{color}");
-        }
     }
 }
