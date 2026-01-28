@@ -54,33 +54,26 @@
 }
 
 .item {
-    width: 50%;
-    height: 50%;
-    align-self: flex-start;
-    transition-duration: 0.1s;
-    background-image: url("project://database/Assets/Art/1x1-Item-Placeholder.png?fileID=-4887920078848588157&guid=c21a549ca20da654b99c87471f113503&type=3#1x1-Item-Placeholder_0");
+    width: 200px;
+    height: 200px;
+    align-self: center;
+    background-image: none;
     flex-shrink: 1;
     align-items: auto;
-    scale: 1 1;
-    background-size: 200px 200px;
     flex-grow: 0;
     position: absolute;
-    max-width: 200px;
-    max-height: 200px;
-    top: auto;
-    left: auto;
+    top: 260px;
+    left: -340px;
     right: auto;
     bottom: auto;
+    transition-duration: 0.1s;
+    opacity: 0;
+    transform-origin: center;
+    scale: 1 1;
 }
 
 .item:hover {
-    width: 60%;
-    height: 60%;
-    transition-duration: 0.1s;
-    transition-timing-function: ease-in;
-}
-
-.item:active {
+    scale: 1.1 1.1;
 }
 
 .item-red {
@@ -99,4 +92,5 @@
     flex-grow: 0;
     flex-shrink: 0;
     visibility: hidden;
+    position: absolute;
 }
