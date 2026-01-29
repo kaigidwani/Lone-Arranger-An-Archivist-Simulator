@@ -197,6 +197,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4ce9630953ca03649b2d8324c40f8ef9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  ItemPool:
+  - {fileID: 11400000, guid: e083ca9a015f2d04f96d6152657d0b0a, type: 2}
+  InventorySize: 
 --- !u!1 &941369010
 GameObject:
   m_ObjectHideFlags: 0

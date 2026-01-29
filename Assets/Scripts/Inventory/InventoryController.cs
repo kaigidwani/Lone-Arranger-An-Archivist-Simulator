@@ -13,6 +13,7 @@ public class InventoryController : MonoBehaviour
     [SerializeField] private List<Button> _debugButtons;
     private VisualElement _root;
     private static VisualElement _ghostIcon;
+    private Accessioning _accessioning;
 
     // Properties
     public static InventoryController Instance;
@@ -44,7 +45,7 @@ public class InventoryController : MonoBehaviour
     {
         InventorySize = new int[2] { 6, 6 };
         _root = GetComponent<UIDocument>().rootVisualElement;
-        //_debugButtons = _root.Q("Debug").Query<Button>().ToList();
+        _accessioning = _root.Q<Accessioning>();
 
         Slots = new List<Slot>();
         Items = new List<Item>();
@@ -56,6 +57,8 @@ public class InventoryController : MonoBehaviour
         _ghostIcon.RegisterCallback<PointerUpEvent>(OnPointerUp);
 
         Debug.Log(_ghostIcon);
+
+        _accessioning.SpawnItems();
 
     }
 
