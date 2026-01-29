@@ -1,22 +1,38 @@
+using System;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UIElements;
 
-public class Slot : VisualElement
+[UxmlElement]
+public partial class Slot : VisualElement
 {
-    [SerializeField] 
-    private Image _sprite;
-    private int _index;
-
+    // Fields
     
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
+
+    // Properties
+    public Item ItemRef;
+
+    public bool IsFree { get { return ItemRef == null; } }
+
+    public Slot()
     {
-        
+
     }
 
-    // Update is called once per frame
-    void Update()
+    public void SetItem(Item item)
     {
-        
+        ItemRef = item;
+        //Add(item);
+
+        item.style.position = Position.Absolute;
+        item.style.left = 0;
+        item.style.top = 0;
     }
+
+    public void Clear()
+    {
+        ItemRef = null;
+    }
+
+
 }
