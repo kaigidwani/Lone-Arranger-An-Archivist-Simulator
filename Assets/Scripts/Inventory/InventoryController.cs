@@ -120,7 +120,7 @@ public class InventoryController : MonoBehaviour
 
         if (hoveredSlot != null && CanPlace(hoveredSlot))
         {
-            PlaceItem(_draggedItem, hoveredSlot);
+            PlaceItem(hoveredSlot);
         }
 
         /*Vector2 localPos = _draggedItem.parent.WorldToLocal(evt.position);
