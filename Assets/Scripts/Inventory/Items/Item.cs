@@ -1,6 +1,7 @@
 using System;
 using UnityEngine;
 using UnityEngine.UIElements;
+using static UnityEditor.Progress;
 using Random = UnityEngine.Random;
 
 [UxmlElement]
@@ -9,6 +10,7 @@ public partial class Item : VisualElement
     // Fields
 
     private ItemInfo _itemInfo;
+    private Slot _currentSlot;
 
     // Properties
 
@@ -16,9 +18,22 @@ public partial class Item : VisualElement
     public Vector2 Dimensions;
     public event Action<Vector2, Item> OnStartDrag = delegate { };
 
+    /// <summary>
+    /// 
+    /// </summary>
+    public Slot CurrentSlot { 
+        get { return _currentSlot; } 
+        set
+        {
+            _currentSlot = value;
+            _currentSlot.Add(this);
+            _currentSlot.SetItem(this);
+        }
+    }
+
     public Item()
     {
-        AddToClassList("item");
+        _currentSlot = null;
         RegisterCallback<PointerDownEvent>(OnPointerDown);
     }
 
@@ -28,6 +43,7 @@ public partial class Item : VisualElement
     /// <param name="box">The element where this item will spawn</param>
     public void Spawn(Accessioning box)
     {
+        AddToClassList("item");
 
         // Generate random item from current item pool
         ItemInfo type = null;

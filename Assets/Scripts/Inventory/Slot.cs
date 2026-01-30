@@ -28,9 +28,7 @@ public partial class Slot : VisualElement
     {
         ItemRef = item;
 
-        item.style.position = Position.Absolute;
-
-        Color = GetSlotColor();
+        Color = GetColor();
         if (!string.IsNullOrEmpty(Color))
         {
             item.AddToClassList($"item-{Color}");
@@ -41,7 +39,7 @@ public partial class Slot : VisualElement
     /// Finds the color of this slot via its classlist
     /// </summary>
     /// <returns>A string containing the color of this slot</returns>
-    private string GetSlotColor()
+    private string GetColor()
     {
         foreach (string className in GetClasses())
         {
@@ -58,7 +56,7 @@ public partial class Slot : VisualElement
     /// <summary>
     /// Removes this slot's item reference
     /// </summary>
-    private void Clear()
+    public void ClearItems()
     {
         ItemRef = null;
     }

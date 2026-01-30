@@ -41,8 +41,11 @@ public partial class Accessioning : VisualElement
 
     public Accessioning()
     {
-        _hasLoaded = false;
-
+        if (_paddingLeftRight == null)
+        {
+            _hasLoaded = false;
+        }
+        
         RegisterCallback<GeometryChangedEvent>(evt =>
         {
             _paddingLeftRight = new Vector2(resolvedStyle.paddingLeft, resolvedStyle.paddingRight);

@@ -6,6 +6,7 @@ using System;
 using Random = UnityEngine.Random;
 using Unity.VisualScripting;
 using static UnityEngine.Rendering.DebugUI.Table;
+using static UnityEditor.Progress;
 
 public class InventoryController : MonoBehaviour
 {
@@ -77,14 +78,21 @@ public class InventoryController : MonoBehaviour
         _isDragging = true;
         _draggedItem = item;
 
+        if (_draggedItem.CurrentSlot != null)
+        {
+            _draggedItem.CurrentSlot.ClearItems();
+        }
+
         _draggedItem.style.visibility = Visibility.Hidden;
+        _ghostIcon.style.visibility = Visibility.Visible;
+
+        RemoveItemColor(_draggedItem);
+        RemoveItemColor(_ghostIcon);
 
         // Copy the item's properties
         _ghostIcon.style.backgroundImage = item.BaseSprite.texture;
         _ghostIcon.style.width = item.resolvedStyle.width;
         _ghostIcon.style.height = item.resolvedStyle.height;
-        
-        _ghostIcon.style.visibility = Visibility.Visible;
 
         _ghostIcon.schedule.Execute(() =>
         {
@@ -110,27 +118,30 @@ public class InventoryController : MonoBehaviour
     {
         if (!_isDragging) return;
 
-        OnDrop?.Invoke(_draggedItem);
-
         _isDragging = false;
 
+        _draggedItem.style.visibility = Visibility.Visible;
+        _ghostIcon.style.visibility = Visibility.Hidden;
+
+        OnDrop?.Invoke(_draggedItem);
+    
+        // Find slot under mouse
         Vector2 mousePos = evt.position;
 
         Slot hoveredSlot = GetSlotUnderMouse(mousePos);
-
         if (hoveredSlot != null && CanPlace(hoveredSlot))
         {
             PlaceItem(hoveredSlot);
         }
-
-        /*Vector2 localPos = _draggedItem.parent.WorldToLocal(evt.position);
-
-        // Place item at cursor
-        _draggedItem.style.left = localPos.x - _draggedItem.resolvedStyle.width/2;
-        _draggedItem.style.top = localPos.y - _draggedItem.resolvedStyle.height/2;*/
         
-        _draggedItem.style.visibility = Visibility.Visible;
-        _ghostIcon.style.visibility = Visibility.Hidden;
+        // Change ghost icon's color to match item's
+        foreach (string className in _draggedItem.GetClasses())
+        {
+            if (className.StartsWith("item-"))
+            {
+                _ghostIcon.AddToClassList(className);
+            }
+        }
     } 
 
     /// <summary>
@@ -142,11 +153,11 @@ public class InventoryController : MonoBehaviour
     {
         foreach (Slot slot in Slots)
         {
-            /*Rect r = slot.worldBound;
+            Rect r = slot.worldBound;
             if (r.Contains(pos))
             {
                 return slot;
-            }*/
+            }
         }
 
         return null;
@@ -159,30 +170,7 @@ public class InventoryController : MonoBehaviour
     /// <returns>Whether the item can be placed in the given slot</returns>
     bool CanPlace(Slot slot)
     {
-        int i = Slots.IndexOf(slot);
-
-        int row = i / InventorySize[1];
-        int col = i % InventorySize[1];
-
-        for (int y = 0; y < _draggedItem.Dimensions.y; y++)
-        {
-            for (int x = 0; x < _draggedItem.Dimensions.x; x++)
-            {
-                int checkIndex = (i + y) * InventorySize[1] + (col + x);
-
-                if (checkIndex < 0 || checkIndex >= Slots.Count)
-                {
-                    return false;
-                }
-
-                if (!Slots[checkIndex].IsFree)
-                {
-                    return false;
-                }
-            }
-        }
-
-        return true;
+        return slot.IsFree;
     }
 
     /// <summary>
@@ -191,21 +179,29 @@ public class InventoryController : MonoBehaviour
     /// <param name="slot">The top-left slot that the user places the item in</param>
     void PlaceItem(Slot slot)
     {
-        int i = Slots.IndexOf(slot);
-        int row = i / InventorySize[1];
-        int col = i % InventorySize[1];
+        _draggedItem.RemoveFromHierarchy();
+        _draggedItem.RemoveFromClassList("item");
+        _draggedItem.AddToClassList("slotted-item");
 
-        for (int y = 0; y < _draggedItem.Dimensions.y; y++)
+        _draggedItem.style.top = StyleKeyword.Null;
+        _draggedItem.style.left = StyleKeyword.Null;
+        _draggedItem.style.opacity = StyleKeyword.Null;
+        
+        _draggedItem.CurrentSlot = slot;
+    }
+
+    public void RemoveItemColor(VisualElement elem)
+    {
+        string prevColor = "";
+        foreach (string className in elem.GetClasses())
         {
-            for (int x = 0; x < _draggedItem.Dimensions.x; x++)
+            if (className.StartsWith("item-"))
             {
-                int index = (row + y) * InventorySize[1] + (col + x);
-
-                Slots[index].ItemRef = _draggedItem;
+                prevColor = className;
             }
         }
 
-        slot.SetItem(_draggedItem);
+        elem.RemoveFromClassList(prevColor);
     }
 
     /*void ReturnItem(Item item)
