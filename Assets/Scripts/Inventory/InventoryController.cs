@@ -10,26 +10,28 @@ using static UnityEngine.Rendering.DebugUI.Table;
 public class InventoryController : MonoBehaviour
 {
     // Fields
+
     [SerializeField] private List<Button> _debugButtons;
     private VisualElement _root;
     private static VisualElement _ghostIcon;
-    private Accessioning _accessioning;
+
+    private static bool _isDragging;
+    private static Item _draggedItem;
 
     // Properties
+
     public static InventoryController Instance;
+
+    public int[] InventorySize;
     public List<Slot> Slots;
     public List<Item> Items;
     public ItemInfo[] ItemPool;
 
-    static bool _isDragging;
-    static Item _draggedItem;
-
     public event Action<Item> OnDrop;
-
-    public int[] InventorySize;
 
     private void Awake()
     {
+        // Singleton pattern
         if (Instance != null && Instance != this)
         {
             Destroy(this.gameObject);
@@ -44,38 +46,32 @@ public class InventoryController : MonoBehaviour
     void Start()
     {
         InventorySize = new int[2] { 6, 6 };
+
         _root = GetComponent<UIDocument>().rootVisualElement;
-        _accessioning = _root.Q<Accessioning>();
+        _root.RegisterCallback<PointerMoveEvent>(OnPointerMove);
+        _root.RegisterCallback<PointerUpEvent>(OnPointerUp);
 
-        Slots = new List<Slot>();
         Items = new List<Item>();
-
         Slots = _root.Q("Inventory").Query<Slot>().ToList();
-
+        
         _ghostIcon = _root.Q("GhostIcon");
-        _ghostIcon.RegisterCallback<PointerMoveEvent>(OnPointerMove);
-        _ghostIcon.RegisterCallback<PointerUpEvent>(OnPointerUp);
-
-        Debug.Log(_ghostIcon);
-
-        _accessioning.SpawnItems();
-
     }
 
-    void CheckSlotColor(VisualElement slot, VisualElement item, string color)
-    {
-        if (slot.ClassListContains($"inventory-slot-{color}"))
-        {
-            item.AddToClassList($"item-{color}");
-        }
-    }
-
+    /// <summary>
+    /// Centers the ghost icon on the given position
+    /// </summary>
+    /// <param name="pos">The position to draw the icon</param>
     static void SetGhostIconPosition(Vector2 pos)
     {
-        _ghostIcon.style.top = pos.y - _ghostIcon.layout.height / 2;
-        _ghostIcon.style.left = pos.x - _ghostIcon.layout.height / 2;
+        _ghostIcon.style.left = pos.x - _ghostIcon.resolvedStyle.width / 2;
+        _ghostIcon.style.top = pos.y - _ghostIcon.resolvedStyle.height / 2;
     }
 
+    /// <summary>
+    /// Toggles visibility of ghost icon on click
+    /// </summary>
+    /// <param name="pos">Where the user clicked</param>
+    /// <param name="item">The item the user clicked on</param>
     public void OnPointerDown(Vector2 pos, Item item)
     {
         _isDragging = true;
@@ -83,22 +79,33 @@ public class InventoryController : MonoBehaviour
 
         _draggedItem.style.visibility = Visibility.Hidden;
 
+        // Copy the item's properties
         _ghostIcon.style.backgroundImage = item.BaseSprite.texture;
         _ghostIcon.style.width = item.resolvedStyle.width;
         _ghostIcon.style.height = item.resolvedStyle.height;
         
         _ghostIcon.style.visibility = Visibility.Visible;
-        SetGhostIconPosition(pos);
+
+        _ghostIcon.schedule.Execute(() =>
+        {
+            SetGhostIconPosition(pos);
+        });
+        
     }
 
+    /// <summary>
+    /// Handles dragging across the screen
+    /// </summary>
     void OnPointerMove(PointerMoveEvent evt)
     {
         if (!_isDragging) return;
 
-        Debug.Log("moving");
         SetGhostIconPosition(evt.position);
     }
 
+    /// <summary>
+    /// Handles dropping items on the screen
+    /// </summary>
     void OnPointerUp(PointerUpEvent evt)
     {
         if (!_isDragging) return;
@@ -111,7 +118,7 @@ public class InventoryController : MonoBehaviour
 
         Slot hoveredSlot = GetSlotUnderMouse(mousePos);
 
-        if (hoveredSlot != null && CanPlaceItem(hoveredSlot, _draggedItem))
+        if (hoveredSlot != null && CanPlace(hoveredSlot))
         {
             PlaceItem(_draggedItem, hoveredSlot);
         }
@@ -127,10 +134,10 @@ public class InventoryController : MonoBehaviour
     } 
 
     /// <summary>
-    /// 
+    /// Finds a slot, if any, that the user is hovering over
     /// </summary>
     /// <param name="pos">Position of the mouse</param>
-    /// <returns></returns>
+    /// <returns>The slot that the user is hovering over</returns>
     Slot GetSlotUnderMouse(Vector2 pos)
     {
         foreach (Slot slot in Slots)
@@ -146,21 +153,20 @@ public class InventoryController : MonoBehaviour
     }
 
     /// <summary>
-    /// 
+    /// Determines whether the slot the user places the item is valid
     /// </summary>
-    /// <param name="slot"></param>
-    /// <param name="item"></param>
-    /// <returns></returns>
-    bool CanPlaceItem(Slot slot, Item item)
+    /// <param name="slot">The slot the user places the item in</param>
+    /// <returns>Whether the item can be placed in the given slot</returns>
+    bool CanPlace(Slot slot)
     {
         int i = Slots.IndexOf(slot);
 
         int row = i / InventorySize[1];
         int col = i % InventorySize[1];
 
-        for (int y = 0; y < item.Dimensions.y; y++)
+        for (int y = 0; y < _draggedItem.Dimensions.y; y++)
         {
-            for (int x = 0; x < item.Dimensions.x; x++)
+            for (int x = 0; x < _draggedItem.Dimensions.x; x++)
             {
                 int checkIndex = (i + y) * InventorySize[1] + (col + x);
 
@@ -180,27 +186,26 @@ public class InventoryController : MonoBehaviour
     }
 
     /// <summary>
-    /// 
+    /// Places the dragged item into a slot
     /// </summary>
-    /// <param name="item"></param>
     /// <param name="slot">The top-left slot that the user places the item in</param>
-    void PlaceItem(Item item, Slot slot)
+    void PlaceItem(Slot slot)
     {
         int i = Slots.IndexOf(slot);
         int row = i / InventorySize[1];
         int col = i % InventorySize[1];
 
-        for (int y = 0; y < item.Dimensions.y; y++)
+        for (int y = 0; y < _draggedItem.Dimensions.y; y++)
         {
-            for (int x = 0; x < item.Dimensions.x; x++)
+            for (int x = 0; x < _draggedItem.Dimensions.x; x++)
             {
                 int index = (row + y) * InventorySize[1] + (col + x);
 
-                Slots[index].ItemRef = item;
+                Slots[index].ItemRef = _draggedItem;
             }
         }
 
-        slot.SetItem(item);
+        slot.SetItem(_draggedItem);
     }
 
     /*void ReturnItem(Item item)

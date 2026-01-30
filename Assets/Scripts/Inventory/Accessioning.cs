@@ -11,25 +11,38 @@ public partial class Accessioning : VisualElement
     private Vector2 _paddingTopBottom;
     private Vector2 _boxSize;
 
+    private bool _hasLoaded;
+
     // Properties
 
-    public Vector2 Bounds
+    /// <summary>
+    /// Minimimum (top-left) position of this element
+    /// </summary>
+    public Vector2 Min
     {
-        get
+        get 
         {
-            float x = _paddingLeftRight.x + _boxSize.x;
-            float y = _paddingTopBottom.x + _boxSize.y;
-            return new Vector2(x, y);
+            return new Vector2(_paddingLeftRight.x, _paddingTopBottom.x);
         }
     }
 
-    public Vector2 Position
+    /// <summary>
+    /// Maximum (top-right) position of this element
+    /// </summary>
+    public Vector2 Max
     {
-        get { return new Vector2(_paddingLeftRight.x, _paddingTopBottom.x); }
+        get
+        {
+            return new Vector2(
+                _paddingLeftRight.x + _boxSize.x,
+                _paddingTopBottom.x + _boxSize.y);
+        }
     }
 
     public Accessioning()
     {
+        _hasLoaded = false;
+
         RegisterCallback<GeometryChangedEvent>(evt =>
         {
             _paddingLeftRight = new Vector2(resolvedStyle.paddingLeft, resolvedStyle.paddingRight);
@@ -38,28 +51,27 @@ public partial class Accessioning : VisualElement
             _boxSize = new Vector2(
                 resolvedStyle.width - _paddingLeftRight.x - _paddingLeftRight.y,
                 resolvedStyle.height - _paddingTopBottom.x - _paddingTopBottom.y);
+
+            if (!_hasLoaded) // Guarantees that items spawn once after event fires
+            {
+                _hasLoaded = true;
+                SpawnItems();
+            }
         });
     }
 
     /// <summary>
-    /// Adds an item to a randomly generated position within the accessioning box on click
+    /// Adds a number of randomly generated items inside this box
     /// </summary>
-    /// <param name="e">Click Event</param>
+    /// <param name="count">Number of items to spawn</param>
     public void SpawnItems(int count = 5)
     {
         Debug.Log("adding items");
 
         for (int i = 0; i < count; i++)
         {
-            ItemInfo type = null;
-            if (InventoryController.Instance.ItemPool.Length > 0)
-            {
-                type = InventoryController.Instance.ItemPool[Random.Range(0, InventoryController.Instance.ItemPool.Length - 1)];
-                Debug.Log(type.Name);
-            }
-
             Item item = new Item();
-            item.Spawn(this, type);
+            item.Spawn(this);
 
             InventoryController.Instance.Items.Add(item);
             Add(item);
