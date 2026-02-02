@@ -7,8 +7,10 @@ public partial class Accessioning : VisualElement
 {
     // Fields
     
-    private Vector2 _paddingLeftRight;
-    private Vector2 _paddingTopBottom;
+    private float _paddingLeft;
+    private float _paddingRight;
+    private float _paddingTop;
+    private float _paddingBottom;
     private Vector2 _boxSize;
 
     private bool _hasLoaded;
@@ -22,7 +24,7 @@ public partial class Accessioning : VisualElement
     {
         get 
         {
-            return new Vector2(_paddingLeftRight.x, _paddingTopBottom.x);
+            return new Vector2(_paddingLeft, _paddingTop);
         }
     }
 
@@ -34,26 +36,28 @@ public partial class Accessioning : VisualElement
         get
         {
             return new Vector2(
-                _paddingLeftRight.x + _boxSize.x,
-                _paddingTopBottom.x + _boxSize.y);
+                Min.x + _boxSize.x,
+                Min.y + _boxSize.y);
         }
     }
 
     public Accessioning()
     {
-        if (_paddingLeftRight == null)
+        if (_paddingLeft == 0)
         {
             _hasLoaded = false;
         }
         
         RegisterCallback<GeometryChangedEvent>(evt =>
         {
-            _paddingLeftRight = new Vector2(resolvedStyle.paddingLeft, resolvedStyle.paddingRight);
-            _paddingTopBottom = new Vector2(resolvedStyle.paddingTop, resolvedStyle.paddingBottom);
+            _paddingLeft = resolvedStyle.paddingLeft;
+            _paddingRight = resolvedStyle.paddingLeft;
+            _paddingTop = resolvedStyle.paddingLeft;
+            _paddingBottom = resolvedStyle.paddingLeft;
 
             _boxSize = new Vector2(
-                resolvedStyle.width - _paddingLeftRight.x - _paddingLeftRight.y,
-                resolvedStyle.height - _paddingTopBottom.x - _paddingTopBottom.y);
+                resolvedStyle.width - resolvedStyle.borderLeftWidth - resolvedStyle.borderRightWidth - _paddingLeft - _paddingRight,
+                resolvedStyle.height - resolvedStyle.borderTopWidth - resolvedStyle.borderBottomWidth - _paddingTop - _paddingBottom);
 
             if (!_hasLoaded) // Guarantees that items spawn once after event fires
             {

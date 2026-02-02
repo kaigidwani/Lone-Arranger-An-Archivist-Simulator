@@ -64,8 +64,9 @@ public class InventoryController : MonoBehaviour
     /// <param name="pos">The position to draw the icon</param>
     static void SetGhostIconPosition(Vector2 pos)
     {
-        _ghostIcon.style.left = pos.x - _ghostIcon.resolvedStyle.width / 2;
-        _ghostIcon.style.top = pos.y - _ghostIcon.resolvedStyle.height / 2;
+        Debug.Log("item size" + new Vector2(_draggedItem.ItemSize.x, _draggedItem.ItemSize.y));
+        _ghostIcon.style.left = pos.x - _draggedItem.ItemSize.x / 2;
+        _ghostIcon.style.top = pos.y - _draggedItem.ItemSize.y / 2;
     }
 
     /// <summary>
@@ -85,20 +86,15 @@ public class InventoryController : MonoBehaviour
 
         _draggedItem.style.visibility = Visibility.Hidden;
         _ghostIcon.style.visibility = Visibility.Visible;
-
-        RemoveItemColor(_draggedItem);
+ 
         RemoveItemColor(_ghostIcon);
 
         // Copy the item's properties
         _ghostIcon.style.backgroundImage = item.BaseSprite.texture;
-        _ghostIcon.style.width = item.resolvedStyle.width;
-        _ghostIcon.style.height = item.resolvedStyle.height;
+        _ghostIcon.style.width = item.ItemSize.x;
+        _ghostIcon.style.height = item.ItemSize.y;
 
-        _ghostIcon.schedule.Execute(() =>
-        {
-            SetGhostIconPosition(pos);
-        });
-        
+        SetGhostIconPosition(pos);
     }
 
     /// <summary>
@@ -133,15 +129,19 @@ public class InventoryController : MonoBehaviour
         {
             PlaceItem(hoveredSlot);
         }
-        
-        // Change ghost icon's color to match item's
-        foreach (string className in _draggedItem.GetClasses())
+        else if (_draggedItem.CurrentSlot != null)
         {
-            if (className.StartsWith("item-"))
-            {
-                _ghostIcon.AddToClassList(className);
-            }
+            PlaceItem(_draggedItem.CurrentSlot);
         }
+
+            // Change ghost icon's color to match item's
+            foreach (string className in _draggedItem.GetClasses())
+            {
+                if (className.StartsWith("item-"))
+                {
+                    _ghostIcon.AddToClassList(className);
+                }
+            }
     } 
 
     /// <summary>
@@ -181,8 +181,9 @@ public class InventoryController : MonoBehaviour
     {
         _draggedItem.RemoveFromHierarchy();
         _draggedItem.RemoveFromClassList("item");
+        RemoveItemColor(_draggedItem);
         _draggedItem.AddToClassList("slotted-item");
-
+        
         _draggedItem.style.top = StyleKeyword.Null;
         _draggedItem.style.left = StyleKeyword.Null;
         _draggedItem.style.opacity = StyleKeyword.Null;
@@ -203,10 +204,4 @@ public class InventoryController : MonoBehaviour
 
         elem.RemoveFromClassList(prevColor);
     }
-
-    /*void ReturnItem(Item item)
-    {
-        _ghostIcon.style.visibility = Visibility.Hidden;
-        item.style.visibility = Visibility.Visible;
-    }*/
 }
