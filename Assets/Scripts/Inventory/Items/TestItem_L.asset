@@ -10,9 +10,13 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 32b81e9028c679343ac9b213bc9974fe, type: 3}
-  m_Name: TestItem
+  m_Name: TestItem_L
   m_EditorClassIdentifier: 
-  Name: Test
-  Description: This is a test
-  Dimensions: {x: 1, y: 1}
-  Sprite: {fileID: -4887920078848588157, guid: c21a549ca20da654b99c87471f113503, type: 3}
+  _activeTiles:
+  - 1, 0
+  - 1, 0
+  - 1, 0
+  Name: 
+  Description: 
+  Dimensions: {x: 2, y: 3}
+  Sprite: {fileID: 0}

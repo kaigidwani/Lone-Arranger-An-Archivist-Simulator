@@ -56,7 +56,7 @@ public partial class Item : VisualElement
             style.backgroundImage = type.Sprite.texture;
 
             BaseSprite = _itemInfo.Sprite;
-            Dimensions = _itemInfo.Dimensions;
+            //Dimensions = _itemInfo.Dimensions;
         }
 
         schedule.Execute(() =>

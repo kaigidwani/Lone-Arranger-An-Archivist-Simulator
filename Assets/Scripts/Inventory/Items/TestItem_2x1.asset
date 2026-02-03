@@ -1,0 +1,20 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 32b81e9028c679343ac9b213bc9974fe, type: 3}
+  m_Name: TestItem_2x1
+  m_EditorClassIdentifier: 
+  _activeTiles:
+  - 1, 1
+  Name: 2x1
+  Description: This is a test of a 2x2 Item
+  Dimensions: {x: 2, y: 1}
+  Sprite: {fileID: 8502630405890745519, guid: fbc1762c1a95019469ecde8653f6e4a3, type: 3}
