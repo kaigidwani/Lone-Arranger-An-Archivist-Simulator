@@ -1,0 +1,85 @@
+.inventory-slot {
+    border-top-width: 1px;
+    border-right-width: 1px;
+    border-bottom-width: 1px;
+    border-left-width: 1px;
+    border-left-color: rgb(0, 0, 0);
+    border-right-color: rgb(0, 0, 0);
+    border-top-color: rgb(0, 0, 0);
+    border-bottom-color: rgb(0, 0, 0);
+    background-color: rgba(99, 99, 99, 0.55);
+    padding-top: 16%;
+    width: 100px;
+    height: -179px;
+}
+
+.inventory-slot-red {
+    background-color: rgba(120, 24, 24, 0.55);
+}
+
+.inventory-slot-green {
+    background-color: rgba(34, 99, 28, 0.55);
+}
+
+.inventory-slot-blue {
+    background-color: rgba(0, 32, 108, 0.55);
+}
+
+.inventory-slot:hover {
+    transition-duration: 0.2s;
+    border-left-color: rgb(255, 255, 255);
+    border-right-color: rgb(255, 255, 255);
+    border-top-color: rgb(255, 255, 255);
+    border-bottom-color: rgb(255, 255, 255);
+}
+
+.debug-bttn {
+    width: 350px;
+    height: 150px;
+    font-size: 18px;
+}
+
+.item {
+    width: 200px;
+    height: 200px;
+    align-self: center;
+    background-image: none;
+    flex-shrink: 1;
+    align-items: auto;
+    flex-grow: 0;
+    position: absolute;
+    top: 260px;
+    left: -340px;
+    right: auto;
+    bottom: auto;
+    transition: none;
+    opacity: 0;
+    transform-origin: center;
+    scale: 1 1;
+}
+
+.item:hover {
+    scale: 1.1 1.1;
+}
+
+.item-red {
+    -unity-background-image-tint-color: rgb(248, 139, 139);
+}
+
+.item-blue {
+    -unity-background-image-tint-color: rgb(143, 172, 231);
+}
+
+.item-green {
+    -unity-background-image-tint-color: rgb(129, 209, 117);
+}
+
+.ghost-icon {
+    flex-grow: 0;
+    flex-shrink: 0;
+    visibility: hidden;
+    position: absolute;
+    align-self: center;
+    align-items: auto;
+    opacity: 0.8;
+}
