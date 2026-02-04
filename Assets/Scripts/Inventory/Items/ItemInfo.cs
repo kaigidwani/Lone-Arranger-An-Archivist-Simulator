@@ -15,38 +15,30 @@ public class ItemInfo : ScriptableObject
     public Sprite Sprite;
 
     [HideInInspector]
-    public List<int[]> Shape
-    {
-        get
-        {
-            List<int[]> shape = new List<int[]>();
-            Debug.Log($"{Name}:{_activeTiles.Length}");
-
-            for (int row = 0; row < _activeTiles.Length; row++)
-            {
-                string[] rowString = _activeTiles[row].Split(',');
-                Debug.Log($"{Name}: running on row");
-                    
-                for (int col = 0; col < rowString.Length; col++)
-                {
-                    Debug.Log($"{Name}: running on coll");
-                    shape[row][col] = int.Parse(rowString[col]);
-                }
-
-            }
-
-            return shape;
-        }
-    }
+    public int[][] Shape;
     
     private void OnValidate()
     {
+        // Creates a new array in the inspector based on the dimensions of the item
         if (_activeTiles.Length != Dimensions.y)
         {
             _activeTiles = new string[(int)Dimensions.y];
         }
 
-        Debug.Log($"{Name}: " + Shape);
-        
+        // Converts the each row's string array of active tiles to a jagged array of integers
+        // for easy parsing later on
+        Shape = new int[(int)Dimensions.y][];
+
+        for (int row = 0; row < _activeTiles.Length; row++)
+        {
+            string[] rowString = _activeTiles[row].Split(',');
+            Shape[row] = new int[rowString.Length];
+
+            for (int col = 0; col < rowString.Length; col++)
+            {
+                Shape[row][col] = int.Parse(rowString[col]);
+            }
+
+        }
     }
 }

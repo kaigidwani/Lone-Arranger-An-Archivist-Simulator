@@ -186,8 +186,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   InventorySize: 
   ItemPool:
-  - {fileID: 11400000, guid: e083ca9a015f2d04f96d6152657d0b0a, type: 2}
+  - {fileID: 11400000, guid: a43ea40ed6e53a645a41abeb59ef83d7, type: 2}
   - {fileID: 11400000, guid: 413d4706439c9b240b0c79d5ebbcd20a, type: 2}
+  - {fileID: 11400000, guid: a43ea40ed6e53a645a41abeb59ef83d7, type: 2}
+  - {fileID: 11400000, guid: a43ea40ed6e53a645a41abeb59ef83d7, type: 2}
 --- !u!1 &941369010
 GameObject:
   m_ObjectHideFlags: 0

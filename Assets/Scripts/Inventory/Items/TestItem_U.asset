@@ -10,13 +10,12 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 32b81e9028c679343ac9b213bc9974fe, type: 3}
-  m_Name: TestItem_L
+  m_Name: TestItem_U
   m_EditorClassIdentifier: 
   _activeTiles:
-  - 1, 0
-  - 1, 0
-  - 1, 1
+  - 1, 0, 1
+  - 1, 1, 1
   Name: L
   Description: This is a test of an L-shaped item
-  Dimensions: {x: 2, y: 3}
+  Dimensions: {x: 3, y: 2}
   Sprite: {fileID: 487540823485519262, guid: 1da469915bf17034a9be6c7d42da6387, type: 3}

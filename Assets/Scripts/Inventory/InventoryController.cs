@@ -25,6 +25,17 @@ public class InventoryController : MonoBehaviour
 
     public int[] InventorySize;
     public List<Slot> Slots;
+    public Vector2 SlotSize
+    {
+        get {
+            return new Vector2(
+                Slots[0].resolvedStyle.width,
+                Slots[0].resolvedStyle.height
+
+            );
+        }
+    }
+
     public List<Item> Items;
     public ItemInfo[] ItemPool;
 
@@ -64,9 +75,9 @@ public class InventoryController : MonoBehaviour
     /// <param name="pos">The position to draw the icon</param>
     static void SetGhostIconPosition(Vector2 pos)
     {
-        Debug.Log("item size" + new Vector2(_draggedItem.ItemSize.x, _draggedItem.ItemSize.y));
-        _ghostIcon.style.left = pos.x - _draggedItem.ItemSize.x / 2;
-        _ghostIcon.style.top = pos.y - _draggedItem.ItemSize.y / 2;
+        //Debug.Log("item size" + new Vector2(_draggedItem.ItemSize.x, _draggedItem.ItemSize.y));
+        _ghostIcon.style.left = pos.x - _draggedItem.resolvedStyle.width / 2;
+        _ghostIcon.style.top = pos.y - _draggedItem.resolvedStyle.height / 2;
     }
 
     /// <summary>
@@ -91,8 +102,8 @@ public class InventoryController : MonoBehaviour
 
         // Copy the item's properties
         _ghostIcon.style.backgroundImage = item.BaseSprite.texture;
-        _ghostIcon.style.width = item.ItemSize.x;
-        _ghostIcon.style.height = item.ItemSize.y;
+        _ghostIcon.style.width = item.resolvedStyle.width;
+        _ghostIcon.style.height = item.resolvedStyle.height;
 
         SetGhostIconPosition(pos);
     }

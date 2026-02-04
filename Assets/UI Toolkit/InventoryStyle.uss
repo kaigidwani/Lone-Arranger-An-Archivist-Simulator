@@ -68,7 +68,7 @@
     align-self: center;
     background-image: none;
     flex-shrink: 1;
-    align-items: auto;
+    align-items: center;
     flex-grow: 0;
     position: absolute;
     top: 260px;
@@ -78,6 +78,8 @@
     opacity: 0;
     transform-origin: center;
     scale: 1 1;
+    flex-direction: row;
+    justify-content: flex-start;
 }
 
 .item:hover {
@@ -150,4 +152,9 @@
     -unity-background-image-tint-color: rgb(129, 209, 117);
     transition-property: -unity-background-image-tint-color;
     transition-duration: 0.5s;
+}
+
+.item-tile {
+    background-size: cover;
+    position: absolute;
 }
