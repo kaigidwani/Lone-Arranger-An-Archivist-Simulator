@@ -146,4 +146,5 @@
     -unity-text-align: middle-left;
     flex-direction: row;
     align-items: center;
+    flex-basis: 14%;
 }
