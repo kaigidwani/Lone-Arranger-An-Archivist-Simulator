@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: TestItem_1x1
   m_EditorClassIdentifier: 
   _activeTiles:
-  - 1
+  - 2
   Name: 1x1
   Description: This is a test of a 1x1 item
   Dimensions: {x: 1, y: 1}

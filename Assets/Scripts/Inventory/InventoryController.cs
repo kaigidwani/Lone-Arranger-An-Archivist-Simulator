@@ -193,7 +193,7 @@ public class InventoryController : MonoBehaviour
         _draggedItem.RemoveFromHierarchy();
         _draggedItem.RemoveFromClassList("item");
         RemoveItemColor(_draggedItem);
-        _draggedItem.AddToClassList("slotted-item");
+        _draggedItem.AddToClassList("item-slotted");
         
         _draggedItem.style.top = StyleKeyword.Null;
         _draggedItem.style.left = StyleKeyword.Null;

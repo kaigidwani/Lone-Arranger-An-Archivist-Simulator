@@ -71,7 +71,7 @@ public partial class Accessioning : VisualElement
     /// Adds a number of randomly generated items inside this box
     /// </summary>
     /// <param name="count">Number of items to spawn</param>
-    public void SpawnItems(int count = 5)
+    public void SpawnItems(int count = 10)
     {
         Debug.Log("adding items");
 

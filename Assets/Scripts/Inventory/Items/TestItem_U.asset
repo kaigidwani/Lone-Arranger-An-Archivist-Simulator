@@ -13,9 +13,9 @@ MonoBehaviour:
   m_Name: TestItem_U
   m_EditorClassIdentifier: 
   _activeTiles:
-  - 1, 0, 1
+  - 2, 0, 1
   - 1, 1, 1
   Name: L
   Description: This is a test of an L-shaped item
   Dimensions: {x: 3, y: 2}
-  Sprite: {fileID: 487540823485519262, guid: 1da469915bf17034a9be6c7d42da6387, type: 3}
+  Sprite: {fileID: 6563575085492716751, guid: 4733a8986982ddc44b0f627ca100e97a, type: 3}

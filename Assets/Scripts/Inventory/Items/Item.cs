@@ -1,6 +1,9 @@
 using System;
+using Unity.VisualScripting.Antlr3.Runtime.Misc;
 using UnityEngine;
 using UnityEngine.UIElements;
+using System.Collections.Generic;
+using static UnityEditor.PlayerSettings;
 using static UnityEditor.Progress;
 using Random = UnityEngine.Random;
 
@@ -10,12 +13,21 @@ public partial class Item : VisualElement
     // Fields
 
     private Slot _currentSlot;
+    private bool _isHovering;
 
     // Properties
 
     public Sprite BaseSprite;
     public Vector2 Dimensions;
     public event Action<Vector2, Item> OnStartDrag = delegate { };
+
+    public VisualElement PivotElement
+    {
+        get
+        {
+            return this.Q("item-pivot");
+        }
+    }
 
     public Slot CurrentSlot { 
         get { return _currentSlot; } 
@@ -31,6 +43,8 @@ public partial class Item : VisualElement
     {
         _currentSlot = null;
         RegisterCallback<PointerDownEvent>(OnPointerDown);
+        RegisterCallback<MouseOverEvent>(OnHover);
+        RegisterCallback<MouseLeaveEvent>(OnHoverExit);
     }
 
     /// <summary>
@@ -73,7 +87,7 @@ public partial class Item : VisualElement
     /// </summary>
     void OnPointerDown(PointerDownEvent evt)
     {
-        if (evt.button != 0) return;
+        if (evt.button != 0 || !_isHovering) return;
 
         OnStartDrag.Invoke(evt.position, this);
         evt.StopPropagation();
@@ -86,11 +100,10 @@ public partial class Item : VisualElement
     void ConstructItem(ItemInfo type)
     {
         // How big each individual tile should be
-        float tileWidth = InventoryController.Instance.SlotSize.x * 0.8f;
-        float tileHeight = InventoryController.Instance.SlotSize.y * 0.8f;
+        float tileWidth = InventoryController.Instance.SlotSize.x ;
+        float tileHeight = InventoryController.Instance.SlotSize.y ;
 
         // Parent container should be as big as the item is (totally)
-        // *** Note: need to account for hovering and clicking on empty tiles
         style.width = Dimensions.x * tileWidth;
         style.height = Dimensions.y * tileHeight;
 
@@ -103,9 +116,14 @@ public partial class Item : VisualElement
                 {
                     continue;
                 }
-
+                
                 VisualElement tile = new VisualElement();
+
                 tile.AddToClassList("item-tile");
+                if (type.Shape[row][col] == 2)
+                {
+                    tile.AddToClassList("item-pivot");
+                }
 
                 tile.style.width = tileWidth;
                 tile.style.height = tileHeight;
@@ -131,5 +149,44 @@ public partial class Item : VisualElement
                 Add(tile);
             }
         }
+    }
+
+    /// <summary>
+    /// Handles transformations when the user hovers over this item
+    /// </summary>
+    /// <param name="evt">Mouse over event</param>
+    void OnHover(MouseOverEvent evt)
+    {
+        foreach (VisualElement elem in Children())
+        {
+            Rect r = elem.worldBound;
+
+            // Item tiles that are empty should not change the scale or be draggable
+            if (r.Contains(evt.mousePosition))
+            {
+                SetScale(new Vector2(1.05f, 1.05f));
+                _isHovering = true;
+
+                return;
+            }
+        }
+
+        SetScale(new Vector2(1, 1));
+        _isHovering = false;
+    }
+
+    /// <summary>
+    /// Handles transformations when the user's mouse leaves this item over this item
+    /// </summary>
+    /// <param name="evt">Mouse leave event</param>
+    void OnHoverExit(MouseLeaveEvent evt)
+    {
+        SetScale(new Vector2(1, 1));
+        _isHovering = false;
+    }
+
+    void SetScale(Vector2 scale)
+    {
+        style.scale = new StyleScale(scale);
     }
 }
