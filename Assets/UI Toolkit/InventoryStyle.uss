@@ -93,13 +93,8 @@
 }
 
 .accessioning-box {
-    flex-grow: 0;
     width: 30%;
-    height: 80%;
-    padding-top: 20px;
-    padding-right: 20px;
-    padding-bottom: 20px;
-    padding-left: 20px;
+    height: 85%;
     flex-shrink: 0;
     transform-origin: top;
     translate: 0 0;
@@ -116,12 +111,8 @@
     border-right-color: rgb(0, 0, 0);
     border-top-color: rgb(0, 0, 0);
     border-bottom-color: rgb(0, 0, 0);
-    align-items: flex-start;
-    flex-direction: row;
-    align-content: flex-start;
-    justify-content: flex-start;
-    align-self: auto;
     margin-top: 3%;
+    align-self: center;
 }
 
 .top-bar-element {
@@ -147,4 +138,31 @@
     flex-direction: row;
     align-items: center;
     flex-basis: 14%;
+}
+
+.bottom-bar-element {
+    background-color: rgb(217, 217, 217);
+    border-top-left-radius: 4px;
+    border-top-right-radius: 4px;
+    border-bottom-right-radius: 4px;
+    border-bottom-left-radius: 4px;
+    border-top-width: 1px;
+    border-right-width: 1px;
+    border-bottom-width: 1px;
+    border-left-width: 1px;
+    border-left-color: rgb(0, 0, 0);
+    border-right-color: rgb(0, 0, 0);
+    border-top-color: rgb(0, 0, 0);
+    border-bottom-color: rgb(0, 0, 0);
+    padding-right: 1%;
+    padding-left: 1%;
+    margin-right: 4%;
+    align-items: center;
+    flex-basis: 14%;
+    margin-bottom: 1.5%;
+    margin-top: 1%;
+}
+
+.bottom-bar-button {
+    font-size: 48px;
 }
