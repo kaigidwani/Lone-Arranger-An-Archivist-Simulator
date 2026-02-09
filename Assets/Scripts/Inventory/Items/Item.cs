@@ -16,18 +16,12 @@ public partial class Item : VisualElement
     private bool _isHovering;
 
     // Properties
+    public VisualElement Pivot { get; set; }
 
     public Sprite BaseSprite;
     public Vector2 Dimensions;
+    public int[][] Shape;
     public event Action<Vector2, Item> OnStartDrag = delegate { };
-
-    public VisualElement PivotElement
-    {
-        get
-        {
-            return this.Q("item-pivot");
-        }
-    }
 
     public Slot CurrentSlot { 
         get { return _currentSlot; } 
@@ -64,8 +58,9 @@ public partial class Item : VisualElement
 
             BaseSprite = type.Sprite;
             Dimensions = type.Dimensions;
+            Shape = type.Shape;
 
-            ConstructItem(type);
+            ConstructItem();
         }
 
         schedule.Execute(() =>
@@ -97,7 +92,7 @@ public partial class Item : VisualElement
     /// Builds out the item in multiple, sliced tiles
     /// </summary>
     /// <param name="type">The type of item to build</param>
-    void ConstructItem(ItemInfo type)
+    void ConstructItem()
     {
         // How big each individual tile should be
         float tileWidth = InventoryController.Instance.SlotSize.x ;
@@ -112,7 +107,7 @@ public partial class Item : VisualElement
             for (int col = 0; col < Dimensions.x; col++)
             {
                 // Empty parts of the shape don't get "made"
-                if (type.Shape[row][col] == 0)
+                if (Shape[row][col] == 0)
                 {
                     continue;
                 }
@@ -120,10 +115,6 @@ public partial class Item : VisualElement
                 VisualElement tile = new VisualElement();
 
                 tile.AddToClassList("item-tile");
-                if (type.Shape[row][col] == 2)
-                {
-                    tile.AddToClassList("item-pivot");
-                }
 
                 tile.style.width = tileWidth;
                 tile.style.height = tileHeight;
@@ -188,5 +179,37 @@ public partial class Item : VisualElement
     void SetScale(Vector2 scale)
     {
         style.scale = new StyleScale(scale);
+    }
+
+
+    /// <summary>
+    /// Places the dragged item into a slot
+    /// </summary>
+    /// <param name="startSlot">The slot that the user places the item in</param>
+    public void Place(Slot startSlot)
+    {
+        RemoveFromHierarchy(); // Remove from accessioning box
+
+        RemoveFromClassList("item");
+        InventoryController.Instance.RemoveItemColor(this);
+
+        AddToClassList("item-slotted");
+
+        style.top = StyleKeyword.Null;
+        style.left = StyleKeyword.Null;
+        style.opacity = StyleKeyword.Null;
+
+        for (int row = 0; row < Dimensions.y; row++)
+        {
+            for (int col = 0; col < Dimensions.x; col++)
+            {
+                if (Shape[row][col] == 0)
+                {
+                    continue;
+                }
+            }
+        }
+
+        CurrentSlot = startSlot;
     }
 }
