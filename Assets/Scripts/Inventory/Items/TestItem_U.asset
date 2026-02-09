@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: TestItem_U
   m_EditorClassIdentifier: 
   _activeTiles:
-  - 2, 0, 1
+  - 1, 0, 1
   - 1, 1, 1
   Name: L
   Description: This is a test of an L-shaped item
