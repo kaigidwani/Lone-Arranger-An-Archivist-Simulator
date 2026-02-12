@@ -76,9 +76,10 @@ public class InventoryController : MonoBehaviour
     /// <param name="pos">The position to draw the icon</param>
     static void SetGhostIconPosition(Vector2 pos)
     {
-        //Debug.Log("item size" + new Vector2(_draggedItem.ItemSize.x, _draggedItem.ItemSize.y));
-        _ghostIcon.style.left = pos.x - _draggedItem.resolvedStyle.width / 2;
-        _ghostIcon.style.top = pos.y - _draggedItem.resolvedStyle.height / 2;
+        Vector2 itemPivotCenter = _draggedItem.Pivot.worldBound.center - _draggedItem.worldBound.position;
+
+        _ghostIcon.style.left = pos.x - itemPivotCenter.x;
+        _ghostIcon.style.top = pos.y - itemPivotCenter.y;
     }
 
     /// <summary>
@@ -108,19 +109,18 @@ public class InventoryController : MonoBehaviour
         _ghostIcon.style.top = item.resolvedStyle.top;
         _ghostIcon.style.left = item.resolvedStyle.left;
 
-        foreach (VisualElement tile in item.Children())
+        foreach (VisualElement tile in _draggedItem.Children())
         {
             Rect r = tile.worldBound;
             if (r.Contains(pos))
             {
                 tile.AddToClassList("pivot");
                 _draggedItem.Pivot = tile;
-                
+
             }
         }
 
-        Debug.Log(_draggedItem.Pivot.resolvedStyle.top);
-        SetGhostIconPosition(pos - _draggedItem.Pivot.worldBound.position);
+        SetGhostIconPosition(pos);
     }
 
     /// <summary>
@@ -131,7 +131,7 @@ public class InventoryController : MonoBehaviour
         if (!_isDragging) return;
 
         //Debug.Log(_draggedItem.Pivot);
-        SetGhostIconPosition((Vector2)evt.position - _draggedItem.Pivot.worldBound.position);
+        SetGhostIconPosition(evt.position);
     }
 
     /// <summary>
