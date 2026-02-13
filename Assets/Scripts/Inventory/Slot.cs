@@ -7,17 +7,36 @@ using UnityEngine.UIElements;
 [UxmlElement]
 public partial class Slot : VisualElement
 {
+    // Fields
+
+    private string _color;
+
     // Properties
 
     public Item ItemRef;
-
-    public string Color;
 
     public bool IsFree { get { return ItemRef == null; } }
 
     public Slot()
     {
+        RegisterCallback<GeometryChangedEvent>(evt =>
+        {
+            _color = GetColor();
+        });
+
         
+        RegisterCallback<MouseEnterEvent>(OnHover);
+        RegisterCallback<MouseLeaveEvent>(OnHoverExit);
+    }
+
+    void OnHover(MouseEnterEvent evt)
+    {
+        AddToClassList("hover");
+    }
+
+    void OnHoverExit(MouseLeaveEvent evt)
+    {
+        RemoveFromClassList("hover");
     }
 
     /// <summary>
@@ -27,19 +46,13 @@ public partial class Slot : VisualElement
     public void SetItem(Item item)
     {
         ItemRef = item;
-
-        Color = GetColor();
-        if (!string.IsNullOrEmpty(Color))
-        {
-            item.AddToClassList($"item-{Color}");
-        }
     }
 
     /// <summary>
     /// Finds the color of this slot via its classlist
     /// </summary>
     /// <returns>A string containing the color of this slot</returns>
-    private string GetColor()
+    public string GetColor()
     {
         foreach (string className in GetClasses())
         {
@@ -56,7 +69,7 @@ public partial class Slot : VisualElement
     /// <summary>
     /// Removes this slot's item reference
     /// </summary>
-    public void ClearItems()
+    public void ClearItem()
     {
         ItemRef = null;
     }

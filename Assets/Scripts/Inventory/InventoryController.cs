@@ -1,13 +1,10 @@
+using System;
+using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UIElements;
-using System.Collections.Generic;
-using System.Linq;
-using System;
-using Random = UnityEngine.Random;
-using Unity.VisualScripting;
-using static UnityEngine.Rendering.DebugUI.Table;
 using static UnityEditor.Progress;
-using UnityEditor.UIElements;
+
 
 public class InventoryController : MonoBehaviour
 {
@@ -15,30 +12,33 @@ public class InventoryController : MonoBehaviour
 
     [SerializeField] private List<Button> _debugButtons;
     private VisualElement _root;
-    private static VisualElement _ghostIcon;
+    private static GhostIcon _ghostIcon;
 
     private static bool _isDragging;
     private static Item _draggedItem;
 
     // Properties
+    public int Width = 6;
+    public int Height = 6;
 
     public static InventoryController Instance;
 
-    public int[] InventorySize;
-    public List<Slot> Slots;
+    public Slot[][] Grid;
+
     public Vector2 SlotSize
     {
         get {
+            
             return new Vector2(
-                Slots[0].resolvedStyle.width,
-                Slots[0].resolvedStyle.height
+                Grid[0][0].resolvedStyle.width,
+                Grid[0][0].resolvedStyle.height
 
             );
         }
     }
 
     public List<Item> Items;
-    public ItemInfo[] ItemPool;
+    public PlaceableItemSO[] ItemPool;
 
     public event Action<Item> OnDrop;
 
@@ -58,29 +58,39 @@ public class InventoryController : MonoBehaviour
 
     void Start()
     {
-        InventorySize = new int[2] { 6, 6 };
-
         _root = GetComponent<UIDocument>().rootVisualElement;
         _root.RegisterCallback<PointerMoveEvent>(OnPointerMove);
         _root.RegisterCallback<PointerUpEvent>(OnPointerUp);
 
         Items = new List<Item>();
-        Slots = _root.Q("Inventory").Query<Slot>().ToList();
-        
-        _ghostIcon = _root.Q("GhostIcon");
+
+        int row = 0;
+        int col = 0;
+        List<Slot> slotList = _root.Query<Slot>().ToList();
+        Grid = new Slot[Height][];
+        foreach (Slot slot in slotList)
+        {
+            if (Grid[row] == null)
+            {
+                Grid[row] = new Slot[Width];
+            }
+
+            Debug.Log($"row: {row}, col: {col}");
+            Grid[row][col] = slot;
+            
+            col++;
+            if (col == Width)
+            {
+                row++;
+                col = 0;
+            }
+        }
+
+        _ghostIcon = _root.Q<GhostIcon>();
+        Debug.Log(_ghostIcon);
     }
 
-    /// <summary>
-    /// Centers the ghost icon on the given position
-    /// </summary>
-    /// <param name="pos">The position to draw the icon</param>
-    static void SetGhostIconPosition(Vector2 pos)
-    {
-        Vector2 itemPivotCenter = _draggedItem.Pivot.worldBound.center - _draggedItem.worldBound.position;
-
-        _ghostIcon.style.left = pos.x - itemPivotCenter.x;
-        _ghostIcon.style.top = pos.y - itemPivotCenter.y;
-    }
+    
 
     /// <summary>
     /// Toggles visibility of ghost icon on click
@@ -94,20 +104,10 @@ public class InventoryController : MonoBehaviour
 
         if (_draggedItem.CurrentSlot != null)
         {
-            _draggedItem.CurrentSlot.ClearItems();
+            _draggedItem.CurrentSlot.ClearItem();
         }
 
         _draggedItem.style.visibility = Visibility.Hidden;
-        _ghostIcon.style.visibility = Visibility.Visible;
- 
-        RemoveItemColor(_ghostIcon);
-
-        // Copy the item's properties
-        _ghostIcon.style.backgroundImage = item.BaseSprite.texture;
-        _ghostIcon.style.width = item.resolvedStyle.width;
-        _ghostIcon.style.height = item.resolvedStyle.height;
-        _ghostIcon.style.top = item.resolvedStyle.top;
-        _ghostIcon.style.left = item.resolvedStyle.left;
 
         foreach (VisualElement tile in _draggedItem.Children())
         {
@@ -120,7 +120,10 @@ public class InventoryController : MonoBehaviour
             }
         }
 
-        SetGhostIconPosition(pos);
+        Vector2 itemPivotCenter = _draggedItem.Pivot.worldBound.center - _draggedItem.worldBound.position;
+
+        _ghostIcon.SetIcon(item);
+        _ghostIcon.SetPosition(pos - itemPivotCenter);
     }
 
     /// <summary>
@@ -131,7 +134,7 @@ public class InventoryController : MonoBehaviour
         if (!_isDragging) return;
 
         //Debug.Log(_draggedItem.Pivot);
-        SetGhostIconPosition(evt.position);
+        _ghostIcon.SetPosition(evt.position);
     }
 
     /// <summary>
@@ -149,16 +152,14 @@ public class InventoryController : MonoBehaviour
             _draggedItem.Pivot = null;
         }
         
-
         _draggedItem.style.visibility = Visibility.Visible;
-        _ghostIcon.style.visibility = Visibility.Hidden;
 
         OnDrop?.Invoke(_draggedItem);
     
         // Find slot under mouse
         Vector2 mousePos = evt.position;
 
-        Slot hoveredSlot = GetHoveredVisualElement(mousePos);
+        Slot hoveredSlot = _root.Q<Slot>("hover");
         if (hoveredSlot != null && CanPlace(hoveredSlot))
         {
             _draggedItem.Place(hoveredSlot);
@@ -168,34 +169,8 @@ public class InventoryController : MonoBehaviour
             _draggedItem.Place(_draggedItem.CurrentSlot);
         }
 
-        // Change ghost icon's color to match item's
-        foreach (string className in _draggedItem.GetClasses())
-        {
-            if (className.StartsWith("item-"))
-            {
-                _ghostIcon.AddToClassList(className);
-            }
-        }
+        _ghostIcon.RefreshVisual();
     } 
-
-    /// <summary>
-    /// Finds a slot, if any, that the user is hovering over
-    /// </summary>
-    /// <param name="pos">Position of the mouse</param>
-    /// <returns>The slot that the user is hovering over</returns>
-    private Slot GetHoveredVisualElement(Vector2 pos)
-    {
-        foreach (Slot slot in Slots)
-        {
-            Rect r = slot.worldBound;
-            if (r.Contains(pos))
-            {
-                return slot;
-            }
-        }
-
-        return null;
-    }
 
     /// <summary>
     /// Determines whether the slot the user places the item is valid
@@ -207,19 +182,5 @@ public class InventoryController : MonoBehaviour
         return slot.IsFree;
     }
 
-    //private bool 
-
-    public void RemoveItemColor(VisualElement elem)
-    {
-        string prevColor = "";
-        foreach (string className in elem.GetClasses())
-        {
-            if (className.StartsWith("item-"))
-            {
-                prevColor = className;
-            }
-        }
-
-        elem.RemoveFromClassList(prevColor);
-    }
+    
 }

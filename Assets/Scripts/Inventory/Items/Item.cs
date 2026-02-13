@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using static UnityEditor.PlayerSettings;
 using static UnityEditor.Progress;
 using Random = UnityEngine.Random;
+using UnityEngine.Tilemaps;
 
 [UxmlElement]
 public partial class Item : VisualElement
@@ -21,6 +22,7 @@ public partial class Item : VisualElement
     public Sprite BaseSprite;
     public Vector2 Dimensions;
     public int[][] Shape;
+    public List<ItemTile> Tiles;
     public event Action<Vector2, Item> OnStartDrag = delegate { };
 
     public Slot CurrentSlot { 
@@ -37,44 +39,8 @@ public partial class Item : VisualElement
     {
         _currentSlot = null;
         RegisterCallback<PointerDownEvent>(OnPointerDown);
-        RegisterCallback<MouseOverEvent>(OnHover);
+        RegisterCallback<MouseEnterEvent>(OnHover);
         RegisterCallback<MouseLeaveEvent>(OnHoverExit);
-    }
-
-    /// <summary>
-    /// Generates a random item inside of the accessioning box
-    /// </summary>
-    /// <param name="box">The element where this item will spawn</param>
-    public void Spawn(Accessioning box)
-    {
-        AddToClassList("item");
-
-        // Generate random item from current item pool
-        ItemInfo type = null;
-        if (InventoryController.Instance.ItemPool.Length > 0)
-        {
-            Debug.Log("items in rotation: " + InventoryController.Instance.ItemPool.Length);
-            type = InventoryController.Instance.ItemPool[Random.Range(0, InventoryController.Instance.ItemPool.Length)];
-
-            BaseSprite = type.Sprite;
-            Dimensions = type.Dimensions;
-            Shape = type.Shape;
-
-            ConstructItem();
-        }
-
-        schedule.Execute(() =>
-        {
-            float x = Random.Range(box.Min.x, box.Max.x - resolvedStyle.width);
-            float y = Random.Range(box.Min.y, box.Max.y - resolvedStyle.height);
-
-            style.left = x;
-            style.top = y;
-            style.opacity = 100;
-        });
-
-        OnStartDrag += InventoryController.Instance.OnPointerDown;
-
     }
 
     /// <summary>
@@ -84,69 +50,16 @@ public partial class Item : VisualElement
     {
         if (evt.button != 0 || !_isHovering) return;
 
+        ResetTileColors();
         OnStartDrag.Invoke(evt.position, this);
         evt.StopPropagation();
-    }
-
-    /// <summary>
-    /// Builds out the item in multiple, sliced tiles
-    /// </summary>
-    /// <param name="type">The type of item to build</param>
-    void ConstructItem()
-    {
-        // How big each individual tile should be
-        float tileWidth = InventoryController.Instance.SlotSize.x ;
-        float tileHeight = InventoryController.Instance.SlotSize.y ;
-
-        // Parent container should be as big as the item is (totally)
-        style.width = Dimensions.x * tileWidth;
-        style.height = Dimensions.y * tileHeight;
-
-        for (int row = 0; row < Dimensions.y; row++)
-        {
-            for (int col = 0; col < Dimensions.x; col++)
-            {
-                // Empty parts of the shape don't get "made"
-                if (Shape[row][col] == 0)
-                {
-                    continue;
-                }
-                
-                VisualElement tile = new VisualElement();
-
-                tile.AddToClassList("item-tile");
-
-                tile.style.width = tileWidth;
-                tile.style.height = tileHeight;
-                tile.style.left = col * tileWidth;
-                tile.style.top = row * tileHeight;
-                tile.style.backgroundImage = BaseSprite.texture; // They all use different parts of the same image
-
-                // Makes each item based on a constant size
-                tile.style.backgroundSize = new BackgroundSize(
-                    new Length(Dimensions.x * 100, LengthUnit.Percent),
-                    new Length(Dimensions.y * 100, LengthUnit.Percent)
-                );
-
-                // Offset contents of tile to slice the image
-                tile.style.backgroundPositionX = new BackgroundPosition(
-                    BackgroundPositionKeyword.Left, -col * tileWidth
-                );
-
-                tile.style.backgroundPositionY = new BackgroundPosition(
-                    BackgroundPositionKeyword.Top, -row * tileHeight
-                );
-
-                Add(tile);
-            }
-        }
     }
 
     /// <summary>
     /// Handles transformations when the user hovers over this item
     /// </summary>
     /// <param name="evt">Mouse over event</param>
-    void OnHover(MouseOverEvent evt)
+    void OnHover(MouseEnterEvent evt)
     {
         foreach (VisualElement elem in Children())
         {
@@ -176,6 +89,99 @@ public partial class Item : VisualElement
         _isHovering = false;
     }
 
+    /// <summary>
+    /// Generates a random item inside of the accessioning box
+    /// </summary>
+    /// <param name="box">The element where this item will spawn</param>
+    public void Spawn(Accessioning box)
+    {
+        AddToClassList("item");
+
+        // Generate random item from current item pool
+        PlaceableItemSO type = null;
+        if (InventoryController.Instance.ItemPool.Length > 0)
+        {
+            Debug.Log("items in rotation: " + InventoryController.Instance.ItemPool.Length);
+            type = InventoryController.Instance.ItemPool[Random.Range(0, InventoryController.Instance.ItemPool.Length)];
+
+            BaseSprite = type.Sprite;
+            Dimensions = type.Dimensions;
+            Shape = type.Shape;
+
+            ConstructItem();
+        }
+
+        schedule.Execute(() =>
+        {
+            float x = Random.Range(box.Min.x, box.Max.x - resolvedStyle.width);
+            float y = Random.Range(box.Min.y, box.Max.y - resolvedStyle.height);
+
+            style.left = x;
+            style.top = y;
+            style.opacity = 100;
+        });
+
+        OnStartDrag += InventoryController.Instance.OnPointerDown;
+
+    }
+
+    /// <summary>
+    /// Builds out the item in multiple, sliced tiles
+    /// </summary>
+    /// <param name="type">The type of item to build</param>
+    void ConstructItem()
+    {
+        // How big each individual tile should be
+        float tileWidth = InventoryController.Instance.SlotSize.x ;
+        float tileHeight = InventoryController.Instance.SlotSize.y ;
+
+        // Parent container should be as big as the item is (totally)
+        style.width = Dimensions.x * tileWidth;
+        style.height = Dimensions.y * tileHeight;
+
+        Tiles = new List<ItemTile>();
+        for (int row = 0; row < Dimensions.y; row++)
+        {
+            for (int col = 0; col < Dimensions.x; col++)
+            {
+                // Empty parts of the shape don't get "made"
+                if (Shape[row][col] == 0)
+                {
+                    continue;
+                }
+                
+                ItemTile tile = new ItemTile();
+                tile.SetGridIndex(row, col);
+
+                tile.AddToClassList("item-tile");
+
+                tile.style.width = tileWidth;
+                tile.style.height = tileHeight;
+                tile.style.left = col * tileWidth;
+                tile.style.top = row * tileHeight;
+                tile.style.backgroundImage = BaseSprite.texture; // They all use different parts of the same image
+
+                // Makes each item based on a constant size
+                tile.style.backgroundSize = new BackgroundSize(
+                    new Length(Dimensions.x * 100, LengthUnit.Percent),
+                    new Length(Dimensions.y * 100, LengthUnit.Percent)
+                );
+
+                // Offset contents of tile to slice the image
+                tile.style.backgroundPositionX = new BackgroundPosition(
+                    BackgroundPositionKeyword.Left, -col * tileWidth
+                );
+
+                tile.style.backgroundPositionY = new BackgroundPosition(
+                    BackgroundPositionKeyword.Top, -row * tileHeight
+                );
+
+                Add(tile);
+                Tiles.Add(tile);
+            }
+        }
+    }
+
     void SetScale(Vector2 scale)
     {
         style.scale = new StyleScale(scale);
@@ -189,9 +195,7 @@ public partial class Item : VisualElement
     public void Place(Slot startSlot)
     {
         RemoveFromHierarchy(); // Remove from accessioning box
-
         RemoveFromClassList("item");
-        InventoryController.Instance.RemoveItemColor(this);
 
         AddToClassList("item-slotted");
 
@@ -211,5 +215,22 @@ public partial class Item : VisualElement
         }
 
         CurrentSlot = startSlot;
+        SetTileColors();
+    }
+
+    public void SetTileColors()
+    {
+        foreach (ItemTile tile in Tiles)
+        {
+            tile.SetColor();
+        }
+    }
+
+    private void ResetTileColors()
+    {
+        foreach (ItemTile tile in Tiles)
+        {
+            tile.RemoveColor();
+        }
     }
 }

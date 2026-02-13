@@ -48,6 +48,9 @@
     background-color: rgba(0, 32, 108, 0.55);
 }
 
+.inventory-slot-default {
+}
+
 .debug-bttn {
     width: 350px;
     height: 150px;
@@ -90,6 +93,11 @@
     transition-duration: 0.5s;
 }
 
+.item-default {
+    transition-property: -unity-background-image-tint-color;
+    transition-duration: 0.5s;
+}
+
 .item-slotted {
     position: absolute;
     scale: 1 1;
@@ -99,16 +107,6 @@
     background-size: cover;
     position: absolute;
     align-self: center;
-}
-
-.ghost-icon {
-    flex-grow: 0;
-    flex-shrink: 0;
-    visibility: hidden;
-    position: absolute;
-    align-self: center;
-    align-items: auto;
-    opacity: 0.8;
 }
 
 .accessioning-box {
@@ -144,4 +142,19 @@
     align-content: flex-start;
     justify-content: flex-start;
     align-self: auto;
+}
+
+.ghost-icon {
+    flex-grow: 0;
+    flex-shrink: 0;
+    visibility: visible;
+    position: absolute;
+    align-self: center;
+    align-items: auto;
+    opacity: 0.8;
+}
+
+.ghost-icon-visual {
+    background-size: cover;
+    position: absolute;
 }

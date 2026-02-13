@@ -3,7 +3,7 @@ using UnityEngine;
 using System.Collections.Generic;
 
 [CreateAssetMenu(fileName = "New Item", menuName = "Scriptable Objects/Item")]
-public class ItemInfo : ScriptableObject
+public class PlaceableItemSO : ScriptableObject
 {
     // Fields
     [SerializeField] private string[] _activeTiles;
