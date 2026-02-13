@@ -93,11 +93,8 @@
 }
 
 .accessioning-box {
-    width: 30%;
-    height: 85%;
+    height: 87%;
     flex-shrink: 0;
-    transform-origin: top;
-    translate: 0 0;
     background-color: rgb(156, 116, 61);
     border-top-left-radius: 20px;
     border-top-right-radius: 20px;
@@ -111,8 +108,19 @@
     border-right-color: rgb(0, 0, 0);
     border-top-color: rgb(0, 0, 0);
     border-bottom-color: rgb(0, 0, 0);
+    align-self: center;
+    flex-direction: row-reverse;
+    width: 67%;
+}
+
+.accessioning-column {
+    width: 30%;
+    height: 85%;
+    flex-shrink: 0;
     margin-top: 3%;
     align-self: center;
+    flex-direction: row-reverse;
+    transform-origin: top;
 }
 
 .top-bar-element {
