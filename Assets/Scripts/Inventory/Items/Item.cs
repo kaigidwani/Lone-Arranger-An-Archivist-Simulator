@@ -1,6 +1,7 @@
 using System;
 using UnityEngine;
 using UnityEngine.UIElements;
+using static UnityEditor.Progress;
 using Random = UnityEngine.Random;
 
 [UxmlElement]
@@ -9,16 +10,31 @@ public partial class Item : VisualElement
     // Fields
 
     private ItemInfo _itemInfo;
+    private Slot _currentSlot;
 
     // Properties
 
     public Sprite BaseSprite;
     public Vector2 Dimensions;
+    public Vector2 ItemSize;
     public event Action<Vector2, Item> OnStartDrag = delegate { };
+
+    /// <summary>
+    /// 
+    /// </summary>
+    public Slot CurrentSlot { 
+        get { return _currentSlot; } 
+        set
+        {
+            _currentSlot = value;
+            _currentSlot.Add(this);
+            _currentSlot.SetItem(this);
+        }
+    }
 
     public Item()
     {
-        AddToClassList("item");
+        _currentSlot = null;
         RegisterCallback<PointerDownEvent>(OnPointerDown);
     }
 
@@ -28,6 +44,7 @@ public partial class Item : VisualElement
     /// <param name="box">The element where this item will spawn</param>
     public void Spawn(Accessioning box)
     {
+        AddToClassList("item");
 
         // Generate random item from current item pool
         ItemInfo type = null;
@@ -44,11 +61,15 @@ public partial class Item : VisualElement
 
         schedule.Execute(() =>
         {
-
-            float x = Random.Range(box.Min.x, box.Max.x - resolvedStyle.width);
-            float y = Random.Range(box.Min.y, box.Max.y - resolvedStyle.height);
-
             // USS properties
+            ItemSize.x = InventoryController.Instance.Slots[0].resolvedStyle.width * 0.8f;
+            ItemSize.y = InventoryController.Instance.Slots[0].resolvedStyle.height * 0.8f;
+            style.width = ItemSize.x;
+            style.height = ItemSize.y;
+
+            float x = Random.Range(box.Min.x, box.Max.x - ItemSize.x);
+            float y = Random.Range(box.Min.y, box.Max.y - ItemSize.y);
+
             style.left = x;
             style.top = y;
             style.opacity = 100;
