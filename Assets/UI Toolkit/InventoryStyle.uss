@@ -25,7 +25,7 @@
     align-items: flex-start;
     justify-content: center;
     align-self: center;
-    align-content: flex-start;
+    align-content: center;
 }
 
 .inventory-slot:hover {
@@ -156,5 +156,15 @@
 
 .ghost-icon-visual {
     background-size: cover;
+    position: relative;
+}
+
+.slot-hover {
+}
+
+.debug-text {
     position: absolute;
+    top: auto;
+    align-self: center;
+    color: rgb(238, 238, 238);
 }

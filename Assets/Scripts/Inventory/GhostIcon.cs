@@ -1,11 +1,15 @@
 using UnityEngine;
+using UnityEngine.InputSystem;
 using UnityEngine.UIElements;
 using static UnityEditor.Progress;
+using static UnityEditor.Rendering.FilterWindow;
+using static UnityEngine.GraphicsBuffer;
 
 [UxmlElement]
 public partial class GhostIcon : VisualElement
 {
     private VisualElement _icon;
+    private Item _draggedItem;
 
     public GhostIcon()
     {
@@ -19,21 +23,28 @@ public partial class GhostIcon : VisualElement
             _icon.RemoveFromHierarchy();
             _icon = null;
         }
+
+        if (_draggedItem != null)
+        {
+            _draggedItem = null;
+        }
+
+        style.left = 0;
+        style.top = 0;
+        style.width = 0;
+        style.height = 0;
     }
 
     public void SetIcon(Item item)
     {
+        _draggedItem = item;
         style.width = item.resolvedStyle.width;
         style.height = item.resolvedStyle.height;
-        style.top = item.resolvedStyle.top;
-        style.left = item.resolvedStyle.left;
 
         _icon = new VisualElement();
         _icon.AddToClassList("ghost-icon-visual");
         _icon.style.width = item.resolvedStyle.width;
         _icon.style.height = item.resolvedStyle.height;
-        //_icon.style.top = item.resolvedStyle.top;
-        //_icon.style.left = item.resolvedStyle.left;
         _icon.style.backgroundImage = item.BaseSprite.texture;
         
         // Change ghost icon's color to match item's
@@ -51,10 +62,26 @@ public partial class GhostIcon : VisualElement
     /// <summary>
     /// Centers the ghost icon on the given position
     /// </summary>
-    /// <param name="pos">The position to draw the icon</param>
-    public void SetPosition(Vector2 pos)
+    public void SetToMousePosition()
     {
-        _icon.style.left = pos.x;
-        _icon.style.top = pos.y;
+
+        if (_draggedItem == null || _draggedItem.Pivot == null)
+        {
+            return;
+        }
+
+        Vector2 mouseScreen = Mouse.current.position.ReadValue();
+        Vector2 mousePanel = UIHelpers.WorldToLocalUIPosition(panel, mouseScreen);
+
+        float tileWidth = _draggedItem.Pivot.resolvedStyle.width;
+        float tileHeight = _draggedItem.Pivot.resolvedStyle.height;
+
+        float pivotOffsetX = tileWidth * _draggedItem.Pivot.Index.x;
+        float pivotOffsetY = tileHeight * _draggedItem.Pivot.Index.y;
+        Debug.Log(_draggedItem.Pivot.Index);
+
+        style.left = mousePanel.x - pivotOffsetX - tileWidth * 0.5f;
+        style.top = mousePanel.y - pivotOffsetY - tileHeight * 0.5f;
+
     }
 }

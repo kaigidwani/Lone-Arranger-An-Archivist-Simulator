@@ -71,10 +71,8 @@ public partial class Accessioning : VisualElement
     /// Adds a number of randomly generated items inside this box
     /// </summary>
     /// <param name="count">Number of items to spawn</param>
-    public void SpawnItems(int count = 10)
+    public void SpawnItems(int count = 5)
     {
-        Debug.Log("adding items");
-
         for (int i = 0; i < count; i++)
         {
             Item item = new Item();
@@ -83,7 +81,5 @@ public partial class Accessioning : VisualElement
             InventoryController.Instance.Items.Add(item);
             Add(item);
         }
-
-        Debug.Log("box full");
     }
 }

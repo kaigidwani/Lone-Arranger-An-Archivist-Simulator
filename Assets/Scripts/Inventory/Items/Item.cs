@@ -7,6 +7,7 @@ using static UnityEditor.PlayerSettings;
 using static UnityEditor.Progress;
 using Random = UnityEngine.Random;
 using UnityEngine.Tilemaps;
+using UnityEngine.WSA;
 
 [UxmlElement]
 public partial class Item : VisualElement
@@ -17,7 +18,7 @@ public partial class Item : VisualElement
     private bool _isHovering;
 
     // Properties
-    public VisualElement Pivot { get; set; }
+    public ItemTile Pivot { get; private set; }
 
     public Sprite BaseSprite;
     public Vector2 Dimensions;
@@ -101,7 +102,7 @@ public partial class Item : VisualElement
         PlaceableItemSO type = null;
         if (InventoryController.Instance.ItemPool.Length > 0)
         {
-            Debug.Log("items in rotation: " + InventoryController.Instance.ItemPool.Length);
+            //sDebug.Log("items in rotation: " + InventoryController.Instance.ItemPool.Length);
             type = InventoryController.Instance.ItemPool[Random.Range(0, InventoryController.Instance.ItemPool.Length)];
 
             BaseSprite = type.Sprite;
@@ -151,7 +152,9 @@ public partial class Item : VisualElement
                 }
                 
                 ItemTile tile = new ItemTile();
-                tile.SetGridIndex(row, col);
+                tile.SetParent(this);
+                tile.SetGridIndex(col, row);
+                
 
                 tile.AddToClassList("item-tile");
 
@@ -203,19 +206,40 @@ public partial class Item : VisualElement
         style.left = StyleKeyword.Null;
         style.opacity = StyleKeyword.Null;
 
-        for (int row = 0; row < Dimensions.y; row++)
-        {
-            for (int col = 0; col < Dimensions.x; col++)
-            {
-                if (Shape[row][col] == 0)
-                {
-                    continue;
-                }
-            }
-        }
+        Vector2Int start = InventoryController.Instance.GetSlotIndex(startSlot);
+        Vector2Int pivot = Pivot.Index;
 
         CurrentSlot = startSlot;
+
+        foreach (ItemTile tile in Tiles)
+        {
+            Vector2Int t = tile.Index;
+
+            int gridRow = start.y + (t.y - pivot.y);
+            int gridCol = start.x + (t.x - pivot.x);
+
+            Slot slot = InventoryController.Instance.Grid[gridRow][gridCol];
+            slot.SetItem(this);
+
+            tile.SetGridIndex(gridCol, gridRow);
+        }
+
+        //SendToBack();
         SetTileColors();
+    }
+
+    public void SetPivot(ItemTile tile)
+    {
+        tile.AddToClassList("pivot");
+        Pivot = tile;
+        
+    }
+
+    public void ResetPivot()
+    {
+        Pivot.RemoveFromClassList("pivot");
+        Pivot = null;
+        
     }
 
     public void SetTileColors()

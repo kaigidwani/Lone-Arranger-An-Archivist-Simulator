@@ -2,22 +2,25 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.InputSystem;
 using UnityEngine.UIElements;
 using static UnityEditor.Progress;
+using Cursor = UnityEngine.Cursor;
 
 
 public class InventoryController : MonoBehaviour
 {
     // Fields
-
-    [SerializeField] private List<Button> _debugButtons;
     private VisualElement _root;
+    List<Slot> _slotList;
+
     private static GhostIcon _ghostIcon;
 
     private static bool _isDragging;
     private static Item _draggedItem;
 
     // Properties
+    
     public int Width = 6;
     public int Height = 6;
 
@@ -66,16 +69,16 @@ public class InventoryController : MonoBehaviour
 
         int row = 0;
         int col = 0;
-        List<Slot> slotList = _root.Query<Slot>().ToList();
+        _slotList = _root.Query<Slot>().ToList();
         Grid = new Slot[Height][];
-        foreach (Slot slot in slotList)
+        foreach (Slot slot in _slotList)
         {
             if (Grid[row] == null)
             {
                 Grid[row] = new Slot[Width];
             }
 
-            Debug.Log($"row: {row}, col: {col}");
+            //Debug.Log($"row: {row}, col: {col}");
             Grid[row][col] = slot;
             
             col++;
@@ -87,7 +90,6 @@ public class InventoryController : MonoBehaviour
         }
 
         _ghostIcon = _root.Q<GhostIcon>();
-        Debug.Log(_ghostIcon);
     }
 
     
@@ -107,23 +109,27 @@ public class InventoryController : MonoBehaviour
             _draggedItem.CurrentSlot.ClearItem();
         }
 
+        Cursor.visible = false;
+
         _draggedItem.style.visibility = Visibility.Hidden;
 
-        foreach (VisualElement tile in _draggedItem.Children())
+        foreach (ItemTile tile in _draggedItem.Tiles)
         {
             Rect r = tile.worldBound;
             if (r.Contains(pos))
             {
-                tile.AddToClassList("pivot");
-                _draggedItem.Pivot = tile;
+                if (_draggedItem.Pivot != null)
+                {
+                    _draggedItem.ResetPivot();
+                }
+                
+                _draggedItem.SetPivot(tile);
 
             }
         }
 
-        Vector2 itemPivotCenter = _draggedItem.Pivot.worldBound.center - _draggedItem.worldBound.position;
-
         _ghostIcon.SetIcon(item);
-        _ghostIcon.SetPosition(pos - itemPivotCenter);
+        _ghostIcon.SetToMousePosition();
     }
 
     /// <summary>
@@ -133,8 +139,7 @@ public class InventoryController : MonoBehaviour
     {
         if (!_isDragging) return;
 
-        //Debug.Log(_draggedItem.Pivot);
-        _ghostIcon.SetPosition(evt.position);
+        _ghostIcon.SetToMousePosition();
     }
 
     /// <summary>
@@ -146,10 +151,11 @@ public class InventoryController : MonoBehaviour
 
         _isDragging = false;
 
+        Cursor.visible = true;
+
         if (_draggedItem.Pivot != null)
         {
-            _draggedItem.RemoveFromClassList("pivot");
-            _draggedItem.Pivot = null;
+            _draggedItem.ResetPivot();
         }
         
         _draggedItem.style.visibility = Visibility.Visible;
@@ -159,14 +165,30 @@ public class InventoryController : MonoBehaviour
         // Find slot under mouse
         Vector2 mousePos = evt.position;
 
-        Slot hoveredSlot = _root.Q<Slot>("hover");
+        Slot hoveredSlot = null;
+
+        foreach (Slot s in _slotList) 
+        {
+            Rect r = s.worldBound;
+            if (r.Contains(mousePos))
+            {
+                hoveredSlot = s;
+            }
+        }
+        
         if (hoveredSlot != null && CanPlace(hoveredSlot))
         {
+            //Debug.Log("placed");
             _draggedItem.Place(hoveredSlot);
         }
         else if (_draggedItem.CurrentSlot != null)
         {
+            
             _draggedItem.Place(_draggedItem.CurrentSlot);
+        }
+        else
+        {
+            //Debug.Log("Error, could not place");
         }
 
         _ghostIcon.RefreshVisual();
@@ -177,9 +199,51 @@ public class InventoryController : MonoBehaviour
     /// </summary>
     /// <param name="slot">The slot the user places the item in</param>
     /// <returns>Whether the item can be placed in the given slot</returns>
-    private bool CanPlace(Slot slot)
+    private bool CanPlace(Slot startSlot)
     {
-        return slot.IsFree;
+        Vector2Int start = GetSlotIndex(startSlot);
+
+        Debug.Log("item pivot: " + _draggedItem.Pivot);
+        Vector2Int pivot = _draggedItem.Pivot.Index;
+
+        foreach (ItemTile tile in _draggedItem.Tiles)
+        {
+            Vector2Int t = tile.Index;
+
+            int gridRow = start.y + (t.y - pivot.y);
+            int gridCol = start.x + (t.x - pivot.x);
+
+            // Bounds logic
+            if (gridRow < 0 || gridRow >= Height ||
+                gridCol < 0 || gridCol >= Width)
+            {
+                return false;
+            }
+
+            // Occupancy logic
+            if (!Grid[gridRow][gridCol].IsFree)
+            {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    public Vector2Int GetSlotIndex(Slot slot)
+    {
+        for (int y = 0; y < Height; y++)
+        {
+            for (int x = 0; x < Width; x++)
+            {
+                if (Grid[y][x] == slot)
+                {
+                    return new Vector2Int(x, y);
+                }
+            }
+        }
+
+        return Vector2Int.zero;
     }
 
     

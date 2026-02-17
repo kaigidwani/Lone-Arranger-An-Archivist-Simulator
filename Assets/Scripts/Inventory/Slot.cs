@@ -1,8 +1,10 @@
 using System;
 using System.Drawing;
 using Unity.VisualScripting;
+using UnityEditor.Search;
 using UnityEngine;
 using UnityEngine.UIElements;
+using static UnityEditor.Progress;
 
 [UxmlElement]
 public partial class Slot : VisualElement
@@ -10,6 +12,7 @@ public partial class Slot : VisualElement
     // Fields
 
     private string _color;
+    private Label _debugLabel;
 
     // Properties
 
@@ -24,19 +27,11 @@ public partial class Slot : VisualElement
             _color = GetColor();
         });
 
-        
-        RegisterCallback<MouseEnterEvent>(OnHover);
-        RegisterCallback<MouseLeaveEvent>(OnHoverExit);
-    }
+        _debugLabel = new Label();
+        _debugLabel.text = "Empty";
+        _debugLabel.AddToClassList("debug-text");
 
-    void OnHover(MouseEnterEvent evt)
-    {
-        AddToClassList("hover");
-    }
-
-    void OnHoverExit(MouseLeaveEvent evt)
-    {
-        RemoveFromClassList("hover");
+        Add(_debugLabel);
     }
 
     /// <summary>
@@ -45,7 +40,10 @@ public partial class Slot : VisualElement
     /// <param name="item">An item that should respond to this slot</param>
     public void SetItem(Item item)
     {
+        Debug.Log(item);
         ItemRef = item;
+        _debugLabel.text = item.name;
+        
     }
 
     /// <summary>
@@ -72,5 +70,6 @@ public partial class Slot : VisualElement
     public void ClearItem()
     {
         ItemRef = null;
+        _debugLabel.text = "Empty";
     }
 }
