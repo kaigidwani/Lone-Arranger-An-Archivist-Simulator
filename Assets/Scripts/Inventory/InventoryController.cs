@@ -12,6 +12,8 @@ public class InventoryController : MonoBehaviour
 {
     // Fields
     private VisualElement _root;
+    private VisualElement _itemContainer;
+
     List<Slot> _slotList;
 
     private static GhostIcon _ghostIcon;
@@ -62,6 +64,8 @@ public class InventoryController : MonoBehaviour
     void Start()
     {
         _root = GetComponent<UIDocument>().rootVisualElement;
+        _itemContainer = _root.Q("ItemLayer");
+
         _root.RegisterCallback<PointerMoveEvent>(OnPointerMove);
         _root.RegisterCallback<PointerUpEvent>(OnPointerUp);
 
@@ -69,6 +73,7 @@ public class InventoryController : MonoBehaviour
 
         int row = 0;
         int col = 0;
+
         _slotList = _root.Query<Slot>().ToList();
         Grid = new Slot[Height][];
         foreach (Slot slot in _slotList)
@@ -89,6 +94,19 @@ public class InventoryController : MonoBehaviour
             }
         }
 
+        Grid[0][0].RegisterCallback<GeometryChangedEvent>((evt) =>
+        {
+            VisualElement slotLayer = _root.Q("SlotLayer");
+
+            _itemContainer.style.width = slotLayer.resolvedStyle.width;
+            _itemContainer.style.height = slotLayer.resolvedStyle.height;
+
+            _itemContainer.style.left = slotLayer.resolvedStyle.left;
+            _itemContainer.style.top = slotLayer.resolvedStyle.top;
+        });
+        
+        
+
         _ghostIcon = _root.Q<GhostIcon>();
     }
 
@@ -104,9 +122,13 @@ public class InventoryController : MonoBehaviour
         _isDragging = true;
         _draggedItem = item;
 
-        if (_draggedItem.CurrentSlot != null)
+        if (_draggedItem.IsPlaced)
         {
-            _draggedItem.CurrentSlot.ClearItem();
+            foreach (ItemTile tile in _draggedItem.Tiles)
+            {
+                tile.ClearGridSlot();
+            }
+            
         }
 
         Cursor.visible = false;
@@ -117,12 +139,7 @@ public class InventoryController : MonoBehaviour
         {
             Rect r = tile.worldBound;
             if (r.Contains(pos))
-            {
-                if (_draggedItem.Pivot != null)
-                {
-                    _draggedItem.ResetPivot();
-                }
-                
+            {                
                 _draggedItem.SetPivot(tile);
 
             }
@@ -152,11 +169,6 @@ public class InventoryController : MonoBehaviour
         _isDragging = false;
 
         Cursor.visible = true;
-
-        if (_draggedItem.Pivot != null)
-        {
-            _draggedItem.ResetPivot();
-        }
         
         _draggedItem.style.visibility = Visibility.Visible;
 
@@ -179,19 +191,20 @@ public class InventoryController : MonoBehaviour
         if (hoveredSlot != null && CanPlace(hoveredSlot))
         {
             //Debug.Log("placed");
-            _draggedItem.Place(hoveredSlot);
+            _draggedItem.Place(_itemContainer, hoveredSlot);
         }
-        else if (_draggedItem.CurrentSlot != null)
+        else if (_draggedItem.IsPlaced)
         {
             
-            _draggedItem.Place(_draggedItem.CurrentSlot);
+            _draggedItem.Place(_itemContainer, _draggedItem.Pivot.GridSlot);
         }
         else
         {
             //Debug.Log("Error, could not place");
         }
 
-        _ghostIcon.RefreshVisual();
+        _ghostIcon.ResetVisual();
+        _draggedItem.ClearPivot();
     } 
 
     /// <summary>
@@ -244,6 +257,11 @@ public class InventoryController : MonoBehaviour
         }
 
         return Vector2Int.zero;
+    }
+
+    public Slot GetSlot(int x, int y)
+    {
+        return Grid[x][y];
     }
 
     

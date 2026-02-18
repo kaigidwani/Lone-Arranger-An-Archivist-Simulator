@@ -16,7 +16,7 @@ public partial class GhostIcon : VisualElement
         AddToClassList("ghost-icon");
     }
 
-    public void RefreshVisual()
+    public void ResetVisual()
     {
         if (_icon != null)
         {

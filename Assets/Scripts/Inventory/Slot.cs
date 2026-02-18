@@ -40,9 +40,9 @@ public partial class Slot : VisualElement
     /// <param name="item">An item that should respond to this slot</param>
     public void SetItem(Item item)
     {
-        Debug.Log(item);
+        Debug.Log(item.Name);
         ItemRef = item;
-        _debugLabel.text = item.name;
+        _debugLabel.text = item.Name;
         
     }
 

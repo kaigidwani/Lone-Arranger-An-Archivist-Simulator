@@ -20,21 +20,14 @@ public partial class Item : VisualElement
     // Properties
     public ItemTile Pivot { get; private set; }
 
+    public bool IsPlaced;
+
+    public string Name;
     public Sprite BaseSprite;
     public Vector2 Dimensions;
     public int[][] Shape;
     public List<ItemTile> Tiles;
     public event Action<Vector2, Item> OnStartDrag = delegate { };
-
-    public Slot CurrentSlot { 
-        get { return _currentSlot; } 
-        set
-        {
-            _currentSlot = value;
-            _currentSlot.Add(this);
-            _currentSlot.SetItem(this);
-        }
-    }
 
     public Item()
     {
@@ -105,6 +98,7 @@ public partial class Item : VisualElement
             //sDebug.Log("items in rotation: " + InventoryController.Instance.ItemPool.Length);
             type = InventoryController.Instance.ItemPool[Random.Range(0, InventoryController.Instance.ItemPool.Length)];
 
+            Name = type.Name;
             BaseSprite = type.Sprite;
             Dimensions = type.Dimensions;
             Shape = type.Shape;
@@ -153,7 +147,7 @@ public partial class Item : VisualElement
                 
                 ItemTile tile = new ItemTile();
                 tile.SetParent(this);
-                tile.SetGridIndex(col, row);
+                tile.SetIndex(col, row);
                 
 
                 tile.AddToClassList("item-tile");
@@ -195,21 +189,22 @@ public partial class Item : VisualElement
     /// Places the dragged item into a slot
     /// </summary>
     /// <param name="startSlot">The slot that the user places the item in</param>
-    public void Place(Slot startSlot)
+    public void Place(VisualElement dest, Slot startSlot)
     {
         RemoveFromHierarchy(); // Remove from accessioning box
+        dest.Add(this);
+        
         RemoveFromClassList("item");
-
         AddToClassList("item-slotted");
 
-        style.top = StyleKeyword.Null;
-        style.left = StyleKeyword.Null;
-        style.opacity = StyleKeyword.Null;
+        float pivotOffsetX = Pivot.Index.x * InventoryController.Instance.SlotSize.x;
+        float pivotOffsetY = Pivot.Index.y * InventoryController.Instance.SlotSize.y;
+
+        style.left = startSlot.resolvedStyle.left - pivotOffsetX;
+        style.top = startSlot.resolvedStyle.top - pivotOffsetY;
 
         Vector2Int start = InventoryController.Instance.GetSlotIndex(startSlot);
         Vector2Int pivot = Pivot.Index;
-
-        CurrentSlot = startSlot;
 
         foreach (ItemTile tile in Tiles)
         {
@@ -218,14 +213,15 @@ public partial class Item : VisualElement
             int gridRow = start.y + (t.y - pivot.y);
             int gridCol = start.x + (t.x - pivot.x);
 
-            Slot slot = InventoryController.Instance.Grid[gridRow][gridCol];
+            Slot slot = InventoryController.Instance.GetSlot(gridRow, gridCol);
             slot.SetItem(this);
 
-            tile.SetGridIndex(gridCol, gridRow);
+            tile.SetGridSlot(gridRow, gridCol);
         }
 
         //SendToBack();
         SetTileColors();
+        IsPlaced = true;
     }
 
     public void SetPivot(ItemTile tile)
@@ -235,11 +231,10 @@ public partial class Item : VisualElement
         
     }
 
-    public void ResetPivot()
+    public void ClearPivot()
     {
         Pivot.RemoveFromClassList("pivot");
         Pivot = null;
-        
     }
 
     public void SetTileColors()

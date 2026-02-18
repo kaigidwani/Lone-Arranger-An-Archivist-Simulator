@@ -149,7 +149,7 @@
     flex-shrink: 0;
     visibility: visible;
     position: absolute;
-    align-self: center;
+    align-self: flex-start;
     align-items: auto;
     opacity: 0.8;
 }
