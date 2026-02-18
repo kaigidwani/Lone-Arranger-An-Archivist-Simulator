@@ -14,13 +14,11 @@ public partial class Item : VisualElement
 {
     // Fields
 
-    private Slot _currentSlot;
-    private bool _isHovering;
-
     // Properties
     public ItemTile Pivot { get; private set; }
 
     public bool IsPlaced;
+    public bool IsHovering;
 
     public string Name;
     public Sprite BaseSprite;
@@ -31,10 +29,8 @@ public partial class Item : VisualElement
 
     public Item()
     {
-        _currentSlot = null;
         RegisterCallback<PointerDownEvent>(OnPointerDown);
-        RegisterCallback<MouseEnterEvent>(OnHover);
-        RegisterCallback<MouseLeaveEvent>(OnHoverExit);
+        
     }
 
     /// <summary>
@@ -42,45 +38,11 @@ public partial class Item : VisualElement
     /// </summary>
     void OnPointerDown(PointerDownEvent evt)
     {
-        if (evt.button != 0 || !_isHovering) return;
+        if (evt.button != 0 || !IsHovering) return;
 
         ResetTileColors();
         OnStartDrag.Invoke(evt.position, this);
         evt.StopPropagation();
-    }
-
-    /// <summary>
-    /// Handles transformations when the user hovers over this item
-    /// </summary>
-    /// <param name="evt">Mouse over event</param>
-    void OnHover(MouseEnterEvent evt)
-    {
-        foreach (VisualElement elem in Children())
-        {
-            Rect r = elem.worldBound;
-
-            // Item tiles that are empty should not change the scale or be draggable
-            if (r.Contains(evt.mousePosition))
-            {
-                SetScale(new Vector2(1.05f, 1.05f));
-                _isHovering = true;
-
-                return;
-            }
-        }
-
-        SetScale(new Vector2(1, 1));
-        _isHovering = false;
-    }
-
-    /// <summary>
-    /// Handles transformations when the user's mouse leaves this item over this item
-    /// </summary>
-    /// <param name="evt">Mouse leave event</param>
-    void OnHoverExit(MouseLeaveEvent evt)
-    {
-        SetScale(new Vector2(1, 1));
-        _isHovering = false;
     }
 
     /// <summary>
@@ -179,7 +141,7 @@ public partial class Item : VisualElement
         }
     }
 
-    void SetScale(Vector2 scale)
+    public void SetScale(Vector2 scale)
     {
         style.scale = new StyleScale(scale);
     }

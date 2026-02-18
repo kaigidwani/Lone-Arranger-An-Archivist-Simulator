@@ -20,7 +20,33 @@ public partial class ItemTile : VisualElement
 
     public ItemTile()
     {
+        RegisterCallback<MouseEnterEvent>(OnHover);
+        RegisterCallback<MouseLeaveEvent>(OnHoverExit);
+    }
 
+    /// <summary>
+    /// Handles transformations when the user hovers over this item
+    /// </summary>
+    /// <param name="evt">Mouse over event</param>
+    void OnHover(MouseEnterEvent evt)
+    {
+        if (ParentItem.IsHovering)
+        {
+            return;
+        }
+
+        ParentItem.SetScale(new Vector2(1.05f, 1.05f));
+        ParentItem.IsHovering = true;
+    }
+
+    /// <summary>
+    /// Handles transformations when the user's mouse leaves this item over this item
+    /// </summary>
+    /// <param name="evt">Mouse leave event</param>
+    void OnHoverExit(MouseLeaveEvent evt)
+    {
+        ParentItem.SetScale(new Vector2(1, 1));
+        ParentItem.IsHovering = false;
     }
 
     public void SetIndex(int x, int y)
