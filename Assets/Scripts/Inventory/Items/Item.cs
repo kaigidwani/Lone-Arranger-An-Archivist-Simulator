@@ -1,116 +1,74 @@
-using System;
-using Unity.VisualScripting.Antlr3.Runtime.Misc;
 using UnityEngine;
 using UnityEngine.UIElements;
 using System.Collections.Generic;
-using static UnityEditor.PlayerSettings;
-using static UnityEditor.Progress;
 using Random = UnityEngine.Random;
-using UnityEngine.Tilemaps;
-using UnityEngine.WSA;
+using static UnityEngine.Rendering.DebugUI.Table;
 
 [UxmlElement]
 public partial class Item : VisualElement
 {
     // Fields
 
+    private PlaceableItemSO _itemSO;
+
     // Properties
+
+    /// <summary>
+    /// Contains information about this item
+    /// </summary>
+    public PlaceableItemSO Type { get { return _itemSO; } }
+
+    /// <summary>
+    /// List of individual tiles that make up this item
+    /// </summary>
+    public List<ItemTile> Tiles { get; private set; }
+
+    /// <summary>
+    /// The item tile the user is currently dragging
+    /// </summary>
     public ItemTile Pivot { get; private set; }
+
+    /// <summary>
+    /// The upper-left-most grid index of this item
+    /// (X = Row, Y = Column)
+    /// </summary>
+    public Vector2Int RootGridIndex { get; private set; }
 
     public bool IsPlaced;
     public bool IsHovering;
 
-    public string Name;
-    public Sprite BaseSprite;
-    public Vector2 Dimensions;
-    public int[][] Shape;
-    public List<ItemTile> Tiles;
-    public event Action<Vector2, Item> OnStartDrag = delegate { };
-
     public Item()
     {
-        RegisterCallback<PointerDownEvent>(OnPointerDown);
-        
-    }
-
-    /// <summary>
-    /// Invokes the method to start dragging this item
-    /// </summary>
-    void OnPointerDown(PointerDownEvent evt)
-    {
-        if (evt.button != 0 || !IsHovering) return;
-
-        ResetTileColors();
-        OnStartDrag.Invoke(evt.position, this);
-        evt.StopPropagation();
-    }
-
-    /// <summary>
-    /// Generates a random item inside of the accessioning box
-    /// </summary>
-    /// <param name="box">The element where this item will spawn</param>
-    public void Spawn(Accessioning box)
-    {
-        AddToClassList("item");
-
-        // Generate random item from current item pool
-        PlaceableItemSO type = null;
-        if (InventoryController.Instance.ItemPool.Length > 0)
-        {
-            //sDebug.Log("items in rotation: " + InventoryController.Instance.ItemPool.Length);
-            type = InventoryController.Instance.ItemPool[Random.Range(0, InventoryController.Instance.ItemPool.Length)];
-
-            Name = type.Name;
-            BaseSprite = type.Sprite;
-            Dimensions = type.Dimensions;
-            Shape = type.Shape;
-
-            ConstructItem();
-        }
-
-        schedule.Execute(() =>
-        {
-            float x = Random.Range(box.Min.x, box.Max.x - resolvedStyle.width);
-            float y = Random.Range(box.Min.y, box.Max.y - resolvedStyle.height);
-
-            style.left = x;
-            style.top = y;
-            style.opacity = 100;
-        });
-
-        OnStartDrag += InventoryController.Instance.OnPointerDown;
 
     }
 
     /// <summary>
-    /// Builds out the item in multiple, sliced tiles
+    /// Builds out a randomly generated item in multiple, sliced tiles
     /// </summary>
-    /// <param name="type">The type of item to build</param>
-    void ConstructItem()
+    private void ConstructItem()
     {
         // How big each individual tile should be
-        float tileWidth = InventoryController.Instance.SlotSize.x ;
-        float tileHeight = InventoryController.Instance.SlotSize.y ;
+        float tileWidth = InventoryController.Instance.SlotSize.x;
+        float tileHeight = InventoryController.Instance.SlotSize.y;
 
         // Parent container should be as big as the item is (totally)
-        style.width = Dimensions.x * tileWidth;
-        style.height = Dimensions.y * tileHeight;
+        style.width = _itemSO.Dimensions.y * tileWidth;
+        style.height = _itemSO.Dimensions.x * tileHeight;
 
         Tiles = new List<ItemTile>();
-        for (int row = 0; row < Dimensions.y; row++)
+        for (int row = 0; row < _itemSO.Dimensions.x; row++)
         {
-            for (int col = 0; col < Dimensions.x; col++)
+            for (int col = 0; col < _itemSO.Dimensions.y; col++)
             {
                 // Empty parts of the shape don't get "made"
-                if (Shape[row][col] == 0)
+                if (_itemSO.Shape[row][col] == 0)
                 {
                     continue;
                 }
-                
+
                 ItemTile tile = new ItemTile();
                 tile.SetParent(this);
-                tile.SetIndex(col, row);
-                
+                tile.SetIndex(row, col);
 
                 tile.AddToClassList("item-tile");
 
@@ -118,12 +76,12 @@ public partial class Item : VisualElement
                 tile.style.height = tileHeight;
                 tile.style.left = col * tileWidth;
                 tile.style.top = row * tileHeight;
-                tile.style.backgroundImage = BaseSprite.texture; // They all use different parts of the same image
+                tile.style.backgroundImage = _itemSO.Sprite.texture; // They all use different parts of the same image
 
                 // Makes each item based on a constant size
                 tile.style.backgroundSize = new BackgroundSize(
-                    new Length(Dimensions.x * 100, LengthUnit.Percent),
-                    new Length(Dimensions.y * 100, LengthUnit.Percent)
+                    new Length(_itemSO.Dimensions.y * 100, LengthUnit.Percent),
+                    new Length(_itemSO.Dimensions.x * 100, LengthUnit.Percent)
                 );
 
                 // Offset contents of tile to slice the image
@@ -141,11 +99,55 @@ public partial class Item : VisualElement
         }
     }
 
-    public void SetScale(Vector2 scale)
+    /// <summary>
+    /// Finds the upper-left-most grid position of this item
+    /// </summary>
+    /// <returns>The index of the upper-left-most grid position</returns>
+    private Vector2Int GetRootGridPosition()
     {
-        style.scale = new StyleScale(scale);
+        int minX = int.MaxValue;
+        int minY = int.MaxValue;  
+
+        foreach (ItemTile tile in Tiles)
+        {
+            if (tile.Position.x < minX || (tile.Position.x == minX && tile.Position.y < minY))
+            {
+                minX = tile.Position.x;
+                minY = tile.Position.y;
+                
+            }
+        }
+
+        return new Vector2Int(minX, minY);
     }
 
+    /// <summary>
+    /// Generates a random item inside of the accessioning box
+    /// </summary>
+    /// <param name="box">The element where this item will spawn</param>
+    public void Spawn(Accessioning box)
+    {
+        AddToClassList("item");
+
+        // Generate random item from current item pool
+        if (InventoryController.Instance.ItemPool.Length > 0)
+        {
+            _itemSO = InventoryController.Instance.ItemPool[Random.Range(0, InventoryController.Instance.ItemPool.Length)];
+            name = _itemSO.Name;
+
+            ConstructItem();
+        }
+
+        schedule.Execute(() =>
+        {
+            float x = Random.Range(box.Min.x, box.Max.x - resolvedStyle.width);
+            float y = Random.Range(box.Min.y, box.Max.y - resolvedStyle.height);
+
+            style.left = x;
+            style.top = y;
+            style.opacity = 100;
+        });
+    }
 
     /// <summary>
     /// Places the dragged item into a slot
@@ -155,48 +157,39 @@ public partial class Item : VisualElement
     {
         RemoveFromHierarchy(); // Remove from accessioning box
         dest.Add(this);
-        
+
         RemoveFromClassList("item");
         AddToClassList("item-slotted");
 
-        float pivotOffsetX = Pivot.Index.x * InventoryController.Instance.SlotSize.x;
-        float pivotOffsetY = Pivot.Index.y * InventoryController.Instance.SlotSize.y;
+        float rowOffset = Pivot.Index.x * InventoryController.Instance.SlotSize.y;
+        float colOffset = Pivot.Index.y * InventoryController.Instance.SlotSize.x;
 
-        style.left = startSlot.resolvedStyle.left - pivotOffsetX;
-        style.top = startSlot.resolvedStyle.top - pivotOffsetY;
-
-        Vector2Int start = InventoryController.Instance.GetSlotIndex(startSlot);
-        Vector2Int pivot = Pivot.Index;
+        style.left = startSlot.resolvedStyle.left - colOffset;
+        style.top = startSlot.resolvedStyle.top - rowOffset;
 
         foreach (ItemTile tile in Tiles)
         {
-            Vector2Int t = tile.Index;
-
-            int gridRow = start.y + (t.y - pivot.y);
-            int gridCol = start.x + (t.x - pivot.x);
-
-            Slot slot = InventoryController.Instance.GetSlot(gridRow, gridCol);
-            slot.SetItem(this);
+            int gridRow = startSlot.GridIndex.x + (tile.Index.x - Pivot.Index.x);
+            int gridCol = startSlot.GridIndex.y + (tile.Index.y - Pivot.Index.y);
 
             tile.SetGridSlot(gridRow, gridCol);
+            Debug.Log($"{name}-- row: {gridRow}, col: {gridCol}");
         }
 
-        //SendToBack();
+        RootGridIndex = GetRootGridPosition();
+
         SetTileColors();
         IsPlaced = true;
     }
 
-    public void SetPivot(ItemTile tile)
+    public void SetScale(Vector2 scale)
     {
-        tile.AddToClassList("pivot");
-        Pivot = tile;
-        
+        style.scale = new StyleScale(scale);
     }
 
-    public void ClearPivot()
+    public void ResetScale()
     {
-        Pivot.RemoveFromClassList("pivot");
-        Pivot = null;
+        style.scale = new StyleScale(Vector2.one);
     }
 
     public void SetTileColors()
@@ -207,11 +200,24 @@ public partial class Item : VisualElement
         }
     }
 
-    private void ResetTileColors()
+    public void ResetTileColors()
     {
         foreach (ItemTile tile in Tiles)
         {
             tile.RemoveColor();
         }
+    }
+
+    public void SetPivot(ItemTile tile)
+    {
+        tile.AddToClassList("pivot");
+        Pivot = tile;
+
+    }
+
+    public void ResetPivot()
+    {
+        Pivot.RemoveFromClassList("pivot");
+        Pivot = null;
     }
 }

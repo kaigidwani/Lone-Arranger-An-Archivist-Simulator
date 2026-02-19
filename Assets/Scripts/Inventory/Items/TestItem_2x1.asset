@@ -16,5 +16,5 @@ MonoBehaviour:
   - 1, 1
   Name: 2x1
   Description: This is a test of a 2x2 Item
-  Dimensions: {x: 2, y: 1}
+  Dimensions: {x: 1, y: 2}
   Sprite: {fileID: 8502630405890745519, guid: fbc1762c1a95019469ecde8653f6e4a3, type: 3}

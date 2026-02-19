@@ -1,22 +1,47 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.UIElements;
-using static UnityEditor.Progress;
-using static UnityEditor.Rendering.FilterWindow;
-using static UnityEngine.GraphicsBuffer;
 
 [UxmlElement]
 public partial class GhostIcon : VisualElement
 {
+    // Fields
+
     private VisualElement _icon;
     private Item _draggedItem;
 
     public GhostIcon()
     {
-        AddToClassList("ghost-icon");
+        // Make sure styling is applied
+        if (!ClassListContains("ghost-icon"))
+        {
+            AddToClassList("ghost-icon");
+        }
     }
 
-    public void ResetVisual()
+    /// <summary>
+    /// Sets the ghost icon's visual to mirror an item
+    /// </summary>
+    /// <param name="item">The item to set the icon to</param>
+    public void SetIcon(Item item)
+    {
+        _draggedItem = item;
+        style.width = item.resolvedStyle.width;
+        style.height = item.resolvedStyle.height;
+
+        _icon = new VisualElement();
+        _icon.AddToClassList("ghost-icon-visual");
+        _icon.style.width = item.resolvedStyle.width;
+        _icon.style.height = item.resolvedStyle.height;
+        _icon.style.backgroundImage = item.Type.Sprite.texture;
+
+        Add(_icon);
+    }
+
+    /// <summary>
+    /// Removes any icon that is currently being displayed while dragging
+    /// </summary>
+    public void ResetIcon()
     {
         if (_icon != null)
         {
@@ -35,36 +60,11 @@ public partial class GhostIcon : VisualElement
         style.height = 0;
     }
 
-    public void SetIcon(Item item)
-    {
-        _draggedItem = item;
-        style.width = item.resolvedStyle.width;
-        style.height = item.resolvedStyle.height;
-
-        _icon = new VisualElement();
-        _icon.AddToClassList("ghost-icon-visual");
-        _icon.style.width = item.resolvedStyle.width;
-        _icon.style.height = item.resolvedStyle.height;
-        _icon.style.backgroundImage = item.BaseSprite.texture;
-        
-        // Change ghost icon's color to match item's
-        foreach (string className in item.GetClasses())
-        {
-            if (className.StartsWith("item-"))
-            {
-                _icon.AddToClassList(className);
-            }
-        }
-
-        Add(_icon);
-    }
-
     /// <summary>
     /// Centers the ghost icon on the given position
     /// </summary>
     public void SetToMousePosition()
     {
-
         if (_draggedItem == null || _draggedItem.Pivot == null)
         {
             return;
@@ -76,12 +76,12 @@ public partial class GhostIcon : VisualElement
         float tileWidth = _draggedItem.Pivot.resolvedStyle.width;
         float tileHeight = _draggedItem.Pivot.resolvedStyle.height;
 
-        float pivotOffsetX = tileWidth * _draggedItem.Pivot.Index.x;
-        float pivotOffsetY = tileHeight * _draggedItem.Pivot.Index.y;
-        Debug.Log(_draggedItem.Pivot.Index);
+        // Find offset from pivot
+        float rowOffset = tileHeight * _draggedItem.Pivot.Index.x;
+        float colOffset = tileWidth * _draggedItem.Pivot.Index.y;   
 
-        style.left = mousePanel.x - pivotOffsetX - tileWidth * 0.5f;
-        style.top = mousePanel.y - pivotOffsetY - tileHeight * 0.5f;
+        style.left = mousePanel.x - colOffset - tileWidth * 0.5f;
+        style.top = mousePanel.y - rowOffset - tileHeight * 0.5f;
 
     }
 }

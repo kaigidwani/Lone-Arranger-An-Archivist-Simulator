@@ -50,13 +50,6 @@
 
 .inventory-slot-default {
 }
-
-.debug-bttn {
-    width: 350px;
-    height: 150px;
-    font-size: 18px;
-}
-
 .item {
     align-self: center;
     background-image: none;

@@ -17,5 +17,5 @@ MonoBehaviour:
   - 1, 1, 1
   Name: L
   Description: This is a test of an L-shaped item
-  Dimensions: {x: 3, y: 2}
+  Dimensions: {x: 2, y: 3}
   Sprite: {fileID: 6563575085492716751, guid: 4733a8986982ddc44b0f627ca100e97a, type: 3}

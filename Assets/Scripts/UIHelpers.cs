@@ -1,6 +1,5 @@
 using UnityEngine;
 using UnityEngine.UIElements;
-using static UnityEngine.Rendering.DebugUI;
 
 public static class UIHelpers
 {
