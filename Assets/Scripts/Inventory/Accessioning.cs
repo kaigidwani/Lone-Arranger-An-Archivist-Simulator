@@ -61,7 +61,11 @@ public partial class Accessioning : VisualElement
             if (!_hasLoaded) // Guarantees that items spawn once after event fires
             {
                 _hasLoaded = true;
-                SpawnItems();
+
+                if (InventoryController.Instance != null)
+                {
+                    SpawnItems();
+                }
             }
         });
     }

@@ -1,49 +1,92 @@
+using System.Collections.Generic;
 using UnityEngine;
+using static UnityEngine.Rendering.ProbeAdjustmentVolume;
 
 [CreateAssetMenu(fileName = "New Item", menuName = "Scriptable Objects/Item")]
 public class PlaceableItemSO : ScriptableObject
 {
     // Fields
 
-    [SerializeField] private string[] _activeTiles;
+    [SerializeField] private Vector2Int _baseDimensions;
+    [SerializeField] private string[] _baseActiveTiles;
 
     // Properties
 
     public string Name;
     public string Description;
-
-    /// <summary>
-    /// (X = Rows, Y = Columns)
-    /// </summary>
-    public Vector2 Dimensions;
-
     public Sprite Sprite;
+
+    public int Width { get; private set; }
+
+    public int Height { get; private set; }
 
     [HideInInspector] public int[][] Shape;
     
     private void OnValidate()
     {
         // Creates a new array in the inspector based on the dimensions of the item
-        if (_activeTiles.Length != Dimensions.x)
+        if (_baseActiveTiles.Length != _baseDimensions.y)
         {
-            _activeTiles = new string[(int)Dimensions.x];
+            _baseActiveTiles = new string[_baseDimensions.y];
         }
 
-        // Converts the each row's string array of active tiles to a jagged array of integers
-        // for easy parsing later on
-        Shape = new int[(int)Dimensions.x][];
+        Width = _baseDimensions.x;
+        Height = _baseDimensions.y;
+        Shape = ParseActiveTiles(_baseActiveTiles, Width, Height);
+    }
 
-        for (int row = 0; row < _activeTiles.Length; row++)
+    private int[][] ParseActiveTiles(string[] tiles, int width, int height)
+    {
+        int[][] result = new int[height][];
+
+        for (int x = 0; x < height; x++)
         {
-            string[] rowString = _activeTiles[row].Split(',');
-            Shape[row] = new int[rowString.Length];
+            result[x] = new int[width];
+            string[] cols = tiles[x].Split(',');   
 
-            for (int col = 0; col < rowString.Length; col++)
+            for (int y = 0; y < width; y++)
             {
-                Shape[row][col] = int.Parse(rowString[col]);
+                result[x][y] = int.Parse(cols[y]);
             }
-
         }
+
+        return result;
+    }
+
+    private string[] RebuildActiveTiles(int[][] shape)
+    {
+        string[] rowList = new string[shape.Length];
+
+        for (int x = 0; x < shape.Length; x++)
+        {
+            rowList[x] = string.Join(',', shape[x]);
+        }
+
+        return rowList;
+    }
+
+    public void RotateCW()
+    {
+        int[][] currentShape = Shape;
+        int[][] rotatedShape = new int[Width][];
+        
+        for (int x = 0; x < Width; x++)
+        {
+            rotatedShape[x] = new int[Height];
+
+            for (int y = 0; y < Height; y++)
+            {
+                rotatedShape[x][Height - 1 - y] = currentShape[y][x];
+                Debug.Log($"{Name}: rotated shape at {x}, {y} is {rotatedShape[x][y]}");
+            }
+        }
+
+        Width = rotatedShape.Length;
+        Height = rotatedShape[0].Length;
+        Debug.Log($"{Name}: rotated new dimensions = {Width}, {Height}");
+
+        string[] newActiveTiles = RebuildActiveTiles(rotatedShape);
+        Shape = ParseActiveTiles(newActiveTiles, Width, Height);
     }
 
     

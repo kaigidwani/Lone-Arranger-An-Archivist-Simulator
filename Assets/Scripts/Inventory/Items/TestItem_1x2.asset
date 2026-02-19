@@ -10,11 +10,11 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 32b81e9028c679343ac9b213bc9974fe, type: 3}
-  m_Name: TestItem_2x1
+  m_Name: TestItem_1x2
   m_EditorClassIdentifier: 
-  _activeTiles:
+  _baseDimensions: {x: 2, y: 1}
+  _baseActiveTiles:
   - 1, 1
-  Name: 2x1
+  Name: 1x2
   Description: This is a test of a 2x2 Item
-  Dimensions: {x: 1, y: 2}
   Sprite: {fileID: 8502630405890745519, guid: fbc1762c1a95019469ecde8653f6e4a3, type: 3}

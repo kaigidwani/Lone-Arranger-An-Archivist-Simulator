@@ -184,7 +184,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4ce9630953ca03649b2d8324c40f8ef9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  InventorySize: 
+  Width: 6
+  Height: 6
   ItemPool:
   - {fileID: 11400000, guid: e083ca9a015f2d04f96d6152657d0b0a, type: 2}
   - {fileID: 11400000, guid: 413d4706439c9b240b0c79d5ebbcd20a, type: 2}

@@ -52,13 +52,13 @@ public partial class Item : VisualElement
         float tileHeight = InventoryController.Instance.SlotSize.y;
 
         // Parent container should be as big as the item is (totally)
-        style.width = _itemSO.Dimensions.y * tileWidth;
-        style.height = _itemSO.Dimensions.x * tileHeight;
+        style.width = _itemSO.Width * tileWidth;
+        style.height = _itemSO.Height * tileHeight;
 
         Tiles = new List<ItemTile>();
-        for (int row = 0; row < _itemSO.Dimensions.x; row++)
+        for (int row = 0; row < _itemSO.Height; row++)
         {
-            for (int col = 0; col < _itemSO.Dimensions.y; col++)
+            for (int col = 0; col < _itemSO.Width; col++)
             {
                 // Empty parts of the shape don't get "made"
                 if (_itemSO.Shape[row][col] == 0)
@@ -80,8 +80,8 @@ public partial class Item : VisualElement
 
                 // Makes each item based on a constant size
                 tile.style.backgroundSize = new BackgroundSize(
-                    new Length(_itemSO.Dimensions.y * 100, LengthUnit.Percent),
-                    new Length(_itemSO.Dimensions.x * 100, LengthUnit.Percent)
+                    new Length(_itemSO.Width * 100, LengthUnit.Percent),
+                    new Length(_itemSO.Height * 100, LengthUnit.Percent)
                 );
 
                 // Offset contents of tile to slice the image
