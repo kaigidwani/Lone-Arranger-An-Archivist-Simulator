@@ -1,4 +1,3 @@
-using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -18,7 +17,7 @@ public partial class Accessioning : VisualElement
     // Properties
 
     /// <summary>
-    /// Minimimum (top-left) position of this element
+    /// Minimimum position of this element (top-left)
     /// </summary>
     public Vector2 Min
     {
@@ -29,7 +28,7 @@ public partial class Accessioning : VisualElement
     }
 
     /// <summary>
-    /// Maximum (top-right) position of this element
+    /// Maximum position of this element (top-right)
     /// </summary>
     public Vector2 Max
     {
@@ -73,17 +72,12 @@ public partial class Accessioning : VisualElement
     /// <param name="count">Number of items to spawn</param>
     public void SpawnItems(int count = 5)
     {
-        Debug.Log("adding items");
-
         for (int i = 0; i < count; i++)
         {
             Item item = new Item();
             item.Spawn(this);
 
-            InventoryController.Instance.Items.Add(item);
             Add(item);
         }
-
-        Debug.Log("box full");
     }
 }

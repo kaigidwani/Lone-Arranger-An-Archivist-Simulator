@@ -1,20 +1,20 @@
-using UnityEngine;
-using UnityEngine.UIElements;
 using System.Collections.Generic;
 using System.Linq;
-using System;
-using Random = UnityEngine.Random;
-using Unity.VisualScripting;
-using static UnityEngine.Rendering.DebugUI.Table;
-using static UnityEditor.Progress;
+using UnityEngine;
+using UnityEngine.UIElements;
+using Cursor = UnityEngine.Cursor;
+
 
 public class InventoryController : MonoBehaviour
 {
     // Fields
 
-    [SerializeField] private List<Button> _debugButtons;
     private VisualElement _root;
-    private static VisualElement _ghostIcon;
+    private VisualElement _itemContainer;
+
+    private List<Slot> _slotList;
+
+    private static GhostIcon _ghostIcon;
 
     private static bool _isDragging;
     private static Item _draggedItem;
@@ -22,13 +22,31 @@ public class InventoryController : MonoBehaviour
     // Properties
 
     public static InventoryController Instance;
+    public int Width = 6;
+    public int Height = 6;
 
-    public int[] InventorySize;
-    public List<Slot> Slots;
-    public List<Item> Items;
-    public ItemInfo[] ItemPool;
+    public PlaceableItemSO[] ItemPool;
 
-    public event Action<Item> OnDrop;
+    /// <summary>
+    /// The list of slots represented as a 2D array
+    /// (X = Row, Y = Column)
+    /// </summary>
+    public Slot[][] Grid { get; private set; }
+
+    /// <summary>
+    /// Final width and height of each individual slot
+    /// </summary>
+    public Vector2 SlotSize
+    {
+        get {
+            
+            return new Vector2(
+                GetSlot(0, 0).resolvedStyle.width,
+                GetSlot(0, 0).resolvedStyle.height
+
+            );
+        }
+    }
 
     private void Awake()
     {
@@ -46,28 +64,52 @@ public class InventoryController : MonoBehaviour
 
     void Start()
     {
-        InventorySize = new int[2] { 6, 6 };
-
         _root = GetComponent<UIDocument>().rootVisualElement;
+        _itemContainer = _root.Q("ItemLayer");
+        _ghostIcon = _root.Q<GhostIcon>();
+
+        _slotList = _root.Query<Slot>().ToList();
+
+        int row = 0;
+        int col = 0;
+        
+        // Initializing grid from slots
+        Grid = new Slot[Height][];
+        foreach (Slot slot in _slotList)
+        {
+            if (Grid[row] == null)
+            {
+                Grid[row] = new Slot[Width];
+            }
+
+            Grid[row][col] = slot;
+            slot.GridIndex = new Vector2Int(row, col);
+            
+            col++;
+            if (col == Width) // at end of row
+            {
+                row++;
+                col = 0;
+            }
+        }
+
+        // Making sure the slot and itewm layers are the same size
+        GetSlot(0, 0).RegisterCallback<GeometryChangedEvent>((evt) =>
+        {
+            VisualElement slotLayer = _root.Q("SlotLayer");
+
+            _itemContainer.style.width = slotLayer.resolvedStyle.width;
+            _itemContainer.style.height = slotLayer.resolvedStyle.height;
+
+            _itemContainer.style.left = slotLayer.resolvedStyle.left;
+            _itemContainer.style.top = slotLayer.resolvedStyle.top;
+        });
+        
         _root.RegisterCallback<PointerMoveEvent>(OnPointerMove);
         _root.RegisterCallback<PointerUpEvent>(OnPointerUp);
-
-        Items = new List<Item>();
-        Slots = _root.Q("Inventory").Query<Slot>().ToList();
-        
-        _ghostIcon = _root.Q("GhostIcon");
     }
 
-    /// <summary>
-    /// Centers the ghost icon on the given position
-    /// </summary>
-    /// <param name="pos">The position to draw the icon</param>
-    static void SetGhostIconPosition(Vector2 pos)
-    {
-        Debug.Log("item size" + new Vector2(_draggedItem.ItemSize.x, _draggedItem.ItemSize.y));
-        _ghostIcon.style.left = pos.x - _draggedItem.ItemSize.x / 2;
-        _ghostIcon.style.top = pos.y - _draggedItem.ItemSize.y / 2;
-    }
+    #region Events
 
     /// <summary>
     /// Toggles visibility of ghost icon on click
@@ -79,22 +121,31 @@ public class InventoryController : MonoBehaviour
         _isDragging = true;
         _draggedItem = item;
 
-        if (_draggedItem.CurrentSlot != null)
+        if (_draggedItem.IsPlaced)
         {
-            _draggedItem.CurrentSlot.ClearItems();
+            foreach (ItemTile tile in _draggedItem.Tiles)
+            {
+                tile.ClearGridSlot();
+            }
+            
         }
 
+        Cursor.visible = false;
+
         _draggedItem.style.visibility = Visibility.Hidden;
-        _ghostIcon.style.visibility = Visibility.Visible;
- 
-        RemoveItemColor(_ghostIcon);
 
-        // Copy the item's properties
-        _ghostIcon.style.backgroundImage = item.BaseSprite.texture;
-        _ghostIcon.style.width = item.ItemSize.x;
-        _ghostIcon.style.height = item.ItemSize.y;
+        foreach (ItemTile tile in _draggedItem.Tiles)
+        {
+            Rect r = tile.worldBound;
+            if (r.Contains(pos))
+            {                
+                _draggedItem.SetPivot(tile);
 
-        SetGhostIconPosition(pos);
+            }
+        }
+
+        _ghostIcon.SetIcon(_draggedItem);
+        _ghostIcon.SetToMousePosition();
     }
 
     /// <summary>
@@ -104,7 +155,7 @@ public class InventoryController : MonoBehaviour
     {
         if (!_isDragging) return;
 
-        SetGhostIconPosition(evt.position);
+        _ghostIcon.SetToMousePosition();
     }
 
     /// <summary>
@@ -116,92 +167,98 @@ public class InventoryController : MonoBehaviour
 
         _isDragging = false;
 
+        Cursor.visible = true;
+        
         _draggedItem.style.visibility = Visibility.Visible;
-        _ghostIcon.style.visibility = Visibility.Hidden;
 
-        OnDrop?.Invoke(_draggedItem);
-    
         // Find slot under mouse
         Vector2 mousePos = evt.position;
 
-        Slot hoveredSlot = GetSlotUnderMouse(mousePos);
+        Slot hoveredSlot = null;
+
+        foreach (Slot s in _slotList) 
+        {
+            Rect r = s.worldBound;
+            if (r.Contains(mousePos))
+            {
+                hoveredSlot = s;
+            }
+        }
+        
         if (hoveredSlot != null && CanPlace(hoveredSlot))
         {
-            PlaceItem(hoveredSlot);
+            _draggedItem.Place(_itemContainer, hoveredSlot);    
         }
-        else if (_draggedItem.CurrentSlot != null)
+        else if (_draggedItem.IsPlaced)
         {
-            PlaceItem(_draggedItem.CurrentSlot);
+            _draggedItem.Place(_itemContainer, _draggedItem.Pivot.GridSlot);
         }
 
-            // Change ghost icon's color to match item's
-            foreach (string className in _draggedItem.GetClasses())
-            {
-                if (className.StartsWith("item-"))
-                {
-                    _ghostIcon.AddToClassList(className);
-                }
-            }
-    } 
-
-    /// <summary>
-    /// Finds a slot, if any, that the user is hovering over
-    /// </summary>
-    /// <param name="pos">Position of the mouse</param>
-    /// <returns>The slot that the user is hovering over</returns>
-    Slot GetSlotUnderMouse(Vector2 pos)
-    {
-        foreach (Slot slot in Slots)
-        {
-            Rect r = slot.worldBound;
-            if (r.Contains(pos))
-            {
-                return slot;
-            }
-        }
-
-        return null;
+        _ghostIcon.ResetIcon();
+        _draggedItem.ResetPivot();
+        ReorderItems();
     }
+
+    #endregion
 
     /// <summary>
     /// Determines whether the slot the user places the item is valid
     /// </summary>
-    /// <param name="slot">The slot the user places the item in</param>
+    /// <param name="startSlot">The slot the user places the item in</param>
     /// <returns>Whether the item can be placed in the given slot</returns>
-    bool CanPlace(Slot slot)
+    private bool CanPlace(Slot startSlot)
     {
-        return slot.IsFree;
-    }
-
-    /// <summary>
-    /// Places the dragged item into a slot
-    /// </summary>
-    /// <param name="slot">The top-left slot that the user places the item in</param>
-    void PlaceItem(Slot slot)
-    {
-        _draggedItem.RemoveFromHierarchy();
-        _draggedItem.RemoveFromClassList("item");
-        RemoveItemColor(_draggedItem);
-        _draggedItem.AddToClassList("slotted-item");
-        
-        _draggedItem.style.top = StyleKeyword.Null;
-        _draggedItem.style.left = StyleKeyword.Null;
-        _draggedItem.style.opacity = StyleKeyword.Null;
-        
-        _draggedItem.CurrentSlot = slot;
-    }
-
-    public void RemoveItemColor(VisualElement elem)
-    {
-        string prevColor = "";
-        foreach (string className in elem.GetClasses())
+        foreach (ItemTile tile in _draggedItem.Tiles)
         {
-            if (className.StartsWith("item-"))
+            int gridRow = startSlot.GridIndex.x + (tile.Index.x - _draggedItem.Pivot.Index.x);
+            int gridCol = startSlot.GridIndex.y + (tile.Index.y - _draggedItem.Pivot.Index.y);
+
+            // Bounds logic
+            if (gridRow < 0 || gridRow >= Height ||
+                gridCol < 0 || gridCol >= Width)
             {
-                prevColor = className;
+                return false;
+            }
+
+            // Occupancy logic
+            if (!GetSlot(gridRow, gridCol).IsFree)
+            {
+                return false;
             }
         }
 
-        elem.RemoveFromClassList(prevColor);
+        return true;
+    }
+
+    /// <summary>
+    /// Finds the grid slot at the given index
+    /// </summary>
+    /// <param name="x">Row</param>
+    /// <param name="y">Column</param>
+    /// <returns>The grid slot at (x, y)</returns>
+    public Slot GetSlot(int x, int y)
+    {
+        return Grid[x][y];
+    }
+
+    /// <summary>
+    /// All placed items are reordered by their grid position
+    /// </summary>
+    public void ReorderItems()
+    {
+        List<Item> items = _itemContainer.Children().OfType<Item>()
+            .OrderBy(x => x.RootGridIndex.x)
+            .OrderBy(y => y.RootGridIndex.y).ToList();
+
+        // Avoids z-indexing issues (being unable to click on certain items)
+        for (int i = 0; i < items.Count; i++)
+        {
+            items[i].BringToFront();
+        }
+
+        foreach (Item item in items)
+        {
+            _itemContainer.Add(item);
+        }
     }
 }

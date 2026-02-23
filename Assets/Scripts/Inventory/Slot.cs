@@ -1,38 +1,44 @@
-using System;
-using System.Drawing;
-using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UIElements;
 
 [UxmlElement]
 public partial class Slot : VisualElement
 {
+    // Fields
+
+    private Label _debugLabel;
+
     // Properties
 
-    public Item ItemRef;
+    /// <summary>
+    /// The position of this slot on the inventory grid
+    /// (X = Row, Y = Column)
+    /// </summary>
+    public Vector2Int GridIndex { get; set; }
 
-    public string Color;
+    /// <summary>
+    /// Color of this slot as a string
+    /// </summary>
+    public string Color { get; private set; }
 
-    public bool IsFree { get { return ItemRef == null; } }
+    /// <summary>
+    /// Which tile is currently contained in this slot
+    /// </summary>
+    public ItemTile TileRef { get; private set; }
+
+    public bool IsFree { get { return TileRef == null; } }
 
     public Slot()
     {
-        
-    }
-
-    /// <summary>
-    /// Adds a reference to an item to this inventory slot
-    /// </summary>
-    /// <param name="item">An item that should respond to this slot</param>
-    public void SetItem(Item item)
-    {
-        ItemRef = item;
-
-        Color = GetColor();
-        if (!string.IsNullOrEmpty(Color))
+        RegisterCallbackOnce<GeometryChangedEvent>(evt =>
         {
-            item.AddToClassList($"item-{Color}");
-        }
+            Color = GetColor();
+        });
+
+        _debugLabel = new Label("Empty");
+        _debugLabel.AddToClassList("debug-text");
+
+        Add(_debugLabel);
     }
 
     /// <summary>
@@ -54,10 +60,18 @@ public partial class Slot : VisualElement
     }
 
     /// <summary>
-    /// Removes this slot's item reference
+    /// Adds a reference to an item to this inventory slot
     /// </summary>
-    public void ClearItems()
+    /// <param name="tile">An item that should respond to this slot</param>
+    public void SetTile(ItemTile tile)
     {
-        ItemRef = null;
+        TileRef = tile;
+        _debugLabel.text = TileRef.name;
+    }
+
+    public void ClearTile()
+    {
+        TileRef = null;
+        _debugLabel.text = "Empty";
     }
 }
