@@ -121,6 +121,18 @@ public partial class Item : VisualElement
         return new Vector2Int(minX, minY);
     }
 
+    public void RotateRight()
+    {
+        //_itemSO.RotateCW();
+        Debug.Log("rotated clockwise");
+    }
+
+    public void RotateLeft()
+    {
+        //_itemSO.RotateCW();
+        Debug.Log("rotated counter clockwise");
+    }
+
     /// <summary>
     /// Generates a random item inside of the accessioning box
     /// </summary>
@@ -173,7 +185,7 @@ public partial class Item : VisualElement
             int gridCol = startSlot.GridIndex.y + (tile.Index.y - Pivot.Index.y);
 
             tile.SetGridSlot(gridRow, gridCol);
-            Debug.Log($"{name}-- row: {gridRow}, col: {gridCol}");
+            //Debug.Log($"{name}-- row: {gridRow}, col: {gridCol}");
         }
 
         RootGridIndex = GetRootGridPosition();

@@ -1,6 +1,8 @@
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using UnityEngine;
+using UnityEngine.InputSystem;
 using UnityEngine.UIElements;
 using Cursor = UnityEngine.Cursor;
 
@@ -259,6 +261,25 @@ public class InventoryController : MonoBehaviour
         foreach (Item item in items)
         {
             _itemContainer.Add(item);
+        }
+    }
+
+    public void OnRotateItem(InputAction.CallbackContext ctx)
+    {
+        if (!_isDragging || ctx.phase != InputActionPhase.Performed)
+        {
+            return;
+        }
+
+        float dir = ctx.ReadValue<float>();
+
+        if (dir > 0)
+        {
+            _draggedItem.RotateRight();
+        }
+        else
+        {
+            _draggedItem.RotateLeft();
         }
     }
 }

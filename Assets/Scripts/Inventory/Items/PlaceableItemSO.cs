@@ -15,6 +15,7 @@ public class PlaceableItemSO : ScriptableObject
     public string Name;
     public string Description;
     public Sprite Sprite;
+    public float Rotation = 0;
 
     public int Width { get; private set; }
 
@@ -24,6 +25,8 @@ public class PlaceableItemSO : ScriptableObject
     
     private void OnValidate()
     {
+        Rotation = 0;
+
         // Creates a new array in the inspector based on the dimensions of the item
         if (_baseActiveTiles.Length != _baseDimensions.y)
         {
@@ -33,6 +36,8 @@ public class PlaceableItemSO : ScriptableObject
         Width = _baseDimensions.x;
         Height = _baseDimensions.y;
         Shape = ParseActiveTiles(_baseActiveTiles, Width, Height);
+
+        //RotateCW();
     }
 
     private int[][] ParseActiveTiles(string[] tiles, int width, int height)
@@ -77,16 +82,17 @@ public class PlaceableItemSO : ScriptableObject
             for (int y = 0; y < Height; y++)
             {
                 rotatedShape[x][Height - 1 - y] = currentShape[y][x];
-                Debug.Log($"{Name}: rotated shape at {x}, {y} is {rotatedShape[x][y]}");
             }
         }
 
-        Width = rotatedShape.Length;
-        Height = rotatedShape[0].Length;
+        Width = rotatedShape[0].Length;
+        Height = rotatedShape.Length;
         Debug.Log($"{Name}: rotated new dimensions = {Width}, {Height}");
 
         string[] newActiveTiles = RebuildActiveTiles(rotatedShape);
         Shape = ParseActiveTiles(newActiveTiles, Width, Height);
+
+        Rotation += 90;
     }
 
     
