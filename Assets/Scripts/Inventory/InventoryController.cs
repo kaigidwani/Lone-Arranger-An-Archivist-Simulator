@@ -187,8 +187,7 @@ public class InventoryController : MonoBehaviour
         
         if (hoveredSlot != null && CanPlace(hoveredSlot))
         {
-            _draggedItem.Place(_itemContainer, hoveredSlot);
-            ReorderItems();
+            _draggedItem.Place(_itemContainer, hoveredSlot);    
         }
         else if (_draggedItem.IsPlaced)
         {
@@ -197,6 +196,7 @@ public class InventoryController : MonoBehaviour
 
         _ghostIcon.ResetIcon();
         _draggedItem.ResetPivot();
+        ReorderItems();
     }
 
     #endregion
