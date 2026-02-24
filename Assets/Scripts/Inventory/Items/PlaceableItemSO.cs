@@ -36,8 +36,6 @@ public class PlaceableItemSO : ScriptableObject
         Width = _baseDimensions.x;
         Height = _baseDimensions.y;
         Shape = ParseActiveTiles(_baseActiveTiles, Width, Height);
-
-        //RotateCW();
     }
 
     private int[][] ParseActiveTiles(string[] tiles, int width, int height)
@@ -92,8 +90,6 @@ public class PlaceableItemSO : ScriptableObject
         string[] newActiveTiles = RebuildActiveTiles(rotatedShape);
         Shape = ParseActiveTiles(newActiveTiles, Width, Height);
 
-        Rotation += 90;
+        Rotation = (Rotation + 90) % 360;
     }
-
-    
 }

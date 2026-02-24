@@ -13,6 +13,7 @@ public class InventoryController : MonoBehaviour
 
     private VisualElement _root;
     private VisualElement _itemContainer;
+    private float _itemScale = 1;
 
     private List<Slot> _slotList;
 
@@ -48,6 +49,11 @@ public class InventoryController : MonoBehaviour
 
             );
         }
+    }
+
+    public Vector2 ItemTileSize
+    {
+        get { return SlotSize * _itemScale; }
     }
 
     private void Awake()
@@ -132,7 +138,7 @@ public class InventoryController : MonoBehaviour
             
         }
 
-        Cursor.visible = false;
+        //Cursor.visible = false;
 
         _draggedItem.style.visibility = Visibility.Hidden;
 
@@ -146,8 +152,8 @@ public class InventoryController : MonoBehaviour
             }
         }
 
-        _ghostIcon.SetIcon(_draggedItem);
-        _ghostIcon.SetToMousePosition();
+        _ghostIcon.SetItem(_draggedItem);
+        _ghostIcon.SetToMousePosition(_draggedItem.Pivot);
     }
 
     /// <summary>
@@ -157,7 +163,7 @@ public class InventoryController : MonoBehaviour
     {
         if (!_isDragging) return;
 
-        _ghostIcon.SetToMousePosition();
+        _ghostIcon.SetToMousePosition(_draggedItem.Pivot);
     }
 
     /// <summary>
@@ -233,20 +239,9 @@ public class InventoryController : MonoBehaviour
     }
 
     /// <summary>
-    /// Finds the grid slot at the given index
-    /// </summary>
-    /// <param name="x">Row</param>
-    /// <param name="y">Column</param>
-    /// <returns>The grid slot at (x, y)</returns>
-    public Slot GetSlot(int x, int y)
-    {
-        return Grid[x][y];
-    }
-
-    /// <summary>
     /// All placed items are reordered by their grid position
     /// </summary>
-    public void ReorderItems()
+    private void ReorderItems()
     {
         List<Item> items = _itemContainer.Children().OfType<Item>()
             .OrderBy(x => x.RootGridIndex.x)
@@ -264,6 +259,17 @@ public class InventoryController : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Finds the grid slot at the given index
+    /// </summary>
+    /// <param name="x">Row</param>
+    /// <param name="y">Column</param>
+    /// <returns>The grid slot at (x, y)</returns>
+    public Slot GetSlot(int x, int y)
+    {
+        return Grid[x][y];
+    }
+
     public void OnRotateItem(InputAction.CallbackContext ctx)
     {
         if (!_isDragging || ctx.phase != InputActionPhase.Performed)
@@ -273,13 +279,7 @@ public class InventoryController : MonoBehaviour
 
         float dir = ctx.ReadValue<float>();
 
-        if (dir > 0)
-        {
-            _draggedItem.RotateRight();
-        }
-        else
-        {
-            _draggedItem.RotateLeft();
-        }
+        _draggedItem.Rotate((int)dir);
+        _ghostIcon.MatchItemRotation(_draggedItem);
     }
 }

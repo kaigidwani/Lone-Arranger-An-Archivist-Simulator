@@ -48,12 +48,13 @@ public partial class Item : VisualElement
     private void ConstructItem()
     {
         // How big each individual tile should be
-        float tileWidth = InventoryController.Instance.SlotSize.x;
-        float tileHeight = InventoryController.Instance.SlotSize.y;
+        float tileWidth = InventoryController.Instance.ItemTileSize.x;
+        float tileHeight = InventoryController.Instance.ItemTileSize.y;
 
         // Parent container should be as big as the item is (totally)
         style.width = _itemSO.Width * tileWidth;
         style.height = _itemSO.Height * tileHeight;
+        style.backgroundImage = _itemSO.Sprite.texture;
 
         Tiles = new List<ItemTile>();
         for (int row = 0; row < _itemSO.Height; row++)
@@ -76,22 +77,6 @@ public partial class Item : VisualElement
                 tile.style.height = tileHeight;
                 tile.style.left = col * tileWidth;
                 tile.style.top = row * tileHeight;
-                tile.style.backgroundImage = _itemSO.Sprite.texture; // They all use different parts of the same image
-
-                // Makes each item based on a constant size
-                tile.style.backgroundSize = new BackgroundSize(
-                    new Length(_itemSO.Width * 100, LengthUnit.Percent),
-                    new Length(_itemSO.Height * 100, LengthUnit.Percent)
-                );
-
-                // Offset contents of tile to slice the image
-                tile.style.backgroundPositionX = new BackgroundPosition(
-                    BackgroundPositionKeyword.Left, -col * tileWidth
-                );
-
-                tile.style.backgroundPositionY = new BackgroundPosition(
-                    BackgroundPositionKeyword.Top, -row * tileHeight
-                );
 
                 Add(tile);
                 Tiles.Add(tile);
@@ -121,16 +106,33 @@ public partial class Item : VisualElement
         return new Vector2Int(minX, minY);
     }
 
-    public void RotateRight()
-    {
-        //_itemSO.RotateCW();
-        Debug.Log("rotated clockwise");
-    }
+    public void Rotate(int dir)
+    { 
+        if (dir == 0)
+        {
+            return;
+        }
 
-    public void RotateLeft()
-    {
-        //_itemSO.RotateCW();
-        Debug.Log("rotated counter clockwise");
+        foreach (ItemTile tile in Tiles)
+        {
+            tile.SetIndex(tile.Index.y, _itemSO.Height - 1 - tile.Index.x);
+            Debug.Log(tile.Index);
+
+            //tile.style.left = tile.Index.y * InventoryController.Instance.ItemTileSize.x;
+            //tile.style.top = tile.Index.x * InventoryController.Instance.ItemTileSize.y;
+        }
+
+        if (dir > 0)
+        {
+            //Debug.Log("rotated clockwise");
+            _itemSO.RotateCW();
+        }
+        else
+        {
+            //Debug.Log("rotated counter clockwise");
+        }
+
+        style.rotate = new Rotate(new Angle(_itemSO.Rotation, AngleUnit.Degree));
     }
 
     /// <summary>
@@ -185,7 +187,6 @@ public partial class Item : VisualElement
             int gridCol = startSlot.GridIndex.y + (tile.Index.y - Pivot.Index.y);
 
             tile.SetGridSlot(gridRow, gridCol);
-            //Debug.Log($"{name}-- row: {gridRow}, col: {gridCol}");
         }
 
         RootGridIndex = GetRootGridPosition();

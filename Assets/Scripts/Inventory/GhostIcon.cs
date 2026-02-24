@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.UIElements;
+using static UnityEditor.Progress;
 
 [UxmlElement]
 public partial class GhostIcon : VisualElement
@@ -8,7 +9,6 @@ public partial class GhostIcon : VisualElement
     // Fields
 
     private VisualElement _icon;
-    private Item _draggedItem;
 
     public GhostIcon()
     {
@@ -23,19 +23,31 @@ public partial class GhostIcon : VisualElement
     /// Sets the ghost icon's visual to mirror an item
     /// </summary>
     /// <param name="item">The item to set the icon to</param>
-    public void SetIcon(Item item)
+    public void SetItem(Item item)
     {
-        _draggedItem = item;
+        MatchItemStyle(item);
+        MatchItemRotation(item);
+
+        Add(_icon);
+    }
+
+    public void MatchItemStyle(Item item)
+    {
         style.width = item.resolvedStyle.width;
         style.height = item.resolvedStyle.height;
 
         _icon = new VisualElement();
         _icon.AddToClassList("ghost-icon-visual");
+
         _icon.style.width = item.resolvedStyle.width;
         _icon.style.height = item.resolvedStyle.height;
         _icon.style.backgroundImage = item.Type.Sprite.texture;
+    }
 
-        Add(_icon);
+    public void MatchItemRotation(Item item)
+    {
+        style.rotate = item.style.rotate;
+        SetToMousePosition(item.Pivot);
     }
 
     /// <summary>
@@ -49,11 +61,6 @@ public partial class GhostIcon : VisualElement
             _icon = null;
         }
 
-        if (_draggedItem != null)
-        {
-            _draggedItem = null;
-        }
-
         style.left = 0;
         style.top = 0;
         style.width = 0;
@@ -61,11 +68,11 @@ public partial class GhostIcon : VisualElement
     }
 
     /// <summary>
-    /// Centers the ghost icon on the given position
+    /// Centers the mouse on the given tile
     /// </summary>
-    public void SetToMousePosition()
+    public void SetToMousePosition(ItemTile origin)
     {
-        if (_draggedItem == null || _draggedItem.Pivot == null)
+        if (origin == null)
         {
             return;
         }
@@ -73,12 +80,12 @@ public partial class GhostIcon : VisualElement
         Vector2 mouseScreen = Mouse.current.position.ReadValue();
         Vector2 mousePanel = UIHelpers.WorldToLocalUIPosition(panel, mouseScreen);
 
-        float tileWidth = _draggedItem.Pivot.resolvedStyle.width;
-        float tileHeight = _draggedItem.Pivot.resolvedStyle.height;
+        float tileWidth = InventoryController.Instance.ItemTileSize.x;
+        float tileHeight = InventoryController.Instance.ItemTileSize.y;
 
         // Find offset from pivot
-        float rowOffset = tileHeight * _draggedItem.Pivot.Index.x;
-        float colOffset = tileWidth * _draggedItem.Pivot.Index.y;   
+        float rowOffset = tileHeight * origin.Index.x;
+        float colOffset = tileWidth * origin.Index.y;   
 
         style.left = mousePanel.x - colOffset - tileWidth * 0.5f;
         style.top = mousePanel.y - rowOffset - tileHeight * 0.5f;
