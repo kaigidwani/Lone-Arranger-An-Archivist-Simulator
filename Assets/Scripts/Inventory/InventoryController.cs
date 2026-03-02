@@ -140,10 +140,12 @@ public class InventoryController : MonoBehaviour
             {
                 tile.ClearGridSlot();
             }
-            
         }
 
-        //Cursor.visible = false;
+        if (!ShowDebug)
+        {
+            Cursor.visible = false;
+        }
 
         _draggedItem.style.visibility = Visibility.Hidden;
 

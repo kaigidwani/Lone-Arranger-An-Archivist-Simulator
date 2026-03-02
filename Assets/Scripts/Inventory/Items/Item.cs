@@ -127,9 +127,6 @@ public partial class Item : VisualElement
 
             tile.style.rotate = new Rotate(new Angle(360.0f - rot.angle.value, AngleUnit.Degree));
             tile.DebugLabel.text = $"({tile.Index.x}, {tile.Index.y})";
-            
-            //tile.style.left = tile.Index.y * InventoryController.Instance.ItemTileSize.x;
-            //tile.style.top = tile.Index.x * InventoryController.Instance.ItemTileSize.y;
         }
 
         if (dir > 0)
@@ -185,8 +182,17 @@ public partial class Item : VisualElement
         float rowOffset = Pivot.Index.x * InventoryController.Instance.SlotSize.y;
         float colOffset = Pivot.Index.y * InventoryController.Instance.SlotSize.x;
 
-        style.left = startSlot.resolvedStyle.left - colOffset;
-        style.top = startSlot.resolvedStyle.top - rowOffset;
+        Debug.Log($"Item rotation: {_itemSO.Rotation}");
+        if (_itemSO.Rotation % 180 != 0)
+        {
+            style.left = startSlot.resolvedStyle.left - colOffset + InventoryController.Instance.ItemTileSize.x / 2;
+            style.top = startSlot.resolvedStyle.top - rowOffset - InventoryController.Instance.ItemTileSize.y / 2;
+        }
+        else
+        {
+            style.left = startSlot.resolvedStyle.left - colOffset;
+            style.top = startSlot.resolvedStyle.top - rowOffset;
+        }
 
         foreach (ItemTile tile in Tiles)
         {
