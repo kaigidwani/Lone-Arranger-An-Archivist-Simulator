@@ -89,7 +89,5 @@ public class PlaceableItemSO : ScriptableObject
 
         string[] newActiveTiles = RebuildActiveTiles(rotatedShape);
         Shape = ParseActiveTiles(newActiveTiles, Width, Height);
-
-        Rotation = (Rotation + 90) % 360;
     }
 }

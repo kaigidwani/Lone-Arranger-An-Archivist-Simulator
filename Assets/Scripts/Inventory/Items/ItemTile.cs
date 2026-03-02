@@ -5,6 +5,10 @@ using System;
 [UxmlElement]
 public partial class ItemTile : VisualElement
 {
+    // Properties
+
+    public Label DebugLabel { get; set; }
+
     /// <summary>
     /// The item that this tile belongs to
     /// </summary>
@@ -36,6 +40,11 @@ public partial class ItemTile : VisualElement
         RegisterCallback<PointerDownEvent>(OnPointerDown);
 
         OnStartDrag += InventoryController.Instance.OnPointerDown;
+
+        DebugLabel = new Label("");
+        DebugLabel.AddToClassList("debug-text");
+
+        Add(DebugLabel);
     }
 
     #region Events

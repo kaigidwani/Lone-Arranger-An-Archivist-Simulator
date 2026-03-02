@@ -6,9 +6,10 @@ public partial class Slot : VisualElement
 {
     // Fields
 
-    private Label _debugLabel;
+
 
     // Properties
+    public Label DebugLabel { get; set; }
 
     /// <summary>
     /// The position of this slot on the inventory grid
@@ -35,10 +36,10 @@ public partial class Slot : VisualElement
             Color = GetColor();
         });
 
-        _debugLabel = new Label("Empty");
-        _debugLabel.AddToClassList("debug-text");
+        DebugLabel = new Label("Empty");
+        DebugLabel.AddToClassList("debug-text");
 
-        Add(_debugLabel);
+        Add(DebugLabel);
     }
 
     /// <summary>
@@ -66,12 +67,12 @@ public partial class Slot : VisualElement
     public void SetTile(ItemTile tile)
     {
         TileRef = tile;
-        _debugLabel.text = TileRef.name;
+        DebugLabel.text = TileRef.name;
     }
 
     public void ClearTile()
     {
         TileRef = null;
-        _debugLabel.text = "Empty";
+        DebugLabel.text = "Empty";
     }
 }

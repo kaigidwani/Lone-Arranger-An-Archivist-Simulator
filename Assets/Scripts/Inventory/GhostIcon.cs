@@ -1,3 +1,4 @@
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.UIElements;
@@ -10,6 +11,10 @@ public partial class GhostIcon : VisualElement
 
     private VisualElement _icon;
 
+
+    // Properties
+    public Label DebugLabel;
+
     public GhostIcon()
     {
         // Make sure styling is applied
@@ -17,6 +22,14 @@ public partial class GhostIcon : VisualElement
         {
             AddToClassList("ghost-icon");
         }
+
+        _icon = new VisualElement();
+        _icon.AddToClassList("ghost-icon-visual");
+        Add(_icon);
+
+        DebugLabel = new Label("");
+        DebugLabel.AddToClassList("debug-text");
+        Add(DebugLabel);
     }
 
     /// <summary>
@@ -27,17 +40,12 @@ public partial class GhostIcon : VisualElement
     {
         MatchItemStyle(item);
         MatchItemRotation(item);
-
-        Add(_icon);
     }
 
     public void MatchItemStyle(Item item)
     {
         style.width = item.resolvedStyle.width;
         style.height = item.resolvedStyle.height;
-
-        _icon = new VisualElement();
-        _icon.AddToClassList("ghost-icon-visual");
 
         _icon.style.width = item.resolvedStyle.width;
         _icon.style.height = item.resolvedStyle.height;
@@ -55,12 +63,6 @@ public partial class GhostIcon : VisualElement
     /// </summary>
     public void ResetIcon()
     {
-        if (_icon != null)
-        {
-            _icon.RemoveFromHierarchy();
-            _icon = null;
-        }
-
         style.left = 0;
         style.top = 0;
         style.width = 0;
@@ -76,6 +78,8 @@ public partial class GhostIcon : VisualElement
         {
             return;
         }
+
+        DebugLabel.text = $"Pivot: ({origin.Index.x}, {origin.Index.y})";
 
         Vector2 mouseScreen = Mouse.current.position.ReadValue();
         Vector2 mousePanel = UIHelpers.WorldToLocalUIPosition(panel, mouseScreen);

@@ -80,6 +80,9 @@ public partial class Item : VisualElement
 
                 Add(tile);
                 Tiles.Add(tile);
+
+                tile.DebugLabel.text = $"({tile.Index.x}, {tile.Index.y})";
+                tile.DebugLabel.visible = InventoryController.Instance.ShowDebug;
             }
         }
     }
@@ -113,26 +116,30 @@ public partial class Item : VisualElement
             return;
         }
 
+        _itemSO.Rotation = (_itemSO.Rotation + 90 * dir) % 360;
+
+        Rotate rot = new Rotate(new Angle(_itemSO.Rotation, AngleUnit.Degree));
+        style.rotate = rot;
+
         foreach (ItemTile tile in Tiles)
         {
             tile.SetIndex(tile.Index.y, _itemSO.Height - 1 - tile.Index.x);
-            Debug.Log(tile.Index);
 
+            tile.style.rotate = new Rotate(new Angle(360.0f - rot.angle.value, AngleUnit.Degree));
+            tile.DebugLabel.text = $"({tile.Index.x}, {tile.Index.y})";
+            
             //tile.style.left = tile.Index.y * InventoryController.Instance.ItemTileSize.x;
             //tile.style.top = tile.Index.x * InventoryController.Instance.ItemTileSize.y;
         }
 
         if (dir > 0)
         {
-            //Debug.Log("rotated clockwise");
             _itemSO.RotateCW();
         }
         else
         {
-            //Debug.Log("rotated counter clockwise");
         }
-
-        style.rotate = new Rotate(new Angle(_itemSO.Rotation, AngleUnit.Degree));
+  
     }
 
     /// <summary>

@@ -30,6 +30,8 @@ public class InventoryController : MonoBehaviour
 
     public PlaceableItemSO[] ItemPool;
 
+    public bool ShowDebug;
+
     /// <summary>
     /// The list of slots represented as a 2D array
     /// (X = Row, Y = Column)
@@ -115,6 +117,9 @@ public class InventoryController : MonoBehaviour
         
         _root.RegisterCallback<PointerMoveEvent>(OnPointerMove);
         _root.RegisterCallback<PointerUpEvent>(OnPointerUp);
+
+        ShowDebug = false;
+        SetDebug();
     }
 
     #region Events
@@ -281,5 +286,44 @@ public class InventoryController : MonoBehaviour
 
         _draggedItem.Rotate((int)dir);
         _ghostIcon.MatchItemRotation(_draggedItem);
+    }
+
+    public void SetDebug()
+    {
+        if (ShowDebug)
+        {
+            Debug.Log("Debug on");
+        }
+        else
+        {
+            Debug.Log("Debug off");
+        }
+        
+
+        List<Item> items = _root.Query<Item>().ToList();
+        for (int i = 0; i < items.Count; i++)
+        {
+            foreach (ItemTile tile in items[i].Tiles)
+            {
+                tile.DebugLabel.visible = ShowDebug;
+            }
+        }
+
+        for (int i = 0; i < _slotList.Count; i++)
+        {
+            _slotList[i].DebugLabel.visible = ShowDebug;
+        }
+
+        _ghostIcon.DebugLabel.visible = ShowDebug;
+    }
+
+    public void OnToggleDebug(InputAction.CallbackContext ctx)
+    {
+        if (ctx.phase == InputActionPhase.Performed)
+        {
+            ShowDebug = !ShowDebug;
+
+            SetDebug();
+        }
     }
 }

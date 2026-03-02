@@ -189,6 +189,7 @@ MonoBehaviour:
   Height: 6
   ItemPool:
   - {fileID: 11400000, guid: a43ea40ed6e53a645a41abeb59ef83d7, type: 2}
+  ShowDebug: 1
 --- !u!114 &222657679
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -270,6 +271,22 @@ MonoBehaviour:
       m_Calls: []
     m_ActionId: 9caa3d8a-6b2f-4e8e-8bad-6ede561bd9be
     m_ActionName: UI/TrackedDeviceOrientation
+  - m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 222657678}
+        m_TargetAssemblyTypeName: InventoryController, Assembly-CSharp
+        m_MethodName: OnToggleDebug
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+    m_ActionId: 18b7b308-d25d-41da-8fe7-cf2cf8217d34
+    m_ActionName: 'Player/Debug[/Keyboard/f]'
   m_NeverAutoSwitchControlSchemes: 0
   m_DefaultControlScheme: Keyboard&Mouse
   m_DefaultActionMap: Player
