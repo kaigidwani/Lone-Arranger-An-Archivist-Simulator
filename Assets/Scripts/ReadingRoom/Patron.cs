@@ -36,6 +36,8 @@ public class Patron : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        
+        // TODO:
+        // - Check if the player has taken the request yet
+        // - Then: Check if the request has been completed yet
     }
 }
