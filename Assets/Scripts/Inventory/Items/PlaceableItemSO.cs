@@ -68,24 +68,32 @@ public class PlaceableItemSO : ScriptableObject
         return rowList;
     }
 
-    public void Rotate(int dir)
+    public void RotateShape(int dir)
     {
         int[][] currentShape = Shape;
         int[][] rotatedShape = new int[Width][];
         
         for (int x = 0; x < Width; x++)
         {
-            rotatedShape[x] = new int[Height];
-
             for (int y = 0; y < Height; y++)
             {
                 if (dir >= 0)
                 {
+                    if (rotatedShape[x] == null)
+                    {
+                        rotatedShape[x] = new int[Height];
+                    }
+
                     rotatedShape[x][Height - 1 - y] = currentShape[y][x];
                 }
                 else
                 {
-                    return;
+                    if (rotatedShape[Width - 1 - x] == null)
+                    {
+                        rotatedShape[Width - 1 - x] = new int[Height];
+                    }
+
+                    rotatedShape[Width - 1 - x][y] = currentShape[y][x];
                 }
             }
         }

@@ -1,9 +1,10 @@
+using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.UIElements;
-using System.Collections.Generic;
 using static UnityEditor.Progress;
+using static UnityEngine.Rendering.DebugUI.Table;
 
 [UxmlElement]
 public partial class GhostIcon : VisualElement
@@ -46,7 +47,16 @@ public partial class GhostIcon : VisualElement
 
     public void MatchItemRotation(Item item)
     {
+        if (Mathf.Abs(item.style.rotate.value.angle.value - style.rotate.value.angle.value) > 90)
+        {
+            style.transitionDuration = new List<TimeValue> { new TimeValue(0, TimeUnit.Second) };
+        }
+
         style.rotate = item.style.rotate;
+
+        // Keep debug label orientation
+        DebugLabel.style.rotate = new Rotate(new Angle(360.0f - style.rotate.value.angle.value, AngleUnit.Degree));
+
         SetToMousePosition(item.Pivot);
     }
 
@@ -61,6 +71,8 @@ public partial class GhostIcon : VisualElement
         style.width = 0;
         style.height = 0;
         style.transitionDuration = new List<TimeValue> { new TimeValue(0, TimeUnit.Second) };
+
+        DebugLabel.style.visibility = Visibility.Hidden;
     }
 
     /// <summary>
@@ -97,5 +109,11 @@ public partial class GhostIcon : VisualElement
 
         style.visibility = Visibility.Visible;
         style.transitionDuration = new List<TimeValue> { new TimeValue(TRANSITION_DURATION, TimeUnit.Second) };
+
+        if (InventoryController.Instance.ShowDebug)
+        {
+            DebugLabel.style.visibility = Visibility.Visible;
+        }
+        
     }
 }

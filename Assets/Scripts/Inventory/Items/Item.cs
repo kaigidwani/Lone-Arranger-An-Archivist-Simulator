@@ -115,12 +115,7 @@ public partial class Item : VisualElement
     }
 
     public void Rotate(int dir)
-    { 
-        if (dir != 1)
-        {
-            return;
-        }
-
+    {
         _itemSO.Rotation = (_itemSO.Rotation + 90 * dir);
 
         Rotate rot = new Rotate(new Angle(_itemSO.Rotation, AngleUnit.Degree));
@@ -142,7 +137,7 @@ public partial class Item : VisualElement
             tile.DebugLabel.text = $"({tile.Index.x}, {tile.Index.y})";
         }
 
-        _itemSO.Rotate(dir);
+        _itemSO.RotateShape(dir);
   
     }
 
@@ -158,12 +153,7 @@ public partial class Item : VisualElement
             }
             else
             {
-                // Will replace this with counter clockwise rotation when I'm able to
-
-                for (int j = 0; j < 3; j++)
-                {
-                    Rotate(1);
-                }
+                Rotate(-1);
             }
         }
     }
@@ -237,6 +227,7 @@ public partial class Item : VisualElement
 
         dest.Add(this);
         IsPlaced = true;
+        _itemSO.Rotation = _itemSO.Rotation % 360;
     }
 
     public void SetScale(Vector2 scale)
