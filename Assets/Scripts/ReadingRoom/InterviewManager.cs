@@ -13,6 +13,9 @@ public class InterviewManager : MonoBehaviour
     [SerializeField] private List<PatronRequest> _requestsList;
     [SerializeField] private List<Patron> _patronsList;
 
+    [SerializeField] private GameObject requestsContainer;
+    [SerializeField] private GameObject requestPrefab;
+
 
     // === Properties ===
 
