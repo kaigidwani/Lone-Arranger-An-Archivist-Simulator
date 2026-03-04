@@ -69,38 +69,17 @@
     justify-content: flex-start;
 }
 
-.item-red {
-    background-color: rgba(153, 9, 9, 0.51);
-    transition-duration: 0.5s;
-}
-
-.item-blue {
-    background-color: rgba(58, 89, 151, 0.51);
-    transition-duration: 0.5s;
-}
-
-.item-green {
-    background-color: rgba(38, 91, 30, 0.51);
-    transition-duration: 0.5s;
-}
-
-.item-default {
-    transition-duration: 0.5s;
-}
-
 .item-slotted {
     position: absolute;
     scale: 1 1;
-}
-
-.item-sprite {
-    position: absolute;
 }
 
 .item-tile {
     position: absolute;
     align-self: center;
     justify-content: center;
+    transition-property: background-color;
+    transition-duration: 0.5s;
 }
 
 .accessioning-box {
@@ -194,11 +173,6 @@
     align-self: flex-start;
     align-items: auto;
     opacity: 0.8;
-}
-
-.ghost-icon-visual {
-    background-size: cover;
-    position: relative;
 }
 
 .slot-hover {

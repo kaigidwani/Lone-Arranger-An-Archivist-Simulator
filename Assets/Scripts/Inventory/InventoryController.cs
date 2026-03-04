@@ -30,7 +30,7 @@ public class InventoryController : MonoBehaviour
 
     public PlaceableItemSO[] ItemPool;
 
-    public bool ShowDebug;
+    [HideInInspector] public bool ShowDebug;
 
     /// <summary>
     /// The list of slots represented as a 2D array
@@ -199,14 +199,19 @@ public class InventoryController : MonoBehaviour
                 hoveredSlot = s;
             }
         }
-        
-        if (hoveredSlot != null && CanPlace(hoveredSlot))
+
+        if (CanPlace(hoveredSlot))
         {
             _draggedItem.Place(_itemContainer, hoveredSlot);    
         }
-        else if (_draggedItem.IsPlaced)
+        else
         {
-            _draggedItem.Place(_itemContainer, _draggedItem.Pivot.GridSlot);
+            _draggedItem.RevertRotation();
+
+            if (_draggedItem.IsPlaced)
+            {
+                _draggedItem.Place(_itemContainer, _draggedItem.Pivot.GridSlot);
+            }
         }
 
         _ghostIcon.ResetIcon();
@@ -223,6 +228,11 @@ public class InventoryController : MonoBehaviour
     /// <returns>Whether the item can be placed in the given slot</returns>
     private bool CanPlace(Slot startSlot)
     {
+        if (startSlot == null)
+        {
+            return false;
+        }
+
         foreach (ItemTile tile in _draggedItem.Tiles)
         {
             int gridRow = startSlot.GridIndex.x + (tile.Index.x - _draggedItem.Pivot.Index.x);

@@ -15,7 +15,7 @@ public class PlaceableItemSO : ScriptableObject
     public string Name;
     public string Description;
     public Sprite Sprite;
-    public float Rotation = 0;
+    public int Rotation = 0;
 
     public int Width { get; private set; }
 
@@ -68,7 +68,7 @@ public class PlaceableItemSO : ScriptableObject
         return rowList;
     }
 
-    public void RotateCW()
+    public void Rotate(int dir)
     {
         int[][] currentShape = Shape;
         int[][] rotatedShape = new int[Width][];
@@ -79,13 +79,19 @@ public class PlaceableItemSO : ScriptableObject
 
             for (int y = 0; y < Height; y++)
             {
-                rotatedShape[x][Height - 1 - y] = currentShape[y][x];
+                if (dir >= 0)
+                {
+                    rotatedShape[x][Height - 1 - y] = currentShape[y][x];
+                }
+                else
+                {
+                    return;
+                }
             }
         }
 
         Width = rotatedShape[0].Length;
         Height = rotatedShape.Length;
-        Debug.Log($"{Name}: rotated new dimensions = {Width}, {Height}");
 
         string[] newActiveTiles = RebuildActiveTiles(rotatedShape);
         Shape = ParseActiveTiles(newActiveTiles, Width, Height);

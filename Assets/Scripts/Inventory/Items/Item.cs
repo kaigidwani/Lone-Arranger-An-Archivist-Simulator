@@ -14,9 +14,14 @@ public partial class Item : VisualElement
     // Properties
 
     /// <summary>
+    /// The rotation of this item before it was clicked
+    /// </summary>
+    public int StoredRotation { get; set; }
+
+    /// <summary>
     /// Contains information about this item
     /// </summary>
-    public PlaceableItemSO Type { get { return _itemSO; } }
+    public PlaceableItemSO SO { get { return _itemSO; } }
 
     /// <summary>
     /// List of individual tiles that make up this item
@@ -111,32 +116,56 @@ public partial class Item : VisualElement
 
     public void Rotate(int dir)
     { 
-        if (dir == 0)
+        if (dir != 1)
         {
             return;
         }
 
-        _itemSO.Rotation = (_itemSO.Rotation + 90 * dir) % 360;
+        _itemSO.Rotation = (_itemSO.Rotation + 90 * dir);
 
         Rotate rot = new Rotate(new Angle(_itemSO.Rotation, AngleUnit.Degree));
         style.rotate = rot;
 
         foreach (ItemTile tile in Tiles)
         {
-            tile.SetIndex(tile.Index.y, _itemSO.Height - 1 - tile.Index.x);
+            if (dir >= 0)
+            {
+                tile.SetIndex(tile.Index.y, _itemSO.Height - 1 - tile.Index.x);
+            }
+            else
+            {
+                tile.SetIndex(_itemSO.Width - 1 - tile.Index.y, tile.Index.x);
+            }
 
-            tile.style.rotate = new Rotate(new Angle(360.0f - rot.angle.value, AngleUnit.Degree));
+            // Keep debug label orientation
+            tile.DebugLabel.style.rotate = new Rotate(new Angle(360.0f - rot.angle.value, AngleUnit.Degree));
             tile.DebugLabel.text = $"({tile.Index.x}, {tile.Index.y})";
         }
 
-        if (dir > 0)
-        {
-            _itemSO.RotateCW();
-        }
-        else
-        {
-        }
+        _itemSO.Rotate(dir);
   
+    }
+
+    public void RevertRotation()
+    {
+        int correctionCount = (_itemSO.Rotation - StoredRotation) / 90;
+
+        for (int i = 0; i < Mathf.Abs(correctionCount); i++)
+        {
+            if (correctionCount < 0)
+            {
+                Rotate(1);
+            }
+            else
+            {
+                // Will replace this with counter clockwise rotation when I'm able to
+
+                for (int j = 0; j < 3; j++)
+                {
+                    Rotate(1);
+                }
+            }
+        }
     }
 
     /// <summary>
@@ -173,26 +202,27 @@ public partial class Item : VisualElement
     /// <param name="startSlot">The slot that the user places the item in</param>
     public void Place(VisualElement dest, Slot startSlot)
     {
-        RemoveFromHierarchy(); // Remove from accessioning box
-        dest.Add(this);
-
+        // TO-DO:
+        // Move to seperate function so this is only called after
+        // taking an item from accessioniong
+        RemoveFromHierarchy(); // Remove from accessioning box 
         RemoveFromClassList("item");
         AddToClassList("item-slotted");
+        // ------------------------------
 
         float rowOffset = Pivot.Index.x * InventoryController.Instance.SlotSize.y;
         float colOffset = Pivot.Index.y * InventoryController.Instance.SlotSize.x;
 
         Debug.Log($"Item rotation: {_itemSO.Rotation}");
+
+        float drawOffset = 0;
         if (_itemSO.Rotation % 180 != 0)
         {
-            style.left = startSlot.resolvedStyle.left - colOffset + InventoryController.Instance.ItemTileSize.x / 2;
-            style.top = startSlot.resolvedStyle.top - rowOffset - InventoryController.Instance.ItemTileSize.y / 2;
+            drawOffset = (_itemSO.Width - _itemSO.Height) * InventoryController.Instance.ItemTileSize.x / 2;
         }
-        else
-        {
-            style.left = startSlot.resolvedStyle.left - colOffset;
-            style.top = startSlot.resolvedStyle.top - rowOffset;
-        }
+
+        style.left = startSlot.resolvedStyle.left - colOffset + drawOffset;
+        style.top = startSlot.resolvedStyle.top - rowOffset - drawOffset;
 
         foreach (ItemTile tile in Tiles)
         {
@@ -200,11 +230,12 @@ public partial class Item : VisualElement
             int gridCol = startSlot.GridIndex.y + (tile.Index.y - Pivot.Index.y);
 
             tile.SetGridSlot(gridRow, gridCol);
+            tile.SetColor();
         }
 
         RootGridIndex = GetRootGridPosition();
 
-        SetTileColors();
+        dest.Add(this);
         IsPlaced = true;
     }
 
@@ -216,14 +247,6 @@ public partial class Item : VisualElement
     public void ResetScale()
     {
         style.scale = new StyleScale(Vector2.one);
-    }
-
-    public void SetTileColors()
-    {
-        foreach (ItemTile tile in Tiles)
-        {
-            tile.SetColor();
-        }
     }
 
     public void ResetTileColors()

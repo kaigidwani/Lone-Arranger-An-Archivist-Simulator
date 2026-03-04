@@ -2,15 +2,14 @@ using UnityEditor;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.UIElements;
+using System.Collections.Generic;
 using static UnityEditor.Progress;
 
 [UxmlElement]
 public partial class GhostIcon : VisualElement
 {
     // Fields
-
-    private VisualElement _icon;
-
+    private static float TRANSITION_DURATION = 0.2f;
 
     // Properties
     public Label DebugLabel;
@@ -22,10 +21,6 @@ public partial class GhostIcon : VisualElement
         {
             AddToClassList("ghost-icon");
         }
-
-        _icon = new VisualElement();
-        _icon.AddToClassList("ghost-icon-visual");
-        Add(_icon);
 
         DebugLabel = new Label("");
         DebugLabel.AddToClassList("debug-text");
@@ -46,10 +41,7 @@ public partial class GhostIcon : VisualElement
     {
         style.width = item.resolvedStyle.width;
         style.height = item.resolvedStyle.height;
-
-        _icon.style.width = item.resolvedStyle.width;
-        _icon.style.height = item.resolvedStyle.height;
-        _icon.style.backgroundImage = item.Type.Sprite.texture;
+        style.backgroundImage = item.SO.Sprite.texture;
     }
 
     public void MatchItemRotation(Item item)
@@ -63,10 +55,12 @@ public partial class GhostIcon : VisualElement
     /// </summary>
     public void ResetIcon()
     {
+        style.visibility = Visibility.Hidden;
         style.left = 0;
         style.top = 0;
         style.width = 0;
         style.height = 0;
+        style.transitionDuration = new List<TimeValue> { new TimeValue(0, TimeUnit.Second) };
     }
 
     /// <summary>
@@ -78,7 +72,7 @@ public partial class GhostIcon : VisualElement
         {
             return;
         }
-
+        
         DebugLabel.text = $"Pivot: ({origin.Index.x}, {origin.Index.y})";
 
         Vector2 mouseScreen = Mouse.current.position.ReadValue();
@@ -89,10 +83,19 @@ public partial class GhostIcon : VisualElement
 
         // Find offset from pivot
         float rowOffset = tileHeight * origin.Index.x;
-        float colOffset = tileWidth * origin.Index.y;   
+        float colOffset = tileWidth * origin.Index.y;
 
-        style.left = mousePanel.x - colOffset - tileWidth * 0.5f;
-        style.top = mousePanel.y - rowOffset - tileHeight * 0.5f;
+        float drawOffset = 0;
+        PlaceableItemSO so = origin.ParentItem.SO;
+        if (so.Rotation % 180 != 0)
+        {
+            drawOffset = (so.Width - so.Height) * InventoryController.Instance.ItemTileSize.x / 2;
+        }
 
+        style.left = (mousePanel.x - colOffset - tileWidth * 0.5f) + drawOffset;
+        style.top = (mousePanel.y - rowOffset - tileHeight * 0.5f) - drawOffset;
+
+        style.visibility = Visibility.Visible;
+        style.transitionDuration = new List<TimeValue> { new TimeValue(TRANSITION_DURATION, TimeUnit.Second) };
     }
 }

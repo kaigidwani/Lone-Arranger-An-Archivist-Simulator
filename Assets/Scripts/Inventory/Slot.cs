@@ -1,12 +1,18 @@
 using UnityEngine;
 using UnityEngine.UIElements;
 
+public enum SlotColor
+{
+    None,
+    Red,
+    Green,
+    Blue,
+}
+
 [UxmlElement]
 public partial class Slot : VisualElement
 {
     // Fields
-
-
 
     // Properties
     public Label DebugLabel { get; set; }
@@ -20,7 +26,7 @@ public partial class Slot : VisualElement
     /// <summary>
     /// Color of this slot as a string
     /// </summary>
-    public string Color { get; private set; }
+    public SlotColor Color { get; private set; }
 
     /// <summary>
     /// Which tile is currently contained in this slot
@@ -46,17 +52,33 @@ public partial class Slot : VisualElement
     /// Finds the color of this slot via its classlist
     /// </summary>
     /// <returns>A string containing the color of this slot</returns>
-    private string GetColor()
+    private SlotColor GetColor()
     {
         foreach (string className in GetClasses())
         {
             if (className.StartsWith("inventory-slot-"))
             {
-                return className.Replace("inventory-slot-", "");
+                string colorStr = className.Replace("inventory-slot-", "");
+
+                switch (colorStr)
+                {
+                    case "red":
+                        return SlotColor.Red;
+
+                    case "green":
+                        return SlotColor.Green;
+
+                    case "blue":
+                        return SlotColor.Blue;
+
+                    case "default":
+                        return SlotColor.None;
+
+                }
             }
         }
 
-        return "";
+        return SlotColor.None;
 
     }
 
