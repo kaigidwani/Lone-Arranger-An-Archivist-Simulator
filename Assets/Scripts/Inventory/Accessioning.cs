@@ -46,28 +46,33 @@ public partial class Accessioning : VisualElement
         {
             _hasLoaded = false;
         }
-        
-        RegisterCallback<GeometryChangedEvent>(evt =>
+
+        RegisterCallback<GeometryChangedEvent>(OnLoad);
+    }
+
+    private void OnLoad(GeometryChangedEvent evt)
+    {
+        _paddingLeft = resolvedStyle.paddingLeft;
+        _paddingRight = resolvedStyle.paddingLeft;
+        _paddingTop = resolvedStyle.paddingLeft;
+        _paddingBottom = resolvedStyle.paddingLeft;
+
+        _boxSize = new Vector2(
+            resolvedStyle.width - resolvedStyle.borderLeftWidth - resolvedStyle.borderRightWidth - _paddingLeft - _paddingRight,
+            resolvedStyle.height - resolvedStyle.borderTopWidth - resolvedStyle.borderBottomWidth - _paddingTop - _paddingBottom);
+
+        if (!_hasLoaded) // Guarantees that items spawn once after event fires
         {
-            _paddingLeft = resolvedStyle.paddingLeft;
-            _paddingRight = resolvedStyle.paddingLeft;
-            _paddingTop = resolvedStyle.paddingLeft;
-            _paddingBottom = resolvedStyle.paddingLeft;
+            _hasLoaded = true;
 
-            _boxSize = new Vector2(
-                resolvedStyle.width - resolvedStyle.borderLeftWidth - resolvedStyle.borderRightWidth - _paddingLeft - _paddingRight,
-                resolvedStyle.height - resolvedStyle.borderTopWidth - resolvedStyle.borderBottomWidth - _paddingTop - _paddingBottom);
-
-            if (!_hasLoaded) // Guarantees that items spawn once after event fires
+            if (InventoryController.Instance != null)
             {
-                _hasLoaded = true;
+                SpawnItems();
 
-                if (InventoryController.Instance != null)
-                {
-                    SpawnItems();
-                }
             }
-        });
+        }
+
+        UnregisterCallback<GeometryChangedEvent>(OnLoad);
     }
 
     /// <summary>

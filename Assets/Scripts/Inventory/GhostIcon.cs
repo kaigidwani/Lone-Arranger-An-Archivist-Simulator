@@ -1,16 +1,14 @@
 using System.Collections.Generic;
-using UnityEditor;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.UIElements;
-using static UnityEditor.Progress;
-using static UnityEngine.Rendering.DebugUI.Table;
 
 [UxmlElement]
 public partial class GhostIcon : VisualElement
 {
     // Fields
-    private static float TRANSITION_DURATION = 0.2f;
+    private static float BASE_TRANSITION_DURATION = 0.2f;
+    private float _transitionDuration;
 
     // Properties
     public Label DebugLabel;
@@ -26,6 +24,8 @@ public partial class GhostIcon : VisualElement
         DebugLabel = new Label("");
         DebugLabel.AddToClassList("debug-text");
         Add(DebugLabel);
+
+        _transitionDuration = BASE_TRANSITION_DURATION;
     }
 
     /// <summary>
@@ -36,6 +36,8 @@ public partial class GhostIcon : VisualElement
     {
         MatchItemStyle(item);
         MatchItemRotation(item);
+
+        _transitionDuration *= item.SO.Weight;
     }
 
     public void MatchItemStyle(Item item)
@@ -73,6 +75,7 @@ public partial class GhostIcon : VisualElement
         style.transitionDuration = new List<TimeValue> { new TimeValue(0, TimeUnit.Second) };
 
         DebugLabel.style.visibility = Visibility.Hidden;
+        _transitionDuration = BASE_TRANSITION_DURATION;
     }
 
     /// <summary>
@@ -108,7 +111,8 @@ public partial class GhostIcon : VisualElement
         style.top = (mousePanel.y - rowOffset - tileHeight * 0.5f) - drawOffset;
 
         style.visibility = Visibility.Visible;
-        style.transitionDuration = new List<TimeValue> { new TimeValue(TRANSITION_DURATION, TimeUnit.Second) };
+        
+        style.transitionDuration = new List<TimeValue> { new TimeValue(_transitionDuration, TimeUnit.Second) };
 
         if (InventoryController.Instance.ShowDebug)
         {

@@ -18,3 +18,5 @@ MonoBehaviour:
   Name: 1x1
   Description: This is a test of a 1x1 item
   Sprite: {fileID: -4887920078848588157, guid: c21a549ca20da654b99c87471f113503, type: 3}
+  Rotation: 0
+  Weight: 0.5

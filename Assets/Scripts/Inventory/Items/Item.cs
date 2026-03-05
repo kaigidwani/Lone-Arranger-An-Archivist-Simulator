@@ -2,7 +2,6 @@ using UnityEngine;
 using UnityEngine.UIElements;
 using System.Collections.Generic;
 using Random = UnityEngine.Random;
-using static UnityEngine.Rendering.DebugUI.Table;
 
 [UxmlElement]
 public partial class Item : VisualElement
@@ -44,7 +43,7 @@ public partial class Item : VisualElement
 
     public Item()
     {
-
+        pickingMode = PickingMode.Ignore;
     }
 
     /// <summary>

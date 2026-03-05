@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.UIElements;
@@ -104,7 +103,7 @@ public class InventoryController : MonoBehaviour
         }
 
         // Making sure the slot and itewm layers are the same size
-        GetSlot(0, 0).RegisterCallback<GeometryChangedEvent>((evt) =>
+        GetSlot(0, 0).RegisterCallbackOnce<GeometryChangedEvent>((evt) =>
         {
             VisualElement slotLayer = _root.Q("SlotLayer");
 

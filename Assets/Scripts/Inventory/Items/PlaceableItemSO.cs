@@ -16,6 +16,7 @@ public class PlaceableItemSO : ScriptableObject
     public string Description;
     public Sprite Sprite;
     public int Rotation = 0;
+    public float Weight = 1;
 
     public int Width { get; private set; }
 
