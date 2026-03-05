@@ -1,0 +1,63 @@
+.main-button {
+    font-size: 64px;
+    background-color: rgb(222, 254, 227);
+    margin-bottom: 30px;
+    border-top-width: 5px;
+    border-right-width: 5px;
+    border-bottom-width: 5px;
+    border-left-width: 5px;
+    border-left-color: rgb(123, 185, 126);
+    border-right-color: rgb(123, 185, 126);
+    border-top-color: rgb(123, 185, 126);
+    border-bottom-color: rgb(123, 185, 126);
+    border-top-left-radius: 20px;
+    border-top-right-radius: 20px;
+    border-bottom-right-radius: 20px;
+    border-bottom-left-radius: 20px;
+    width: 250px;
+    max-width: 275px;
+    transition-property: scale;
+    transition-duration: 0.2s;
+    transition-timing-function: ease-in-out-bounce;
+    margin-top: 10px;
+}
+
+.main-button:hover {
+    scale: 1.1 1.2;
+}
+
+.secondary-button {
+    font-size: 42px;
+    margin-bottom: 15px;
+    background-color: rgb(247, 247, 247);
+    border-top-width: 5px;
+    border-right-width: 5px;
+    border-bottom-width: 5px;
+    border-left-width: 5px;
+    border-top-left-radius: 20px;
+    border-top-right-radius: 20px;
+    border-bottom-right-radius: 20px;
+    border-bottom-left-radius: 20px;
+    border-left-color: rgb(114, 100, 92);
+    border-right-color: rgb(114, 100, 92);
+    border-top-color: rgb(114, 100, 92);
+    border-bottom-color: rgb(114, 100, 92);
+    transition-property: scale;
+    transition-timing-function: ease-in-out-bounce;
+    transition-duration: 0.2s;
+    margin-top: 5px;
+}
+
+.secondary-button:hover {
+    scale: 1.1 1.1;
+}
+
+.h1 {
+    -unity-font-style: bold;
+    font-size: 96px;
+}
+
+.h2 {
+    -unity-font-style: italic;
+    font-size: 48px;
+}

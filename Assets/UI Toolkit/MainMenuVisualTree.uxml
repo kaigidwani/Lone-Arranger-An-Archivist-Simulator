@@ -1,0 +1,13 @@
+<ui:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="project://database/Assets/UI%20Toolkit/MainMenuStyle.uss?fileID=7433441132597879392&amp;guid=965efb360fc620e458f257988c5110a3&amp;type=3#MainMenuStyle" />
+    <ui:VisualElement style="flex-grow: 1; background-color: rgb(255, 231, 205);">
+        <ui:VisualElement name="Title" style="flex-grow: 1; justify-content: center; align-self: auto; align-content: center; align-items: center;">
+            <ui:Label text="Lone Arranger" name="title" class="h1" />
+            <ui:Label text="An Archivist Simulator" name="subtitle" class="h2" />
+        </ui:VisualElement>
+        <ui:VisualElement name="Buttons" style="flex-grow: 1; justify-content: center; align-self: auto; align-content: center; align-items: center;">
+            <ui:Button text="Start" name="start" class="main-button" />
+            <ui:Button text="Options" name="options" class="secondary-button" />
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>
