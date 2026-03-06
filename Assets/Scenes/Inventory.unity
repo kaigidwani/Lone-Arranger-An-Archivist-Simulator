@@ -184,11 +184,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4ce9630953ca03649b2d8324c40f8ef9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  InventorySize: 
+  Width: 6
+  Height: 6
   ItemPool:
-  - {fileID: 11400000, guid: e083ca9a015f2d04f96d6152657d0b0a, type: 2}
-  - {fileID: 11400000, guid: 413d4706439c9b240b0c79d5ebbcd20a, type: 2}
-  - {fileID: 11400000, guid: a43ea40ed6e53a645a41abeb59ef83d7, type: 2}
+  - {fileID: 11400000, guid: 01f0e19f34e84624abc429800071b2de, type: 2}
+  - {fileID: 11400000, guid: c45e0665c7ad6ed419bdce7f6bb1b199, type: 2}
+  - {fileID: 11400000, guid: fdb055965725fcc4ba60b1dc66c7fc0e, type: 2}
 --- !u!1 &941369010
 GameObject:
   m_ObjectHideFlags: 0
