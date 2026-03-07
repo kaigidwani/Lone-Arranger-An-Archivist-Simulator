@@ -7,6 +7,7 @@ using UnityEngine.UIElements;
 public enum TransitionStyle
 {
     BasicFade,
+    LongFade,
     SlideIn,
 }
 

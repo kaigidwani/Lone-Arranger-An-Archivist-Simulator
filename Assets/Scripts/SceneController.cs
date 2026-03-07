@@ -15,10 +15,16 @@ public enum Scene
 public class SceneController : ScriptableObject
 {
     public static event Action<SceneController> OnSceneLoad;
+    public static event Action<SceneController> OnSceneExit;
 
     public async UniTask ChangeScene(Scene newScene)
     {
         Debug.Log("changing scene...");
+
+        if (OnSceneLoad != null)
+        {
+            OnSceneExit(this);
+        }
 
         await OverlayManager.Instance.DisplayOverlay();
 

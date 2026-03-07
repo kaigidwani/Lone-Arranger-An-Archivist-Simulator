@@ -6,6 +6,7 @@ using UnityEngine.UIElements;
 public class AccessioningController : MonoBehaviour
 {
     // Fields
+    [SerializeField] private SceneController _sceneController;
 
     private const string WRAPPER_CLS = "accessioning-column";
     private const string WRAPPER_ACTIVE_CLS = "accessioning-column--active";
@@ -15,6 +16,8 @@ public class AccessioningController : MonoBehaviour
     private VisualElement _root;
     private VisualElement _wrapper;
     private Accessioning _box;
+
+    private Button _startDayBttn;
 
     [SerializeField] private List<Transition> _transitionsList;
     [SerializeField] private TransitionStyle _transition;
@@ -26,6 +29,9 @@ public class AccessioningController : MonoBehaviour
         _wrapper = _root.Q(className: WRAPPER_CLS);
         _box = _root.Q<Accessioning>();
 
+        _startDayBttn = _root.Q<Button>("Start");
+        _startDayBttn.RegisterCallback<ClickEvent>(StartDay);
+
         _transitionInfo = _transitionsList.Find(t => t.Style == _transition);
         _wrapper.AddToClassList(_transitionInfo.ClassName);
 
@@ -35,10 +41,19 @@ public class AccessioningController : MonoBehaviour
 
     }
 
+
     public void OnDisable()
     {
         SceneController.OnSceneLoad -= DisplayAccessioning;
-        SceneController.OnSceneLoad -= HideAccessioning;
+        SceneController.OnSceneExit -= HideAccessioning;
+
+        _startDayBttn.UnregisterCallback<ClickEvent>(StartDay);
+    }
+
+    public void StartDay(ClickEvent evt)
+    {
+        SceneController.OnSceneExit += HideAccessioning;
+        _sceneController.ChangeScene(Scene.MainMenu);
     }
 
     public async void DisplayAccessioning(SceneController controller)

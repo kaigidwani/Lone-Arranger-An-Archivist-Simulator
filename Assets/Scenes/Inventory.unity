@@ -234,6 +234,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 045e8d52657bf9d44bee33c8e8498286, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _sceneController: {fileID: 11400000, guid: 1701d00df2ba8de43b7d010724f47cea, type: 2}
   _transitionsList:
   - Style: 1
     DurationMS: 500
