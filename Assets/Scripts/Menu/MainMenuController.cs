@@ -1,3 +1,4 @@
+using Cysharp.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -28,7 +29,6 @@ public class MainMenuController : MonoBehaviour
 
     private void OnStartGame(ClickEvent evt)
     {
-        Debug.Log("game started!");
         _sceneController.ChangeScene(Scene.Inventory);
     }
 }

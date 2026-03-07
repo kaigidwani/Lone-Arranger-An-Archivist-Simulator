@@ -10,6 +10,8 @@ public partial class Item : VisualElement
     // Fields
 
     private PlaceableItemSO _itemSO;
+    private float _width;
+    private float _height;
 
     // Properties
 
@@ -52,8 +54,10 @@ public partial class Item : VisualElement
         float tileHeight = InventoryController.Instance.SlotSize.y;
 
         // Parent container should be as big as the item is (totally)
-        style.width = _itemSO.Dimensions.y * tileWidth;
-        style.height = _itemSO.Dimensions.x * tileHeight;
+        _width = _itemSO.Dimensions.y * tileWidth;
+        _height = _itemSO.Dimensions.x * tileHeight;
+        style.width = _width;
+        style.height = _height;
 
         Tiles = new List<ItemTile>();
         for (int row = 0; row < _itemSO.Dimensions.x; row++)
@@ -132,21 +136,21 @@ public partial class Item : VisualElement
         // Generate random item from current item pool
         if (InventoryController.Instance.ItemPool.Length > 0)
         {
-            _itemSO = InventoryController.Instance.ItemPool[Random.Range(0, InventoryController.Instance.ItemPool.Length)];
+            _itemSO = InventoryController.Instance.ItemPool[Random.Range(0, InventoryController.Instance.ItemPool.Length)];           
             name = _itemSO.Name;
+            Debug.Log(_itemSO.Name);
 
+            _itemSO.GenerateShape();
             ConstructItem();
-        }
 
-        schedule.Execute(() =>
-        {
-            float x = Random.Range(box.Min.x, box.Max.x - resolvedStyle.width);
-            float y = Random.Range(box.Min.y, box.Max.y - resolvedStyle.height);
+            float x = Random.Range(box.Min.x, box.Max.x - _width);
+            float y = Random.Range(box.Min.y, box.Max.y - _height);
+            Debug.Log(new Vector2(box.Min.x, _width));
 
             style.left = x;
             style.top = y;
             style.opacity = 100;
-        });
+        }
     }
 
     /// <summary>

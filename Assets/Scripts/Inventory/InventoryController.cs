@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.UIElements;
+using UnityEngine.SceneManagement;
 using Cursor = UnityEngine.Cursor;
 
 
@@ -48,28 +49,36 @@ public class InventoryController : MonoBehaviour
         }
     }
 
+    private void OnEnable()
+    {
+        _root = GameObject.Find("AccessioningController").GetComponent<UIDocument>().rootVisualElement;
+        _itemContainer = _root.Q("ItemLayer");
+        _ghostIcon = _root.Q<GhostIcon>();
+
+        _slotList = _root.Query<Slot>().ToList();
+    }
+
+    private void OnDisable()
+    {
+        
+    }
+
     private void Awake()
     {
         // Singleton pattern
-        if (Instance != null && Instance != this)
-        {
-            Destroy(this.gameObject);
-            return;
-        }
-        else
+        if (Instance == null)
         {
             Instance = this;
+            DontDestroyOnLoad(gameObject);
+        }
+        else if (Instance != this)
+        {
+            Destroy(gameObject);
         }
     }
 
     void Start()
     {
-        _root = GetComponent<UIDocument>().rootVisualElement;
-        _itemContainer = _root.Q("ItemLayer");
-        _ghostIcon = _root.Q<GhostIcon>();
-
-        _slotList = _root.Query<Slot>().ToList();
-
         int row = 0;
         int col = 0;
         

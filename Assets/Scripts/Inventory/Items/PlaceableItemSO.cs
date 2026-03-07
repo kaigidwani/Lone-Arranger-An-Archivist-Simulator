@@ -28,7 +28,10 @@ public class PlaceableItemSO : ScriptableObject
         {
             _activeTiles = new string[(int)Dimensions.x];
         }
+    }
 
+    public void GenerateShape()
+    {
         // Converts the each row's string array of active tiles to a jagged array of integers
         // for easy parsing later on
         Shape = new int[(int)Dimensions.x][];

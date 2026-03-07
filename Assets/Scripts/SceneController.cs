@@ -1,10 +1,12 @@
 using Cysharp.Threading.Tasks;
+using System;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
 public enum Scene
 {
     MainMenu,
+    Accessioning,
     Inventory,
     ReferenceInterviews,
 }
@@ -12,9 +14,13 @@ public enum Scene
 [CreateAssetMenu(fileName = "SceneController", menuName = "Scriptable Objects/Managers/SceneController")]
 public class SceneController : ScriptableObject
 {
+    public static event Action<SceneController> OnSceneLoad;
+
     public async UniTask ChangeScene(Scene newScene)
     {
-        await TransitionManager.Instance.DisplayOverlay();
+        Debug.Log("changing scene...");
+
+        await OverlayManager.Instance.DisplayOverlay();
 
         switch (newScene)
         {
@@ -29,6 +35,11 @@ public class SceneController : ScriptableObject
                 break;
         }
 
-        await TransitionManager.Instance.HideOverlay();
+        await OverlayManager.Instance.HideOverlay();
+
+        if (OnSceneLoad != null)
+        {
+            OnSceneLoad(this);
+        }
     }
 }

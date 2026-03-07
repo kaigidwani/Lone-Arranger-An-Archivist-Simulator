@@ -7,7 +7,7 @@ using UnityEngine.UIElements;
 public enum TransitionStyle
 {
     BasicFade,
-    
+    SlideIn,
 }
 
 [Serializable]
@@ -18,9 +18,9 @@ public struct Transition
     public string ClassName;
 }
 
-public class TransitionManager : MonoBehaviour
+public class OverlayManager : MonoBehaviour
 {
-    public static TransitionManager Instance;
+    public static OverlayManager Instance;
 
     private const string WRAPPER_CLS = "overlay";
     private const string WRAPPER_ACTIVE_CLS = "overlay--active";
@@ -30,6 +30,7 @@ public class TransitionManager : MonoBehaviour
 
     [SerializeField] private List<Transition> _transitionsList;
     [SerializeField] private TransitionStyle _transition;
+    private Transition _transitionInfo;
 
     private void Awake()
     {
@@ -49,21 +50,21 @@ public class TransitionManager : MonoBehaviour
         _root = GetComponent<UIDocument>().rootVisualElement;
         _wrapper = _root.Q(className: WRAPPER_CLS);
 
-        Transition transitionInfo = _transitionsList.Find(t => t.Style == _transition);
-        _wrapper.AddToClassList(transitionInfo.ClassName);
+        _transitionInfo = _transitionsList.Find(t => t.Style == _transition);
+        _wrapper.AddToClassList(_transitionInfo.ClassName);
     }
 
     public async UniTask DisplayOverlay()
     {
         _wrapper.AddToClassList(WRAPPER_ACTIVE_CLS);
 
-        await UniTask.Delay(500);
+        await UniTask.Delay(_transitionInfo.DurationMS);
     }
 
     public async UniTask HideOverlay()
     {
         _wrapper.RemoveFromClassList(WRAPPER_ACTIVE_CLS);
 
-        await UniTask.Delay(500);
+        await UniTask.Delay(_transitionInfo.DurationMS);
     }
 }
