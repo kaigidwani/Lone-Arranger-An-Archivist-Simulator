@@ -2,7 +2,6 @@ using UnityEngine;
 using UnityEngine.UIElements;
 using System.Collections.Generic;
 using Random = UnityEngine.Random;
-using static UnityEngine.Rendering.DebugUI.Table;
 
 [UxmlElement]
 public partial class Item : VisualElement
@@ -14,9 +13,34 @@ public partial class Item : VisualElement
     // Properties
 
     /// <summary>
+    /// The rotation of this item before it was clicked
+    /// </summary>
+    public int StoredRotation { get; set; }
+
+    /// <summary>
+    /// This item's current rotation (0-360)
+    /// </summary>
+    public int Rotation { get; set; }
+
+    /// <summary>
+    /// This item's current shape
+    /// </summary>
+    public int[][] Shape { get; set; }
+
+    /// <summary>
+    /// The width of this item in tiles
+    /// </summary>
+    public int Width { get; set; }
+
+    /// <summary>
+    /// The height of this item in tiles
+    /// </summary>
+    public int Height { get; set; }
+
+    /// <summary>
     /// Contains information about this item
     /// </summary>
-    public PlaceableItemSO Type { get { return _itemSO; } }
+    public PlaceableItemSO SO { get { return _itemSO; } }
 
     /// <summary>
     /// List of individual tiles that make up this item
@@ -39,7 +63,7 @@ public partial class Item : VisualElement
 
     public Item()
     {
-
+        pickingMode = PickingMode.Ignore;
     }
 
     /// <summary>
@@ -48,20 +72,21 @@ public partial class Item : VisualElement
     private void ConstructItem()
     {
         // How big each individual tile should be
-        float tileWidth = InventoryController.Instance.SlotSize.x;
-        float tileHeight = InventoryController.Instance.SlotSize.y;
+        float tileWidth = InventoryController.Instance.ItemTileSize.x;
+        float tileHeight = InventoryController.Instance.ItemTileSize.y;
 
         // Parent container should be as big as the item is (totally)
-        style.width = _itemSO.Dimensions.y * tileWidth;
-        style.height = _itemSO.Dimensions.x * tileHeight;
+        style.width = _itemSO.BaseWidth * tileWidth;
+        style.height = _itemSO.BaseHeight * tileHeight;
+        style.backgroundImage = _itemSO.Sprite.texture;
 
         Tiles = new List<ItemTile>();
-        for (int row = 0; row < _itemSO.Dimensions.x; row++)
+        for (int row = 0; row < _itemSO.BaseHeight; row++)
         {
-            for (int col = 0; col < _itemSO.Dimensions.y; col++)
+            for (int col = 0; col < _itemSO.BaseWidth; col++)
             {
                 // Empty parts of the shape don't get "made"
-                if (_itemSO.Shape[row][col] == 0)
+                if (_itemSO.BaseShape[row][col] == 0)
                 {
                     continue;
                 }
@@ -76,25 +101,12 @@ public partial class Item : VisualElement
                 tile.style.height = tileHeight;
                 tile.style.left = col * tileWidth;
                 tile.style.top = row * tileHeight;
-                tile.style.backgroundImage = _itemSO.Sprite.texture; // They all use different parts of the same image
-
-                // Makes each item based on a constant size
-                tile.style.backgroundSize = new BackgroundSize(
-                    new Length(_itemSO.Dimensions.y * 100, LengthUnit.Percent),
-                    new Length(_itemSO.Dimensions.x * 100, LengthUnit.Percent)
-                );
-
-                // Offset contents of tile to slice the image
-                tile.style.backgroundPositionX = new BackgroundPosition(
-                    BackgroundPositionKeyword.Left, -col * tileWidth
-                );
-
-                tile.style.backgroundPositionY = new BackgroundPosition(
-                    BackgroundPositionKeyword.Top, -row * tileHeight
-                );
 
                 Add(tile);
                 Tiles.Add(tile);
+
+                tile.DebugLabel.text = $"({tile.Index.x}, {tile.Index.y})";
+                tile.DebugLabel.visible = InventoryController.Instance.ShowDebug;
             }
         }
     }
@@ -122,6 +134,57 @@ public partial class Item : VisualElement
     }
 
     /// <summary>
+    /// Rotates the item in the specified direction
+    /// </summary>
+    /// <param name="dir">The direction to rotate (positive = clockwise)</param>
+    public void Rotate(int dir)
+    {
+        Rotation = (Rotation + 90 * dir) % 360; // clamp it to 360 deg
+
+        Rotate rot = new Rotate(new Angle(Rotation, AngleUnit.Degree));
+        style.rotate = rot;
+
+        foreach (ItemTile tile in Tiles)
+        {
+            if (dir >= 0) // clockwise
+            {
+                tile.SetIndex(tile.Index.y, Height - 1 - tile.Index.x);
+            }
+            else // counter-clockwise
+            {
+                tile.SetIndex(Width - 1 - tile.Index.y, tile.Index.x);
+            }
+
+            // Keep debug label orientation
+            tile.DebugLabel.style.rotate = new Rotate(new Angle(360.0f - rot.angle.value, AngleUnit.Degree));
+            tile.DebugLabel.text = $"({tile.Index.x}, {tile.Index.y})";
+        }
+
+        _itemSO.RotateItemShape(this, dir);
+
+    }
+
+    /// <summary>
+    /// Resets the rotation of the item to its value before the user started rotating it.
+    /// </summary>
+    public void RevertRotation()
+    {
+        int correctionCount = (Rotation - StoredRotation) / 90;
+
+        for (int i = 0; i < Mathf.Abs(correctionCount); i++)
+        {
+            if (correctionCount < 0)
+            {
+                Rotate(1);
+            }
+            else
+            {
+                Rotate(-1);
+            }
+        }
+    }
+
+    /// <summary>
     /// Generates a random item inside of the accessioning box
     /// </summary>
     /// <param name="box">The element where this item will spawn</param>
@@ -134,6 +197,9 @@ public partial class Item : VisualElement
         {
             _itemSO = InventoryController.Instance.ItemPool[Random.Range(0, InventoryController.Instance.ItemPool.Length)];
             name = _itemSO.Name;
+            Width = _itemSO.BaseWidth;
+            Height = _itemSO.BaseHeight;
+            Shape = _itemSO.BaseShape;
 
             ConstructItem();
         }
@@ -155,17 +221,25 @@ public partial class Item : VisualElement
     /// <param name="startSlot">The slot that the user places the item in</param>
     public void Place(VisualElement dest, Slot startSlot)
     {
-        RemoveFromHierarchy(); // Remove from accessioning box
-        dest.Add(this);
-
+        // TO-DO:
+        // Move to seperate function so this is only called after
+        // taking an item from accessioniong
+        RemoveFromHierarchy(); // Remove from accessioning box 
         RemoveFromClassList("item");
         AddToClassList("item-slotted");
+        // ------------------------------
 
         float rowOffset = Pivot.Index.x * InventoryController.Instance.SlotSize.y;
         float colOffset = Pivot.Index.y * InventoryController.Instance.SlotSize.x;
 
-        style.left = startSlot.resolvedStyle.left - colOffset;
-        style.top = startSlot.resolvedStyle.top - rowOffset;
+        float drawOffset = 0;
+        if (Rotation % 180 != 0)
+        {
+            drawOffset = (Width - Height) * InventoryController.Instance.ItemTileSize.x / 2;
+        }
+
+        style.left = startSlot.resolvedStyle.left - colOffset + drawOffset;
+        style.top = startSlot.resolvedStyle.top - rowOffset - drawOffset;
 
         foreach (ItemTile tile in Tiles)
         {
@@ -173,12 +247,12 @@ public partial class Item : VisualElement
             int gridCol = startSlot.GridIndex.y + (tile.Index.y - Pivot.Index.y);
 
             tile.SetGridSlot(gridRow, gridCol);
-            Debug.Log($"{name}-- row: {gridRow}, col: {gridCol}");
+            tile.SetColor();
         }
 
         RootGridIndex = GetRootGridPosition();
 
-        SetTileColors();
+        dest.Add(this);
         IsPlaced = true;
     }
 
@@ -190,14 +264,6 @@ public partial class Item : VisualElement
     public void ResetScale()
     {
         style.scale = new StyleScale(Vector2.one);
-    }
-
-    public void SetTileColors()
-    {
-        foreach (ItemTile tile in Tiles)
-        {
-            tile.SetColor();
-        }
     }
 
     public void ResetTileColors()

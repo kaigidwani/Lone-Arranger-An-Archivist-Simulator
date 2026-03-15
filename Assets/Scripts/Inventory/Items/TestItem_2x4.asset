@@ -1,0 +1,25 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 32b81e9028c679343ac9b213bc9974fe, type: 3}
+  m_Name: TestItem_2x4
+  m_EditorClassIdentifier: 
+  _baseWidth: 2
+  _baseHeight: 4
+  _activeTiles:
+  - 1, 1
+  - 1, 1
+  - 1, 1
+  - 1, 1
+  Name: 2x4
+  Description: This is a test of an 2x4-shaped item
+  Sprite: {fileID: -9012833017913935500, guid: c1e31aecc3515e645b9be22b013d86f5, type: 3}
+  Weight: 1
