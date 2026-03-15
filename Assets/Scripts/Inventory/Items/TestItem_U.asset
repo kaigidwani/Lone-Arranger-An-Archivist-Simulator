@@ -12,12 +12,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 32b81e9028c679343ac9b213bc9974fe, type: 3}
   m_Name: TestItem_U
   m_EditorClassIdentifier: 
-  _baseDimensions: {x: 3, y: 2}
-  _baseActiveTiles:
+  _baseWidth: 3
+  _baseHeight: 2
+  _activeTiles:
   - 1, 0, 1
   - 1, 1, 1
   Name: U
   Description: This is a test of an U-shaped item
   Sprite: {fileID: 6563575085492716751, guid: 4733a8986982ddc44b0f627ca100e97a, type: 3}
-  Rotation: 0
   Weight: 3.5

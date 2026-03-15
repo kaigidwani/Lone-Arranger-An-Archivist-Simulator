@@ -158,24 +158,23 @@ public class InventoryController : MonoBehaviour
             }
         }
 
-        _ghostIcon.SetItem(_draggedItem);
-        _ghostIcon.SetToMousePosition(_draggedItem.Pivot);
+        _ghostIcon.SetVisual(_draggedItem);        
     }
 
     /// <summary>
     /// Handles dragging across the screen
     /// </summary>
-    void OnPointerMove(PointerMoveEvent evt)
+    public void OnPointerMove(PointerMoveEvent evt)
     {
         if (!_isDragging) return;
 
-        _ghostIcon.SetToMousePosition(_draggedItem.Pivot);
+        _ghostIcon.UpdatePosition(_draggedItem.Pivot);
     }
 
     /// <summary>
     /// Handles dropping items on the screen
     /// </summary>
-    void OnPointerUp(PointerUpEvent evt)
+    public void OnPointerUp(PointerUpEvent evt)
     {
         if (!_isDragging) return;
 
@@ -213,9 +212,22 @@ public class InventoryController : MonoBehaviour
             }
         }
 
-        _ghostIcon.ResetIcon();
+        _ghostIcon.ResetVisual();
         _draggedItem.ResetPivot();
         ReorderItems();
+    }
+
+    public void OnRotateItem(InputAction.CallbackContext ctx)
+    {
+        if (!_isDragging || ctx.phase != InputActionPhase.Performed)
+        {
+            return;
+        }
+
+        float dir = ctx.ReadValue<float>();
+
+        _draggedItem.Rotate((int)dir);
+        _ghostIcon.Rotate((int)dir, _draggedItem.Pivot);
     }
 
     #endregion
@@ -286,19 +298,7 @@ public class InventoryController : MonoBehaviour
         return Grid[x][y];
     }
 
-    public void OnRotateItem(InputAction.CallbackContext ctx)
-    {
-        if (!_isDragging || ctx.phase != InputActionPhase.Performed)
-        {
-            return;
-        }
-
-        float dir = ctx.ReadValue<float>();
-
-        _draggedItem.Rotate((int)dir);
-        _ghostIcon.MatchItemRotation(_draggedItem);
-    }
-
+    #region Debug
     public void SetDebug()
     {
         if (ShowDebug)
@@ -337,4 +337,6 @@ public class InventoryController : MonoBehaviour
             SetDebug();
         }
     }
+
+    #endregion
 }

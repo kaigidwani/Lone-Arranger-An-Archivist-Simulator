@@ -18,6 +18,26 @@ public partial class Item : VisualElement
     public int StoredRotation { get; set; }
 
     /// <summary>
+    /// This item's current rotation (0-360)
+    /// </summary>
+    public int Rotation { get; set; }
+
+    /// <summary>
+    /// This item's current shape
+    /// </summary>
+    public int[][] Shape { get; set; }
+
+    /// <summary>
+    /// The width of this item in tiles
+    /// </summary>
+    public int Width { get; set; }
+
+    /// <summary>
+    /// The height of this item in tiles
+    /// </summary>
+    public int Height { get; set; }
+
+    /// <summary>
     /// Contains information about this item
     /// </summary>
     public PlaceableItemSO SO { get { return _itemSO; } }
@@ -56,17 +76,17 @@ public partial class Item : VisualElement
         float tileHeight = InventoryController.Instance.ItemTileSize.y;
 
         // Parent container should be as big as the item is (totally)
-        style.width = _itemSO.Width * tileWidth;
-        style.height = _itemSO.Height * tileHeight;
+        style.width = _itemSO.BaseWidth * tileWidth;
+        style.height = _itemSO.BaseHeight * tileHeight;
         style.backgroundImage = _itemSO.Sprite.texture;
 
         Tiles = new List<ItemTile>();
-        for (int row = 0; row < _itemSO.Height; row++)
+        for (int row = 0; row < _itemSO.BaseHeight; row++)
         {
-            for (int col = 0; col < _itemSO.Width; col++)
+            for (int col = 0; col < _itemSO.BaseWidth; col++)
             {
                 // Empty parts of the shape don't get "made"
-                if (_itemSO.Shape[row][col] == 0)
+                if (_itemSO.BaseShape[row][col] == 0)
                 {
                     continue;
                 }
@@ -113,22 +133,26 @@ public partial class Item : VisualElement
         return new Vector2Int(minX, minY);
     }
 
+    /// <summary>
+    /// Rotates the item in the specified direction
+    /// </summary>
+    /// <param name="dir">The direction to rotate (positive = clockwise)</param>
     public void Rotate(int dir)
     {
-        _itemSO.Rotation = (_itemSO.Rotation + 90 * dir);
+        Rotation = (Rotation + 90 * dir) % 360; // clamp it to 360 deg
 
-        Rotate rot = new Rotate(new Angle(_itemSO.Rotation, AngleUnit.Degree));
+        Rotate rot = new Rotate(new Angle(Rotation, AngleUnit.Degree));
         style.rotate = rot;
 
         foreach (ItemTile tile in Tiles)
         {
-            if (dir >= 0)
+            if (dir >= 0) // clockwise
             {
-                tile.SetIndex(tile.Index.y, _itemSO.Height - 1 - tile.Index.x);
+                tile.SetIndex(tile.Index.y, Height - 1 - tile.Index.x);
             }
-            else
+            else // counter-clockwise
             {
-                tile.SetIndex(_itemSO.Width - 1 - tile.Index.y, tile.Index.x);
+                tile.SetIndex(Width - 1 - tile.Index.y, tile.Index.x);
             }
 
             // Keep debug label orientation
@@ -136,13 +160,16 @@ public partial class Item : VisualElement
             tile.DebugLabel.text = $"({tile.Index.x}, {tile.Index.y})";
         }
 
-        _itemSO.RotateShape(dir);
-  
+        _itemSO.RotateItemShape(this, dir);
+
     }
 
+    /// <summary>
+    /// Resets the rotation of the item to its value before the user started rotating it.
+    /// </summary>
     public void RevertRotation()
     {
-        int correctionCount = (_itemSO.Rotation - StoredRotation) / 90;
+        int correctionCount = (Rotation - StoredRotation) / 90;
 
         for (int i = 0; i < Mathf.Abs(correctionCount); i++)
         {
@@ -170,6 +197,9 @@ public partial class Item : VisualElement
         {
             _itemSO = InventoryController.Instance.ItemPool[Random.Range(0, InventoryController.Instance.ItemPool.Length)];
             name = _itemSO.Name;
+            Width = _itemSO.BaseWidth;
+            Height = _itemSO.BaseHeight;
+            Shape = _itemSO.BaseShape;
 
             ConstructItem();
         }
@@ -202,12 +232,10 @@ public partial class Item : VisualElement
         float rowOffset = Pivot.Index.x * InventoryController.Instance.SlotSize.y;
         float colOffset = Pivot.Index.y * InventoryController.Instance.SlotSize.x;
 
-        Debug.Log($"Item rotation: {_itemSO.Rotation}");
-
         float drawOffset = 0;
-        if (_itemSO.Rotation % 180 != 0)
+        if (Rotation % 180 != 0)
         {
-            drawOffset = (_itemSO.Width - _itemSO.Height) * InventoryController.Instance.ItemTileSize.x / 2;
+            drawOffset = (Width - Height) * InventoryController.Instance.ItemTileSize.x / 2;
         }
 
         style.left = startSlot.resolvedStyle.left - colOffset + drawOffset;
@@ -226,7 +254,6 @@ public partial class Item : VisualElement
 
         dest.Add(this);
         IsPlaced = true;
-        _itemSO.Rotation = _itemSO.Rotation % 360;
     }
 
     public void SetScale(Vector2 scale)

@@ -12,8 +12,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 32b81e9028c679343ac9b213bc9974fe, type: 3}
   m_Name: TestItem_2x4
   m_EditorClassIdentifier: 
-  _baseDimensions: {x: 2, y: 4}
-  _baseActiveTiles:
+  _baseWidth: 2
+  _baseHeight: 4
+  _activeTiles:
   - 1, 1
   - 1, 1
   - 1, 1
@@ -21,4 +22,4 @@ MonoBehaviour:
   Name: 2x4
   Description: This is a test of an 2x4-shaped item
   Sprite: {fileID: -9012833017913935500, guid: c1e31aecc3515e645b9be22b013d86f5, type: 3}
-  Rotation: 0
+  Weight: 1

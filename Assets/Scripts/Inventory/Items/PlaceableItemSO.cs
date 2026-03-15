@@ -7,38 +7,86 @@ public class PlaceableItemSO : ScriptableObject
 {
     // Fields
 
-    [SerializeField] private Vector2Int _baseDimensions;
-    [SerializeField] private string[] _baseActiveTiles;
+    [SerializeField] private int _baseWidth;
+    [SerializeField] private int _baseHeight;
+    [SerializeField] private string[] _activeTiles;
 
     // Properties
 
     public string Name;
     public string Description;
     public Sprite Sprite;
-    public int Rotation = 0;
     public float Weight = 1;
 
-    public int Width { get; private set; }
+    public int BaseWidth { get { return _baseWidth; } }
 
-    public int Height { get; private set; }
+    public int BaseHeight { get { return _baseHeight; } }
 
-    [HideInInspector] public int[][] Shape;
-    
-    private void OnValidate()
+
+    [HideInInspector] public int[][] BaseShape;
+
+    /// <summary>
+    /// Rotates a specific item's shape
+    /// </summary>
+    /// <param name="item">The item to rotate</param>
+    /// <param name="dir">The direction to rotate in (positive = clockwise)</param>
+    public void RotateItemShape(Item item, int dir)
     {
-        Rotation = 0;
-
-        // Creates a new array in the inspector based on the dimensions of the item
-        if (_baseActiveTiles.Length != _baseDimensions.y)
+        // Swap width and height
+        int newWidth = item.Height;
+        int newHeight = item.Width;
+        
+        int[][] rotatedShape = new int[newHeight][];
+        
+        for (int x = 0; x < newHeight; x++)
         {
-            _baseActiveTiles = new string[_baseDimensions.y];
+            for (int y = 0; y < newWidth; y++)
+            {
+                if (dir >= 0) // clockwise
+                {
+                    if (rotatedShape[x] == null)
+                    {
+                        rotatedShape[x] = new int[newWidth];
+                    }
+
+                    rotatedShape[x][newWidth - 1 - y] = item.Shape[y][x];
+                }
+                else // counter-clockwise
+                {
+                    if (rotatedShape[newHeight - 1 - x] == null)
+                    {
+                        rotatedShape[newHeight - 1 - x] = new int[newWidth];
+                    }
+
+                    rotatedShape[newHeight - 1 - x][y] = item.Shape[y][x];
+                }
+            }
         }
 
-        Width = _baseDimensions.x;
-        Height = _baseDimensions.y;
-        Shape = ParseActiveTiles(_baseActiveTiles, Width, Height);
+        // update item's properties
+        item.Width = newWidth;
+        item.Height = newHeight;
+        item.Shape = rotatedShape;
     }
 
+    private void OnValidate()
+    {
+        // Creates a new array in the inspector based on the dimensions of the item
+        if (_activeTiles.Length != _baseHeight)
+        {
+            _activeTiles = new string[_baseHeight];
+        }
+
+        BaseShape = ParseActiveTiles(_activeTiles, _baseWidth, _baseHeight);
+    }
+
+    /// <summary>
+    /// Creates a set of base active tiles to act as the shape of this item
+    /// </summary>
+    /// <param name="tiles">2D string array with 1s and 0s, seperated by commas</param>
+    /// <param name="width">Width of this item</param>
+    /// <param name="height">Height of this item</param>
+    /// <returns>The shape of this item as a 2D int arry</returns>
     private int[][] ParseActiveTiles(string[] tiles, int width, int height)
     {
         int[][] result = new int[height][];
@@ -46,7 +94,7 @@ public class PlaceableItemSO : ScriptableObject
         for (int x = 0; x < height; x++)
         {
             result[x] = new int[width];
-            string[] cols = tiles[x].Split(',');   
+            string[] cols = tiles[x].Split(',');
 
             for (int y = 0; y < width; y++)
             {
@@ -55,54 +103,5 @@ public class PlaceableItemSO : ScriptableObject
         }
 
         return result;
-    }
-
-    private string[] RebuildActiveTiles(int[][] shape)
-    {
-        string[] rowList = new string[shape.Length];
-
-        for (int x = 0; x < shape.Length; x++)
-        {
-            rowList[x] = string.Join(',', shape[x]);
-        }
-
-        return rowList;
-    }
-
-    public void RotateShape(int dir)
-    {
-        int[][] currentShape = Shape;
-        int[][] rotatedShape = new int[Width][];
-        
-        for (int x = 0; x < Width; x++)
-        {
-            for (int y = 0; y < Height; y++)
-            {
-                if (dir >= 0)
-                {
-                    if (rotatedShape[x] == null)
-                    {
-                        rotatedShape[x] = new int[Height];
-                    }
-
-                    rotatedShape[x][Height - 1 - y] = currentShape[y][x];
-                }
-                else
-                {
-                    if (rotatedShape[Width - 1 - x] == null)
-                    {
-                        rotatedShape[Width - 1 - x] = new int[Height];
-                    }
-
-                    rotatedShape[Width - 1 - x][y] = currentShape[y][x];
-                }
-            }
-        }
-
-        Width = rotatedShape[0].Length;
-        Height = rotatedShape.Length;
-
-        string[] newActiveTiles = RebuildActiveTiles(rotatedShape);
-        Shape = ParseActiveTiles(newActiveTiles, Width, Height);
     }
 }

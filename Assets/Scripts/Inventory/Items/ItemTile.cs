@@ -96,7 +96,7 @@ public partial class ItemTile : VisualElement
         }
 
         ParentItem.ResetTileColors();
-        ParentItem.StoredRotation = ParentItem.SO.Rotation;
+        ParentItem.StoredRotation = ParentItem.Rotation;
         OnStartDrag.Invoke(evt.position, ParentItem);
         evt.StopPropagation();
     }
