@@ -217,17 +217,28 @@ public class InventoryController : MonoBehaviour
         ReorderItems();
     }
 
-    public void OnRotateItem(InputAction.CallbackContext ctx)
+    public void OnRotateCW(InputAction.CallbackContext ctx)
+    {
+        if (!_isDragging || ctx.phase != InputActionPhase.Performed)
+        {
+            return;
+        }   
+
+        int dir = 1;
+        _draggedItem.Rotate(dir);
+        _ghostIcon.Rotate(dir, _draggedItem.Pivot);
+    }
+
+    public void OnRotateCCW(InputAction.CallbackContext ctx)
     {
         if (!_isDragging || ctx.phase != InputActionPhase.Performed)
         {
             return;
         }
 
-        float dir = ctx.ReadValue<float>();
-
-        _draggedItem.Rotate((int)dir);
-        _ghostIcon.Rotate((int)dir, _draggedItem.Pivot);
+        int dir = -1;
+        _draggedItem.Rotate(dir);
+        _ghostIcon.Rotate(dir, _draggedItem.Pivot);
     }
 
     #endregion
