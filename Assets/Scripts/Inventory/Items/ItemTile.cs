@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UIElements;
 using System;
@@ -5,6 +6,20 @@ using System;
 [UxmlElement]
 public partial class ItemTile : VisualElement
 {
+    // Fields
+
+    private static List<Color> COLOR_CODES = new List<Color>
+    {
+        new Color(0, 0, 0, 0),
+        new Color(153/255f, 9/255f, 9/255f, 0.51f),
+        new Color(38/255f, 91/255f, 30/255f, 0.51f),
+        new Color(58/255f, 89/255f, 151/255f, 0.51f)
+    };
+
+    // Properties
+
+    public Label DebugLabel { get; set; }
+
     /// <summary>
     /// The item that this tile belongs to
     /// </summary>
@@ -36,6 +51,11 @@ public partial class ItemTile : VisualElement
         RegisterCallback<PointerDownEvent>(OnPointerDown);
 
         OnStartDrag += InventoryController.Instance.OnPointerDown;
+
+        DebugLabel = new Label("");
+        DebugLabel.AddToClassList("debug-text");
+
+        Add(DebugLabel);
     }
 
     #region Events
@@ -70,9 +90,13 @@ public partial class ItemTile : VisualElement
     /// </summary>
     private void OnPointerDown(PointerDownEvent evt)
     {
-        if (evt.button != 0 || !ParentItem.IsHovering) return;
+        if (evt.button != 0 || !ParentItem.IsHovering)
+        {
+            return;
+        }
 
         ParentItem.ResetTileColors();
+        ParentItem.StoredRotation = ParentItem.Rotation;
         OnStartDrag.Invoke(evt.position, ParentItem);
         evt.StopPropagation();
     }
@@ -102,13 +126,15 @@ public partial class ItemTile : VisualElement
 
     public void SetColor()
     {
-        string slotColor = GridSlot.Color;
-        AddToClassList($"item-{slotColor}");
+        schedule.Execute(() =>
+        {
+            style.backgroundColor = COLOR_CODES[(int)GridSlot.Color];
+        });
+        
     }
 
     public void RemoveColor()
     {
-        string slotColor = GridSlot.Color;
-        RemoveFromClassList($"item-{slotColor}");
+        style.backgroundColor = COLOR_CODES[(int)SlotColor.None];
     }
 }

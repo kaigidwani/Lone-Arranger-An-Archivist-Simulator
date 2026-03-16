@@ -15,7 +15,6 @@
     width: auto;
     height: auto;
     max-height: none;
-    background-color: rgba(99, 99, 99, 0.55);
     padding-top: 16%;
     flex-basis: 16%;
     position: relative;
@@ -26,10 +25,11 @@
     justify-content: center;
     align-self: center;
     align-content: center;
+    transition-duration: 0.2s;
 }
 
 .inventory-slot:hover {
-    transition-duration: 0.2s;
+    
     border-left-color: rgb(255, 255, 255);
     border-right-color: rgb(255, 255, 255);
     border-top-color: rgb(255, 255, 255);
@@ -37,19 +37,21 @@
 }
 
 .inventory-slot-red {
-    background-color: rgba(120, 24, 24, 0.55);
+    background-color: rgba(120, 24, 24, 0.51);
 }
 
 .inventory-slot-green {
-    background-color: rgba(34, 99, 28, 0.55);
+    background-color: rgba(34, 99, 28, 0.51);
 }
 
 .inventory-slot-blue {
-    background-color: rgba(0, 32, 108, 0.55);
+    background-color: rgba(0, 32, 108, 0.51);
 }
 
 .inventory-slot-default {
+    background-color: rgba(99, 99, 99, 0.51);
 }
+
 .item {
     align-self: center;
     background-image: none;
@@ -68,38 +70,18 @@
     justify-content: flex-start;
 }
 
-.item-red {
-    -unity-background-image-tint-color: rgb(248, 139, 139);
-    transition-property: -unity-background-image-tint-color;
-    transition-duration: 0.5s;
-}
-
-.item-blue {
-    -unity-background-image-tint-color: rgb(143, 172, 231);
-    transition-property: -unity-background-image-tint-color;
-    transition-duration: 0.5s;
-}
-
-.item-green {
-    -unity-background-image-tint-color: rgb(129, 209, 117);
-    transition-property: -unity-background-image-tint-color;
-    transition-duration: 0.5s;
-}
-
-.item-default {
-    transition-property: -unity-background-image-tint-color;
-    transition-duration: 0.5s;
-}
-
 .item-slotted {
     position: absolute;
     scale: 1 1;
 }
 
 .item-tile {
-    background-size: cover;
     position: absolute;
     align-self: center;
+    justify-content: center;
+    background-color: rgba(0, 0, 0, 0);
+    transition-property: background-color;
+    transition-duration: 0.5s;
 }
 
 .ghost-icon {
@@ -122,4 +104,10 @@
     top: auto;
     align-self: center;
     color: rgb(238, 238, 238);
+    font-size: 24px;
+    background-color: rgb(0, 0, 0);
+    padding-top: 8px;
+    padding-right: 8px;
+    padding-bottom: 8px;
+    padding-left: 8px;
 }
