@@ -125,7 +125,7 @@ public partial class GhostIcon : VisualElement
         Item item = pivot.ParentItem;
         if (pivot.ParentItem.Rotation % 180 != 0)
         {
-            drawOffset = (item.Width - item.Height) * InventoryController.Instance.ItemTileSize.x / 2;
+            drawOffset = (item.WidthInTiles - item.HeightInTiles) * InventoryController.Instance.ItemTileSize.x / 2;
         }
 
         style.left = (mousePanel.x - colOffset - tileWidth * 0.5f) + drawOffset;

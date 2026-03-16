@@ -59,6 +59,7 @@ public class AccessioningController : MonoBehaviour
     public async void DisplayAccessioning(SceneController controller)
     {
         _box.GetDimensions();
+        Debug.Log($"box max pos: {_box.Max}");
         SpawnItems();
 
         _wrapper.AddToClassList(WRAPPER_ACTIVE_CLS);

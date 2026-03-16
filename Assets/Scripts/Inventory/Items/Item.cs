@@ -32,12 +32,12 @@ public partial class Item : VisualElement
     /// <summary>
     /// The width of this item in tiles
     /// </summary>
-    public int Width { get; set; }
+    public int WidthInTiles { get; set; }
 
     /// <summary>
     /// The height of this item in tiles
     /// </summary>
-    public int Height { get; set; }
+    public int HeightInTiles { get; set; }
 
     /// <summary>
     /// Contains information about this item
@@ -69,18 +69,13 @@ public partial class Item : VisualElement
     }
 
     /// <summary>
-    /// Builds out a randomly generated item in multiple, sliced tiles
+    /// Builds out a list of sliced tiles based on the item's shape
     /// </summary>
-    private void ConstructItem()
+    private void GenerateItemTiles()
     {
         // How big each individual tile should be
         float tileWidth = InventoryController.Instance.ItemTileSize.x;
         float tileHeight = InventoryController.Instance.ItemTileSize.y;
-
-        // Parent container should be as big as the item is (totally)
-        style.width = _itemSO.BaseWidth * tileWidth;
-        style.height = _itemSO.BaseHeight * tileHeight;
-        style.backgroundImage = _itemSO.Sprite.texture;
 
         Tiles = new List<ItemTile>();
         for (int row = 0; row < _itemSO.BaseHeight; row++)
@@ -150,11 +145,11 @@ public partial class Item : VisualElement
         {
             if (dir >= 0) // clockwise
             {
-                tile.SetIndex(tile.Index.y, Height - 1 - tile.Index.x);
+                tile.SetIndex(tile.Index.y, HeightInTiles - 1 - tile.Index.x);
             }
             else // counter-clockwise
             {
-                tile.SetIndex(Width - 1 - tile.Index.y, tile.Index.x);
+                tile.SetIndex(WidthInTiles - 1 - tile.Index.y, tile.Index.x);
             }
 
             // Keep debug label orientation
@@ -199,21 +194,31 @@ public partial class Item : VisualElement
         {
             _itemSO = InventoryController.Instance.ItemPool[Random.Range(0, InventoryController.Instance.ItemPool.Length)];           
             name = _itemSO.Name;
-            Width = _itemSO.BaseWidth;
-            Height = _itemSO.BaseHeight;
-            Shape = _itemSO.BaseShape;
+
+            WidthInTiles = _itemSO.BaseWidth;
+            HeightInTiles = _itemSO.BaseHeight;
 
             _itemSO.GenerateShape();
-            ConstructItem();
+            Shape = _itemSO.BaseShape;
 
-            float x = Random.Range(box.Min.x, box.Max.x - _width);
-            float y = Random.Range(box.Min.y, box.Max.y - _height);
-            Debug.Log(new Vector2(box.Min.x, _width));
-
-            style.left = x;
-            style.top = y;
-            style.opacity = 100;
+            GenerateItemTiles();
         }
+
+        // Parent container should be as big as the item is (totally)
+        _width = _itemSO.BaseWidth * InventoryController.Instance.ItemTileSize.x;
+        _height = _itemSO.BaseHeight * InventoryController.Instance.ItemTileSize.y;
+        
+        float x = Random.Range(box.Min.x, box.Max.x - _width);
+        float y = Random.Range(box.Min.y, box.Max.y - _height);
+
+        style.left = x;
+        style.top = y;
+        style.width = _width;
+        style.height = _height;
+
+        style.backgroundImage = _itemSO.Sprite.texture;
+        style.opacity = 100;
+
     }
 
     /// <summary>
@@ -236,7 +241,7 @@ public partial class Item : VisualElement
         float drawOffset = 0;
         if (Rotation % 180 != 0)
         {
-            drawOffset = (Width - Height) * InventoryController.Instance.ItemTileSize.x / 2;
+            drawOffset = (WidthInTiles - HeightInTiles) * InventoryController.Instance.ItemTileSize.x / 2;
         }
 
         style.left = startSlot.resolvedStyle.left - colOffset + drawOffset;
