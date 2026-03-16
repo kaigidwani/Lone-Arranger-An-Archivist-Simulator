@@ -1,50 +1,107 @@
+using System.Collections.Generic;
 using UnityEngine;
+using static UnityEngine.Rendering.ProbeAdjustmentVolume;
 
 [CreateAssetMenu(fileName = "New Item", menuName = "Scriptable Objects/Item")]
 public class PlaceableItemSO : ScriptableObject
 {
     // Fields
 
+    [SerializeField] private int _baseWidth;
+    [SerializeField] private int _baseHeight;
     [SerializeField] private string[] _activeTiles;
 
     // Properties
 
     public string Name;
     public string Description;
+    public Sprite Sprite;
+    public float Weight = 1;
+
+    public int BaseWidth { get { return _baseWidth; } }
+
+    public int BaseHeight { get { return _baseHeight; } }
+
+
+    [HideInInspector] public int[][] BaseShape;
 
     /// <summary>
-    /// (X = Rows, Y = Columns)
+    /// Rotates a specific item's shape
     /// </summary>
-    public Vector2 Dimensions;
+    /// <param name="item">The item to rotate</param>
+    /// <param name="dir">The direction to rotate in (positive = clockwise)</param>
+    public void RotateItemShape(Item item, int dir)
+    {
+        // Swap width and height
+        int newWidth = item.Height;
+        int newHeight = item.Width;
+        
+        int[][] rotatedShape = new int[newHeight][];
+        
+        for (int x = 0; x < newHeight; x++)
+        {
+            for (int y = 0; y < newWidth; y++)
+            {
+                if (dir >= 0) // clockwise
+                {
+                    if (rotatedShape[x] == null)
+                    {
+                        rotatedShape[x] = new int[newWidth];
+                    }
 
-    public Sprite Sprite;
+                    rotatedShape[x][newWidth - 1 - y] = item.Shape[y][x];
+                }
+                else // counter-clockwise
+                {
+                    if (rotatedShape[newHeight - 1 - x] == null)
+                    {
+                        rotatedShape[newHeight - 1 - x] = new int[newWidth];
+                    }
 
-    [HideInInspector] public int[][] Shape;
-    
+                    rotatedShape[newHeight - 1 - x][y] = item.Shape[y][x];
+                }
+            }
+        }
+
+        // update item's properties
+        item.Width = newWidth;
+        item.Height = newHeight;
+        item.Shape = rotatedShape;
+    }
+
     private void OnValidate()
     {
         // Creates a new array in the inspector based on the dimensions of the item
-        if (_activeTiles.Length != Dimensions.x)
+        if (_activeTiles.Length != _baseHeight)
         {
-            _activeTiles = new string[(int)Dimensions.x];
+            _activeTiles = new string[_baseHeight];
         }
 
-        // Converts the each row's string array of active tiles to a jagged array of integers
-        // for easy parsing later on
-        Shape = new int[(int)Dimensions.x][];
-
-        for (int row = 0; row < _activeTiles.Length; row++)
-        {
-            string[] rowString = _activeTiles[row].Split(',');
-            Shape[row] = new int[rowString.Length];
-
-            for (int col = 0; col < rowString.Length; col++)
-            {
-                Shape[row][col] = int.Parse(rowString[col]);
-            }
-
-        }
+        BaseShape = ParseActiveTiles(_activeTiles, _baseWidth, _baseHeight);
     }
 
-    
+    /// <summary>
+    /// Creates a set of base active tiles to act as the shape of this item
+    /// </summary>
+    /// <param name="tiles">2D string array with 1s and 0s, seperated by commas</param>
+    /// <param name="width">Width of this item</param>
+    /// <param name="height">Height of this item</param>
+    /// <returns>The shape of this item as a 2D int arry</returns>
+    private int[][] ParseActiveTiles(string[] tiles, int width, int height)
+    {
+        int[][] result = new int[height][];
+
+        for (int x = 0; x < height; x++)
+        {
+            result[x] = new int[width];
+            string[] cols = tiles[x].Split(',');
+
+            for (int y = 0; y < width; y++)
+            {
+                result[x][y] = int.Parse(cols[y]);
+            }
+        }
+
+        return result;
+    }
 }
