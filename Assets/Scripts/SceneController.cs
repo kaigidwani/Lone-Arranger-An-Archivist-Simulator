@@ -14,17 +14,9 @@ public enum Scene
 [CreateAssetMenu(fileName = "SceneController", menuName = "Scriptable Objects/Managers/SceneController")]
 public class SceneController : ScriptableObject
 {
-    public static event Action<SceneController> OnSceneLoad;
-    public static event Action<SceneController> OnSceneExit;
-
     public async UniTask ChangeScene(Scene newScene)
     {
         Debug.Log("changing scene...");
-
-        if (OnSceneLoad != null)
-        {
-            OnSceneExit(this);
-        }
 
         await OverlayManager.Instance.DisplayOverlay();
 
@@ -42,10 +34,5 @@ public class SceneController : ScriptableObject
         }
 
         await OverlayManager.Instance.HideOverlay();
-
-        if (OnSceneLoad != null)
-        {
-            OnSceneLoad(this);
-        }
     }
 }

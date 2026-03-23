@@ -13,6 +13,11 @@ public partial class GhostIcon : VisualElement
     // Properties
     public Label DebugLabel;
 
+    public Vector2 Position
+    {
+        get { return new Vector2(worldBound.x, worldBound.y); }
+    }
+
     public GhostIcon()
     {
         pickingMode = PickingMode.Ignore;
@@ -38,7 +43,6 @@ public partial class GhostIcon : VisualElement
     public void SetVisual(Item item)
     {
         MatchItemStyle(item);
-        UpdatePosition(item.Pivot);
 
         //_transitionDuration *= item.SO.Weight;
 
@@ -60,17 +64,20 @@ public partial class GhostIcon : VisualElement
     }
 
     /// <summary>
-    /// Moves the ghost icon to the given mouse position
+    /// Centers the mouse on the given tile
     /// </summary>
-    /// <param name="pivot">Which tile is currently being dragged</param>
-    public void UpdatePosition(ItemTile pivot)
+    public void SetToMousePosition(ItemTile pivot, Vector2 mousePos)
     {
-        if (pivot != null)
+        if (pivot == null)
         {
-            SetToMousePosition(pivot);
-
-            // Space to add some cool effects or something idk
+            return;
         }
+
+        DebugLabel.text = $"Pivot: ({pivot.Index.x}, {pivot.Index.y})";
+
+        Vector2 newPos = UIHelpers.SetItemPivotToMouse(pivot, mousePos);
+        style.left = newPos.x;
+        style.top = newPos.y;
     }
 
     /// <summary>
@@ -82,8 +89,6 @@ public partial class GhostIcon : VisualElement
     {
         Rotate rot = new Rotate(new Angle(style.rotate.value.angle.value + 90 * dir, AngleUnit.Degree));
         style.rotate = rot;
-
-        UpdatePosition(pivot); // Maintain mouse position on center of pivot
 
         // Keep debug label orientation
         DebugLabel.style.rotate = new Rotate(new Angle(360.0f - Mathf.Abs(style.rotate.value.angle.value), AngleUnit.Degree));
@@ -104,31 +109,5 @@ public partial class GhostIcon : VisualElement
         style.rotate = rot;
     }
 
-    /// <summary>
-    /// Centers the mouse on the given tile
-    /// </summary>
-    private void SetToMousePosition(ItemTile pivot)
-    {
-        DebugLabel.text = $"Pivot: ({pivot.Index.x}, {pivot.Index.y})";
-
-        Vector2 mouseScreen = Mouse.current.position.ReadValue();
-        Vector2 mousePanel = UIHelpers.WorldToLocalUIPosition(panel, mouseScreen);
-
-        float tileWidth = InventoryController.Instance.ItemTileSize.x;
-        float tileHeight = InventoryController.Instance.ItemTileSize.y;
-
-        // Find offset from pivot
-        float rowOffset = tileHeight * pivot.Index.x;
-        float colOffset = tileWidth * pivot.Index.y;
-
-        float drawOffset = 0;
-        Item item = pivot.ParentItem;
-        if (pivot.ParentItem.Rotation % 180 != 0)
-        {
-            drawOffset = (item.WidthInTiles - item.HeightInTiles) * InventoryController.Instance.ItemTileSize.x / 2;
-        }
-
-        style.left = (mousePanel.x - colOffset - tileWidth * 0.5f) + drawOffset;
-        style.top = (mousePanel.y - rowOffset - tileHeight * 0.5f) - drawOffset;
-    }
+    
 }

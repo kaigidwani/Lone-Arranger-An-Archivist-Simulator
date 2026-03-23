@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -15,7 +16,7 @@ public partial class Accessioning : VisualElement
     // Properties
 
     /// <summary>
-    /// Minimimum position of this element (top-left)
+    /// Minimimum position of this element (x=left, y=top)
     /// </summary>
     public Vector2 Min
     {
@@ -48,5 +49,10 @@ public partial class Accessioning : VisualElement
         _boxSize = new Vector2(
             resolvedStyle.width - resolvedStyle.borderLeftWidth - resolvedStyle.borderRightWidth - _paddingLeft - _paddingRight,
             resolvedStyle.height - resolvedStyle.borderTopWidth - resolvedStyle.borderBottomWidth - _paddingTop - _paddingBottom);
+    }
+
+    public bool TryGetDimensions()
+    {
+        return resolvedStyle.width > 0;
     }
 }

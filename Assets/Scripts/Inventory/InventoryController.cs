@@ -10,6 +10,7 @@ using Cursor = UnityEngine.Cursor;
 public class InventoryController : MonoBehaviour
 {
     // Fields
+    private Vector2 _mousePos;
 
     private VisualElement _root;
     private VisualElement _itemContainer;
@@ -139,10 +140,11 @@ public class InventoryController : MonoBehaviour
     /// <param name="item">The item the user clicked on</param>
     public void OnPointerDown(Vector2 pos, Item item)
     {
+        _mousePos = pos;
         _isDragging = true;
         _draggedItem = item;
 
-        if (_draggedItem.IsPlaced)
+        if (_draggedItem.CurrentState == ItemState.InInventory)
         {
             foreach (ItemTile tile in _draggedItem.Tiles)
             {
@@ -167,6 +169,7 @@ public class InventoryController : MonoBehaviour
             }
         }
 
+        _ghostIcon.SetToMousePosition(_draggedItem.Pivot, _mousePos);
         _ghostIcon.SetVisual(_draggedItem);        
     }
 
@@ -177,7 +180,8 @@ public class InventoryController : MonoBehaviour
     {
         if (!_isDragging) return;
 
-        _ghostIcon.UpdatePosition(_draggedItem.Pivot);
+        _mousePos = evt.position;
+        _ghostIcon.SetToMousePosition(_draggedItem.Pivot, _mousePos);
     }
 
     /// <summary>
@@ -193,31 +197,43 @@ public class InventoryController : MonoBehaviour
         
         _draggedItem.style.visibility = Visibility.Visible;
 
-        // Find slot under mouse
-        Vector2 mousePos = evt.position;
-
         Slot hoveredSlot = null;
 
         foreach (Slot s in _slotList) 
         {
             Rect r = s.worldBound;
-            if (r.Contains(mousePos))
+            if (r.Contains(_mousePos))
             {
                 hoveredSlot = s;
             }
         }
 
-        if (CanPlace(hoveredSlot))
+        Accessioning accBox = AccessioningController.Instance.GetBox();
+        bool overBox = false;
+        if (hoveredSlot == null)
         {
-            _draggedItem.Place(_itemContainer, hoveredSlot);    
+            Rect r = accBox.worldBound;
+
+            overBox = r.Contains(_mousePos);
         }
-        else
+
+        if (overBox)
+        {
+            _draggedItem.SetState(ItemState.InAccessioning);
+            _draggedItem.PlaceInBox(accBox, _mousePos);
+        }
+        else if (CanPlace(hoveredSlot))
+        {
+            _draggedItem.SetState(ItemState.InInventory);
+            _draggedItem.PlaceInSlot(_itemContainer, hoveredSlot);
+        }
+        else // Couldn't place
         {
             _draggedItem.RevertRotation();
 
-            if (_draggedItem.IsPlaced)
+            if (_draggedItem.CurrentState == ItemState.InInventory)
             {
-                _draggedItem.Place(_itemContainer, _draggedItem.Pivot.GridSlot);
+                _draggedItem.PlaceInSlot(_itemContainer, _draggedItem.Pivot.GridSlot);
             }
         }
 
@@ -236,6 +252,7 @@ public class InventoryController : MonoBehaviour
         int dir = 1;
         _draggedItem.Rotate(dir);
         _ghostIcon.Rotate(dir, _draggedItem.Pivot);
+        _ghostIcon.SetToMousePosition(_draggedItem.Pivot, _mousePos);
     }
 
     public void OnRotateCCW(InputAction.CallbackContext ctx)

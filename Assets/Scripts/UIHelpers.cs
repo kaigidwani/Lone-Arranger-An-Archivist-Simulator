@@ -1,17 +1,26 @@
 using UnityEngine;
 using UnityEngine.UIElements;
+using static UnityEngine.Rendering.DebugUI.MessageBox;
 
 public static class UIHelpers
 {
-    public static Vector2 WorldToLocalUIPosition(IPanel rootPanel, Vector2 pos)
+    public static Vector2 SetItemPivotToMouse(ItemTile pivot, Vector2 mousePos)
     {
-        // In UI Toolkit, the Y-axis is inverted
-        pos.y = Screen.height - pos.y;
+        float tileWidth = InventoryController.Instance.ItemTileSize.x;
+        float tileHeight = InventoryController.Instance.ItemTileSize.y;
 
-        // Convert screen position to the panel's local position
-        Vector2 panelLocalPosition = RuntimePanelUtils.ScreenToPanel(rootPanel, pos);
+        // Find offset from pivot
+        float rowOffset = tileHeight * pivot.Index.x;
+        float colOffset = tileWidth * pivot.Index.y;
 
-        return panelLocalPosition;
-        
+        float drawOffset = 0;
+        Item item = pivot.ParentItem;
+        if (pivot.ParentItem.Rotation % 180 != 0)
+        {
+            drawOffset = (item.WidthInTiles - item.HeightInTiles) * tileWidth / 2;
+        }
+
+        return new Vector2((mousePos.x - colOffset - tileWidth * 0.5f) + drawOffset,
+            (mousePos.y - rowOffset - tileHeight * 0.5f) - drawOffset);
     }
 }

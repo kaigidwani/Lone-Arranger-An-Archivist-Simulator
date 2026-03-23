@@ -2,17 +2,28 @@ using UnityEngine;
 using UnityEngine.UIElements;
 using System.Collections.Generic;
 using Random = UnityEngine.Random;
+using UnityEngine.InputSystem;
+using UnityEngine.InputSystem.LowLevel;
+
+public enum ItemState
+{
+    InAccessioning,
+    InInventory,
+}
 
 [UxmlElement]
 public partial class Item : VisualElement
 {
     // Fields
+    
 
     private PlaceableItemSO _itemSO;
     private float _width;
     private float _height;
 
     // Properties
+
+    public ItemState CurrentState;
 
     /// <summary>
     /// The rotation of this item before it was clicked
@@ -60,12 +71,12 @@ public partial class Item : VisualElement
     /// </summary>
     public Vector2Int RootGridIndex { get; private set; }
 
-    public bool IsPlaced;
     public bool IsHovering;
 
     public Item()
     {
         pickingMode = PickingMode.Ignore;
+        CurrentState = ItemState.InAccessioning;
     }
 
     /// <summary>
@@ -225,11 +236,8 @@ public partial class Item : VisualElement
     /// Places the dragged item into a slot
     /// </summary>
     /// <param name="startSlot">The slot that the user places the item in</param>
-    public void Place(VisualElement dest, Slot startSlot)
+    public void PlaceInSlot(VisualElement dest, Slot startSlot)
     {
-        // TO-DO:
-        // Move to seperate function so this is only called after
-        // taking an item from accessioniong
         RemoveFromHierarchy(); // Remove from accessioning box 
         RemoveFromClassList("item");
         AddToClassList("item-slotted");
@@ -259,7 +267,23 @@ public partial class Item : VisualElement
         RootGridIndex = GetRootGridPosition();
 
         dest.Add(this);
-        IsPlaced = true;
+        CurrentState = ItemState.InInventory;
+    }
+
+    public void PlaceInBox(Accessioning box, Vector2 mousePos)
+    {
+        RemoveFromHierarchy(); // Remove from inventory
+        RemoveFromClassList("item-slotted");
+        AddToClassList("item");
+
+        //if (mousePos)
+
+        Vector2 itemPos = UIHelpers.SetItemPivotToMouse(Pivot, mousePos);
+        style.left = itemPos.x - box.worldBound.x;
+        style.top = itemPos.y - box.worldBound.y;
+
+        box.Add(this);
+        CurrentState = ItemState.InAccessioning;
     }
 
     public void SetScale(Vector2 scale)
@@ -291,5 +315,24 @@ public partial class Item : VisualElement
     {
         Pivot.RemoveFromClassList("pivot");
         Pivot = null;
+    }
+
+    public void SetState(ItemState newState)
+    {
+        if (CurrentState == newState)
+        {
+            return;
+        }  
+
+        if (CurrentState == ItemState.InAccessioning && newState == ItemState.InInventory) // moving from accessioning to inventory
+        {
+            AccessioningController.Instance.TakeDonation();
+        }
+        else if (CurrentState == ItemState.InInventory && newState == ItemState.InAccessioning) // moving from inventory to accessioning
+        {
+            AccessioningController.Instance.ReturnDonation();
+        }
+
+        CurrentState = newState;
     }
 }

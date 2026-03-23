@@ -14,7 +14,7 @@
         <ui:VisualElement name="Inventories" style="justify-content: center; flex-direction: row; flex-shrink: 0; flex-basis: auto; align-items: flex-start; width: 100%;">
             <ui:VisualElement name="DonationColumn" class="accessioning-column" style="flex-grow: 1; flex-direction: column-reverse;">
                 <ui:VisualElement name="VisualElement" style="background-color: rgb(156, 116, 61); border-top-width: 3px; border-right-width: 3px; border-bottom-width: 3px; border-left-width: 3px; border-top-left-radius: 14%; border-top-right-radius: 14%; border-bottom-right-radius: 14%; border-bottom-left-radius: 14%; border-left-color: rgb(0, 0, 0); border-right-color: rgb(0, 0, 0); border-top-color: rgb(0, 0, 0); border-bottom-color: rgb(0, 0, 0); width: 49%; align-self: center; translate: 0 -19%; height: 15%; align-items: center; justify-content: center;">
-                    <ui:Label text="3/5 Donations Taken" style="-unity-text-align: upper-center; font-size: 36px;" />
+                    <ui:Label name="DonationCountLabel" text="3/5 Donations Taken" style="-unity-text-align: upper-center; font-size: 36px;" />
                 </ui:VisualElement>
                 <Accessioning name="Accessioning" class="accessioning-box" />
             </ui:VisualElement>
