@@ -6,6 +6,7 @@ public class PatronRequest : MonoBehaviour
     // === Fields ===
 
     [SerializeField] private List<Item> _itemsList;
+    [SerializeField] private List<string> _colorsList;
     [SerializeField] private int _reqNum;
     [SerializeField] private Patron _patronRef;
     [SerializeField] private int _itemAmount;
@@ -18,6 +19,11 @@ public class PatronRequest : MonoBehaviour
     /// Get the items list of a request
     /// </summary>
     public List<Item> ItemsList { get { return _itemsList; } }
+
+    /// <summary>
+    /// Get the colors list of a request
+    /// </summary>
+    public List<string> ColorsList { get { return _colorsList; } }
 
     /// <summary>
     /// Get the request's number
@@ -61,5 +67,15 @@ public class PatronRequest : MonoBehaviour
     void Update()
     {
         
+    }
+
+    private void GenerateItemLists()
+    {
+        // Create 2 lists, one of the item types, one of the item colors
+        // Use itemsList prefab to acess the diffrent types
+        // Colors are string and will be either "red" "green" "blue" or "" (for blank).
+
+
+        return;
     }
 }
