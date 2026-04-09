@@ -3,7 +3,6 @@ using System.Linq;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.UIElements;
-using UnityEngine.SceneManagement;
 using Cursor = UnityEngine.Cursor;
 
 
@@ -19,7 +18,9 @@ public class InventoryController : MonoBehaviour
     private List<Slot> _slotList;
 
     private static GhostIcon _ghostIcon;
+    private static Accessioning _accBox;
 
+    private static bool _isOverBox;
     private static bool _isDragging;
     private static Item _draggedItem;
 
@@ -127,6 +128,8 @@ public class InventoryController : MonoBehaviour
         _root.RegisterCallback<PointerMoveEvent>(OnPointerMove);
         _root.RegisterCallback<PointerUpEvent>(OnPointerUp);
 
+        _accBox = AccessioningController.Instance.GetBox();
+
         ShowDebug = false;
         SetDebug();
     }
@@ -143,6 +146,7 @@ public class InventoryController : MonoBehaviour
         _mousePos = pos;
         _isDragging = true;
         _draggedItem = item;
+        _accBox.pickingMode = PickingMode.Position;
 
         if (_draggedItem.CurrentState == ItemState.InInventory)
         {
@@ -170,7 +174,8 @@ public class InventoryController : MonoBehaviour
         }
 
         _ghostIcon.SetToMousePosition(_draggedItem.Pivot, _mousePos);
-        _ghostIcon.SetVisual(_draggedItem);        
+        _ghostIcon.SetVisual(_draggedItem);   
+        
     }
 
     /// <summary>
@@ -182,6 +187,19 @@ public class InventoryController : MonoBehaviour
 
         _mousePos = evt.position;
         _ghostIcon.SetToMousePosition(_draggedItem.Pivot, _mousePos);
+
+        Rect r = _accBox.worldBound;
+        _isOverBox = r.Contains(_mousePos);
+
+        if (_isOverBox)
+        {
+            _accBox.AddToClassList("accessioning-box--active");
+        }
+        else
+        {
+            _accBox.RemoveFromClassList("accessioning-box--active");
+        }
+        
     }
 
     /// <summary>
@@ -208,19 +226,11 @@ public class InventoryController : MonoBehaviour
             }
         }
 
-        Accessioning accBox = AccessioningController.Instance.GetBox();
-        bool overBox = false;
-        if (hoveredSlot == null)
-        {
-            Rect r = accBox.worldBound;
-
-            overBox = r.Contains(_mousePos);
-        }
-
-        if (overBox)
+        if (_isOverBox)
         {
             _draggedItem.SetState(ItemState.InAccessioning);
-            _draggedItem.PlaceInBox(accBox, _mousePos);
+            _draggedItem.PlaceInBox(_accBox, _mousePos);
+            _accBox.RemoveFromClassList("accessioning-box--active");
         }
         else if (CanPlace(hoveredSlot))
         {
@@ -237,6 +247,7 @@ public class InventoryController : MonoBehaviour
             }
         }
 
+        _accBox.pickingMode = PickingMode.Ignore;
         _ghostIcon.ResetVisual();
         _draggedItem.ResetPivot();
         ReorderItems();

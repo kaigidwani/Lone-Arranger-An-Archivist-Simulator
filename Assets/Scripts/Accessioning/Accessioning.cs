@@ -1,58 +1,45 @@
-using System;
 using UnityEngine;
 using UnityEngine.UIElements;
+using Random = UnityEngine.Random;
 
 [UxmlElement]
 public partial class Accessioning : VisualElement
 {
-    // Fields
-    
-    private float _paddingLeft;
-    private float _paddingRight;
-    private float _paddingTop;
-    private float _paddingBottom;
-    private Vector2 _boxSize;
-
     // Properties
 
     /// <summary>
     /// Minimimum position of this element (x=left, y=top)
     /// </summary>
-    public Vector2 Min
-    {
-        get 
-        {
-            return new Vector2(_paddingLeft, _paddingTop);
-        }
-    }
+    public Vector2 Min { get; private set; }
 
     /// <summary>
     /// Maximum position of this element (top-right)
     /// </summary>
-    public Vector2 Max
+    public Vector2 Max { get; private set; }
+
+    public Accessioning()
     {
-        get
-        {
-            return new Vector2(
-                Min.x + _boxSize.x,
-                Min.y + _boxSize.y);
-        }
+        pickingMode = PickingMode.Ignore;
     }
 
     public void GetDimensions()
     {
-        _paddingLeft = resolvedStyle.paddingLeft;
-        _paddingRight = resolvedStyle.paddingLeft;
-        _paddingTop = resolvedStyle.paddingLeft;
-        _paddingBottom = resolvedStyle.paddingLeft;
-
-        _boxSize = new Vector2(
-            resolvedStyle.width - resolvedStyle.borderLeftWidth - resolvedStyle.borderRightWidth - _paddingLeft - _paddingRight,
-            resolvedStyle.height - resolvedStyle.borderTopWidth - resolvedStyle.borderBottomWidth - _paddingTop - _paddingBottom);
+        Min = new Vector2(resolvedStyle.borderLeftWidth, resolvedStyle.borderTopWidth);
+        Max = new Vector2(worldBound.width - resolvedStyle.borderRightWidth,
+            worldBound.height - resolvedStyle.borderBottomWidth);
+        Debug.Log("Min:" + Min);
+        Debug.Log("Max:" + Max);
     }
 
     public bool TryGetDimensions()
     {
-        return resolvedStyle.width > 0;
+        return worldBound.width > 0;
+    }
+
+    public Vector2 GetRandomPoint(float offsetX, float offsetY)
+    {
+        float x = Random.Range(Min.x, Max.x - offsetX);
+        float y = Random.Range(Min.y, Max.y - offsetY);
+        return new Vector2(x, y);
     }
 }

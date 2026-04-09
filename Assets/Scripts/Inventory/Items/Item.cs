@@ -2,8 +2,6 @@ using UnityEngine;
 using UnityEngine.UIElements;
 using System.Collections.Generic;
 using Random = UnityEngine.Random;
-using UnityEngine.InputSystem;
-using UnityEngine.InputSystem.LowLevel;
 
 public enum ItemState
 {
@@ -15,8 +13,6 @@ public enum ItemState
 public partial class Item : VisualElement
 {
     // Fields
-    
-
     private PlaceableItemSO _itemSO;
     private float _width;
     private float _height;
@@ -169,6 +165,9 @@ public partial class Item : VisualElement
         }
 
         _itemSO.RotateItemShape(this, dir);
+        float oldWidth = _width;
+        _width = _height;
+        _height = oldWidth;
 
     }
 
@@ -218,12 +217,11 @@ public partial class Item : VisualElement
         // Parent container should be as big as the item is (totally)
         _width = _itemSO.BaseWidth * InventoryController.Instance.ItemTileSize.x;
         _height = _itemSO.BaseHeight * InventoryController.Instance.ItemTileSize.y;
-        
-        float x = Random.Range(box.Min.x, box.Max.x - _width);
-        float y = Random.Range(box.Min.y, box.Max.y - _height);
 
-        style.left = x;
-        style.top = y;
+        Vector2 pos = box.GetRandomPoint(_width, _height);
+
+        style.left = pos.x;
+        style.top = pos.y;
         style.width = _width;
         style.height = _height;
 
@@ -270,19 +268,54 @@ public partial class Item : VisualElement
         CurrentState = ItemState.InInventory;
     }
 
-    public void PlaceInBox(Accessioning box, Vector2 mousePos)
+    public void PlaceInBox(Accessioning box, Vector2 mouse)
     {
         RemoveFromHierarchy(); // Remove from inventory
         RemoveFromClassList("item-slotted");
         AddToClassList("item");
-
-        //if (mousePos)
-
-        Vector2 itemPos = UIHelpers.SetItemPivotToMouse(Pivot, mousePos);
-        style.left = itemPos.x - box.worldBound.x;
-        style.top = itemPos.y - box.worldBound.y;
-
         box.Add(this);
+
+        Vector2 mousePos = UIHelpers.SetItemPivotToMouse(Pivot, mouse);
+        Vector2 itemPos = mousePos - new Vector2(box.worldBound.x, box.worldBound.y);
+        style.left = itemPos.x;
+        style.top = itemPos.y;
+
+        schedule.Execute(() =>
+        {
+            Debug.Log("the item's max is: " + worldBound.max.x);
+            Debug.Log("the box's max is: " + box.worldBound.max.x);
+
+            // Scooch back into box if placed outside
+            if (worldBound.min.x < box.worldBound.min.x)
+            {
+                style.left = itemPos.x + Mathf.Abs(worldBound.min.x - box.worldBound.min.x);
+            }
+
+            if (worldBound.min.y < box.worldBound.min.y)
+            {
+                style.top = itemPos.y + Mathf.Abs(worldBound.min.y - box.worldBound.min.y);
+            }
+
+            if (worldBound.max.x > box.worldBound.max.x)
+            {
+                style.left = itemPos.x - Mathf.Abs(worldBound.max.x - box.worldBound.max.x);
+            }
+
+            if (worldBound.max.y > box.worldBound.max.y)
+            {
+                style.top = itemPos.y - Mathf.Abs(worldBound.max.y - box.worldBound.max.y);
+            }
+
+            //if (worldBound.max)
+        });
+        //Debug.Log("item pos: " + worldBound.position);
+
+        /*Vector2 pos = box.GetRandomPoint(_width, _height);
+
+        style.left = pos.x;
+        style.top = pos.y;*/
+
+        
         CurrentState = ItemState.InAccessioning;
     }
 

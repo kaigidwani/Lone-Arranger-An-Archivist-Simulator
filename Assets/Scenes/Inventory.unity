@@ -356,6 +356,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _sceneController: {fileID: 11400000, guid: 1701d00df2ba8de43b7d010724f47cea, type: 2}
+  _maxItems: 5
   _transitionsList:
   - Style: 2
     DurationMS: 500

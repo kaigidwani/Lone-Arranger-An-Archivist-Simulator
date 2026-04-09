@@ -2,21 +2,19 @@
     height: 87%;
     flex-shrink: 0;
     background-color: rgb(156, 116, 61);
-    border-top-left-radius: 20px;
-    border-top-right-radius: 20px;
-    border-bottom-right-radius: 20px;
-    border-bottom-left-radius: 20px;
-    border-top-width: 5px;
-    border-right-width: 5px;
-    border-bottom-width: 5px;
-    border-left-width: 5px;
-    border-left-color: rgb(0, 0, 0);
-    border-right-color: rgb(0, 0, 0);
-    border-top-color: rgb(0, 0, 0);
-    border-bottom-color: rgb(0, 0, 0);
+    border-radius: 20px;
+    border-width: 5px;
+    border-color: rgb(0, 0, 0);
+    transition-property: border-color;
+    transition-duration: 200ms;
+    transition-timing-function: ease-out;
     align-self: center;
     flex-direction: row-reverse;
     width: 67%;
+}
+
+.accessioning-box--active {
+    border-color: rgb(255, 255, 255);
 }
 
 .accessioning-column {
@@ -90,4 +88,25 @@
 
 .bottom-bar-button {
     font-size: 48px;
+    border-radius: 20px;
+    background-color: rgb(247, 247, 247);
+    border-color: rgb(114, 100, 92);
+    scale: 1 1;
+
+    transition-property: scale, border-color, background-color;
+    transition-duration: 100ms, 100ms, 100ms;
+    transition-timing-function: ease, ease, ease;
+}
+
+.bottom-bar-button--active {
+    font-size: 48px;
+}
+
+.bottom-bar-button--active:hover {
+    scale: 1.05 1.05;
+    border-color: rgb(209, 183, 156);
+}
+
+.bottom-bar-button--locked {
+    background-color: rgba(100, 100, 100, 0.5);
 }
