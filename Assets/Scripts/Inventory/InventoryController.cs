@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.InputSystem;
 using UnityEngine.UIElements;
 using Cursor = UnityEngine.Cursor;
 
@@ -8,14 +9,18 @@ using Cursor = UnityEngine.Cursor;
 public class InventoryController : MonoBehaviour
 {
     // Fields
+    private Vector2 _mousePos;
 
     private VisualElement _root;
     private VisualElement _itemContainer;
+    private float _itemScale = 1;
 
     private List<Slot> _slotList;
 
     private static GhostIcon _ghostIcon;
+    private static Accessioning _accBox;
 
+    private static bool _isOverBox;
     private static bool _isDragging;
     private static Item _draggedItem;
 
@@ -26,6 +31,8 @@ public class InventoryController : MonoBehaviour
     public int Height = 6;
 
     public PlaceableItemSO[] ItemPool;
+
+    [HideInInspector] public bool ShowDebug;
 
     /// <summary>
     /// The list of slots represented as a 2D array
@@ -48,28 +55,41 @@ public class InventoryController : MonoBehaviour
         }
     }
 
+    private void OnEnable()
+    {
+        _root = GameObject.Find("AccessioningController").GetComponent<UIDocument>().rootVisualElement;
+        _itemContainer = _root.Q("ItemLayer");
+        _ghostIcon = _root.Q<GhostIcon>();
+
+        _slotList = _root.Query<Slot>().ToList();
+    }
+
+    private void OnDisable()
+    {
+        
+    }
+
+    public Vector2 ItemTileSize
+    {
+        get { return SlotSize * _itemScale; }
+    }
+
     private void Awake()
     {
         // Singleton pattern
-        if (Instance != null && Instance != this)
-        {
-            Destroy(this.gameObject);
-            return;
-        }
-        else
+        if (Instance == null)
         {
             Instance = this;
+            DontDestroyOnLoad(gameObject);
+        }
+        else if (Instance != this)
+        {
+            Destroy(gameObject);
         }
     }
 
     void Start()
     {
-        _root = GetComponent<UIDocument>().rootVisualElement;
-        _itemContainer = _root.Q("ItemLayer");
-        _ghostIcon = _root.Q<GhostIcon>();
-
-        _slotList = _root.Query<Slot>().ToList();
-
         int row = 0;
         int col = 0;
         
@@ -94,7 +114,7 @@ public class InventoryController : MonoBehaviour
         }
 
         // Making sure the slot and itewm layers are the same size
-        GetSlot(0, 0).RegisterCallback<GeometryChangedEvent>((evt) =>
+        GetSlot(0, 0).RegisterCallbackOnce<GeometryChangedEvent>((evt) =>
         {
             VisualElement slotLayer = _root.Q("SlotLayer");
 
@@ -107,6 +127,11 @@ public class InventoryController : MonoBehaviour
         
         _root.RegisterCallback<PointerMoveEvent>(OnPointerMove);
         _root.RegisterCallback<PointerUpEvent>(OnPointerUp);
+
+        _accBox = AccessioningController.Instance.GetBox();
+
+        ShowDebug = false;
+        SetDebug();
     }
 
     #region Events
@@ -118,19 +143,23 @@ public class InventoryController : MonoBehaviour
     /// <param name="item">The item the user clicked on</param>
     public void OnPointerDown(Vector2 pos, Item item)
     {
+        _mousePos = pos;
         _isDragging = true;
         _draggedItem = item;
+        _accBox.pickingMode = PickingMode.Position;
 
-        if (_draggedItem.IsPlaced)
+        if (_draggedItem.CurrentState == ItemState.InInventory)
         {
             foreach (ItemTile tile in _draggedItem.Tiles)
             {
                 tile.ClearGridSlot();
             }
-            
         }
 
-        Cursor.visible = false;
+        if (!ShowDebug)
+        {
+            Cursor.visible = false;
+        }
 
         _draggedItem.style.visibility = Visibility.Hidden;
 
@@ -144,24 +173,39 @@ public class InventoryController : MonoBehaviour
             }
         }
 
-        _ghostIcon.SetIcon(_draggedItem);
-        _ghostIcon.SetToMousePosition();
+        _ghostIcon.SetToMousePosition(_draggedItem.Pivot, _mousePos);
+        _ghostIcon.SetVisual(_draggedItem);   
+        
     }
 
     /// <summary>
     /// Handles dragging across the screen
     /// </summary>
-    void OnPointerMove(PointerMoveEvent evt)
+    public void OnPointerMove(PointerMoveEvent evt)
     {
         if (!_isDragging) return;
 
-        _ghostIcon.SetToMousePosition();
+        _mousePos = evt.position;
+        _ghostIcon.SetToMousePosition(_draggedItem.Pivot, _mousePos);
+
+        Rect r = _accBox.worldBound;
+        _isOverBox = r.Contains(_mousePos);
+
+        if (_isOverBox)
+        {
+            _accBox.AddToClassList("accessioning-box--active");
+        }
+        else
+        {
+            _accBox.RemoveFromClassList("accessioning-box--active");
+        }
+        
     }
 
     /// <summary>
     /// Handles dropping items on the screen
     /// </summary>
-    void OnPointerUp(PointerUpEvent evt)
+    public void OnPointerUp(PointerUpEvent evt)
     {
         if (!_isDragging) return;
 
@@ -171,32 +215,67 @@ public class InventoryController : MonoBehaviour
         
         _draggedItem.style.visibility = Visibility.Visible;
 
-        // Find slot under mouse
-        Vector2 mousePos = evt.position;
-
         Slot hoveredSlot = null;
 
         foreach (Slot s in _slotList) 
         {
             Rect r = s.worldBound;
-            if (r.Contains(mousePos))
+            if (r.Contains(_mousePos))
             {
                 hoveredSlot = s;
             }
         }
-        
-        if (hoveredSlot != null && CanPlace(hoveredSlot))
+
+        if (_isOverBox)
         {
-            _draggedItem.Place(_itemContainer, hoveredSlot);    
+            _draggedItem.SetState(ItemState.InAccessioning);
+            _draggedItem.PlaceInBox(_accBox, _mousePos);
+            _accBox.RemoveFromClassList("accessioning-box--active");
         }
-        else if (_draggedItem.IsPlaced)
+        else if (CanPlace(hoveredSlot))
         {
-            _draggedItem.Place(_itemContainer, _draggedItem.Pivot.GridSlot);
+            _draggedItem.SetState(ItemState.InInventory);
+            _draggedItem.PlaceInSlot(_itemContainer, hoveredSlot);
+        }
+        else // Couldn't place
+        {
+            _draggedItem.RevertRotation();
+
+            if (_draggedItem.CurrentState == ItemState.InInventory)
+            {
+                _draggedItem.PlaceInSlot(_itemContainer, _draggedItem.Pivot.GridSlot);
+            }
         }
 
-        _ghostIcon.ResetIcon();
+        _accBox.pickingMode = PickingMode.Ignore;
+        _ghostIcon.ResetVisual();
         _draggedItem.ResetPivot();
         ReorderItems();
+    }
+
+    public void OnRotateCW(InputAction.CallbackContext ctx)
+    {
+        if (!_isDragging || ctx.phase != InputActionPhase.Performed)
+        {
+            return;
+        }   
+
+        int dir = 1;
+        _draggedItem.Rotate(dir);
+        _ghostIcon.Rotate(dir, _draggedItem.Pivot);
+        _ghostIcon.SetToMousePosition(_draggedItem.Pivot, _mousePos);
+    }
+
+    public void OnRotateCCW(InputAction.CallbackContext ctx)
+    {
+        if (!_isDragging || ctx.phase != InputActionPhase.Performed)
+        {
+            return;
+        }
+
+        int dir = -1;
+        _draggedItem.Rotate(dir);
+        _ghostIcon.Rotate(dir, _draggedItem.Pivot);
     }
 
     #endregion
@@ -208,6 +287,11 @@ public class InventoryController : MonoBehaviour
     /// <returns>Whether the item can be placed in the given slot</returns>
     private bool CanPlace(Slot startSlot)
     {
+        if (startSlot == null)
+        {
+            return false;
+        }
+
         foreach (ItemTile tile in _draggedItem.Tiles)
         {
             int gridRow = startSlot.GridIndex.x + (tile.Index.x - _draggedItem.Pivot.Index.x);
@@ -231,20 +315,9 @@ public class InventoryController : MonoBehaviour
     }
 
     /// <summary>
-    /// Finds the grid slot at the given index
-    /// </summary>
-    /// <param name="x">Row</param>
-    /// <param name="y">Column</param>
-    /// <returns>The grid slot at (x, y)</returns>
-    public Slot GetSlot(int x, int y)
-    {
-        return Grid[x][y];
-    }
-
-    /// <summary>
     /// All placed items are reordered by their grid position
     /// </summary>
-    public void ReorderItems()
+    private void ReorderItems()
     {
         List<Item> items = _itemContainer.Children().OfType<Item>()
             .OrderBy(x => x.RootGridIndex.x)
@@ -261,4 +334,57 @@ public class InventoryController : MonoBehaviour
             _itemContainer.Add(item);
         }
     }
+
+    /// <summary>
+    /// Finds the grid slot at the given index
+    /// </summary>
+    /// <param name="x">Row</param>
+    /// <param name="y">Column</param>
+    /// <returns>The grid slot at (x, y)</returns>
+    public Slot GetSlot(int x, int y)
+    {
+        return Grid[x][y];
+    }
+
+    #region Debug
+    public void SetDebug()
+    {
+        if (ShowDebug)
+        {
+            Debug.Log("Debug on");
+        }
+        else
+        {
+            Debug.Log("Debug off");
+        }
+        
+
+        List<Item> items = _root.Query<Item>().ToList();
+        for (int i = 0; i < items.Count; i++)
+        {
+            foreach (ItemTile tile in items[i].Tiles)
+            {
+                tile.DebugLabel.visible = ShowDebug;
+            }
+        }
+
+        for (int i = 0; i < _slotList.Count; i++)
+        {
+            _slotList[i].DebugLabel.visible = ShowDebug;
+        }
+
+        _ghostIcon.DebugLabel.visible = ShowDebug;
+    }
+
+    public void OnToggleDebug(InputAction.CallbackContext ctx)
+    {
+        if (ctx.phase == InputActionPhase.Performed)
+        {
+            ShowDebug = !ShowDebug;
+
+            SetDebug();
+        }
+    }
+
+    #endregion
 }
