@@ -9,6 +9,7 @@ using Cursor = UnityEngine.Cursor;
 public class InventoryController : MonoBehaviour
 {
     // Fields
+    private Vector2 _mousePos;
 
     private VisualElement _root;
     private VisualElement _itemContainer;
@@ -17,7 +18,9 @@ public class InventoryController : MonoBehaviour
     private List<Slot> _slotList;
 
     private static GhostIcon _ghostIcon;
+    private static Accessioning _accBox;
 
+    private static bool _isOverBox;
     private static bool _isDragging;
     private static Item _draggedItem;
 
@@ -52,6 +55,20 @@ public class InventoryController : MonoBehaviour
         }
     }
 
+    private void OnEnable()
+    {
+        _root = GameObject.Find("AccessioningController").GetComponent<UIDocument>().rootVisualElement;
+        _itemContainer = _root.Q("ItemLayer");
+        _ghostIcon = _root.Q<GhostIcon>();
+
+        _slotList = _root.Query<Slot>().ToList();
+    }
+
+    private void OnDisable()
+    {
+        
+    }
+
     public Vector2 ItemTileSize
     {
         get { return SlotSize * _itemScale; }
@@ -60,25 +77,19 @@ public class InventoryController : MonoBehaviour
     private void Awake()
     {
         // Singleton pattern
-        if (Instance != null && Instance != this)
-        {
-            Destroy(this.gameObject);
-            return;
-        }
-        else
+        if (Instance == null)
         {
             Instance = this;
+            DontDestroyOnLoad(gameObject);
+        }
+        else if (Instance != this)
+        {
+            Destroy(gameObject);
         }
     }
 
     void Start()
     {
-        _root = GetComponent<UIDocument>().rootVisualElement;
-        _itemContainer = _root.Q("ItemLayer");
-        _ghostIcon = _root.Q<GhostIcon>();
-
-        _slotList = _root.Query<Slot>().ToList();
-
         int row = 0;
         int col = 0;
         
@@ -117,6 +128,8 @@ public class InventoryController : MonoBehaviour
         _root.RegisterCallback<PointerMoveEvent>(OnPointerMove);
         _root.RegisterCallback<PointerUpEvent>(OnPointerUp);
 
+        _accBox = AccessioningController.Instance.GetBox();
+
         ShowDebug = false;
         SetDebug();
     }
@@ -130,10 +143,12 @@ public class InventoryController : MonoBehaviour
     /// <param name="item">The item the user clicked on</param>
     public void OnPointerDown(Vector2 pos, Item item)
     {
+        _mousePos = pos;
         _isDragging = true;
         _draggedItem = item;
+        _accBox.pickingMode = PickingMode.Position;
 
-        if (_draggedItem.IsPlaced)
+        if (_draggedItem.CurrentState == ItemState.InInventory)
         {
             foreach (ItemTile tile in _draggedItem.Tiles)
             {
@@ -158,7 +173,9 @@ public class InventoryController : MonoBehaviour
             }
         }
 
-        _ghostIcon.SetVisual(_draggedItem);        
+        _ghostIcon.SetToMousePosition(_draggedItem.Pivot, _mousePos);
+        _ghostIcon.SetVisual(_draggedItem);   
+        
     }
 
     /// <summary>
@@ -168,7 +185,21 @@ public class InventoryController : MonoBehaviour
     {
         if (!_isDragging) return;
 
-        _ghostIcon.UpdatePosition(_draggedItem.Pivot);
+        _mousePos = evt.position;
+        _ghostIcon.SetToMousePosition(_draggedItem.Pivot, _mousePos);
+
+        Rect r = _accBox.worldBound;
+        _isOverBox = r.Contains(_mousePos);
+
+        if (_isOverBox)
+        {
+            _accBox.AddToClassList("accessioning-box--active");
+        }
+        else
+        {
+            _accBox.RemoveFromClassList("accessioning-box--active");
+        }
+        
     }
 
     /// <summary>
@@ -184,34 +215,39 @@ public class InventoryController : MonoBehaviour
         
         _draggedItem.style.visibility = Visibility.Visible;
 
-        // Find slot under mouse
-        Vector2 mousePos = evt.position;
-
         Slot hoveredSlot = null;
 
         foreach (Slot s in _slotList) 
         {
             Rect r = s.worldBound;
-            if (r.Contains(mousePos))
+            if (r.Contains(_mousePos))
             {
                 hoveredSlot = s;
             }
         }
 
-        if (CanPlace(hoveredSlot))
+        if (_isOverBox)
         {
-            _draggedItem.Place(_itemContainer, hoveredSlot);    
+            _draggedItem.SetState(ItemState.InAccessioning);
+            _draggedItem.PlaceInBox(_accBox, _mousePos);
+            _accBox.RemoveFromClassList("accessioning-box--active");
         }
-        else
+        else if (CanPlace(hoveredSlot))
+        {
+            _draggedItem.SetState(ItemState.InInventory);
+            _draggedItem.PlaceInSlot(_itemContainer, hoveredSlot);
+        }
+        else // Couldn't place
         {
             _draggedItem.RevertRotation();
 
-            if (_draggedItem.IsPlaced)
+            if (_draggedItem.CurrentState == ItemState.InInventory)
             {
-                _draggedItem.Place(_itemContainer, _draggedItem.Pivot.GridSlot);
+                _draggedItem.PlaceInSlot(_itemContainer, _draggedItem.Pivot.GridSlot);
             }
         }
 
+        _accBox.pickingMode = PickingMode.Ignore;
         _ghostIcon.ResetVisual();
         _draggedItem.ResetPivot();
         ReorderItems();
@@ -227,6 +263,7 @@ public class InventoryController : MonoBehaviour
         int dir = 1;
         _draggedItem.Rotate(dir);
         _ghostIcon.Rotate(dir, _draggedItem.Pivot);
+        _ghostIcon.SetToMousePosition(_draggedItem.Pivot, _mousePos);
     }
 
     public void OnRotateCCW(InputAction.CallbackContext ctx)

@@ -128,35 +128,15 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 222657676}
-  - component: {fileID: 222657675}
   - component: {fileID: 222657678}
   - component: {fileID: 222657679}
   m_Layer: 5
-  m_Name: Inventory
+  m_Name: InventoryController
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &222657675
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 222657674}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 19102, guid: 0000000000000000e000000000000000, type: 0}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_PanelSettings: {fileID: 11400000, guid: 615c61a35094fc64a9b0d97b71b2365e, type: 2}
-  m_ParentUI: {fileID: 0}
-  sourceAsset: {fileID: 9197481963319205126, guid: b70eee19de233764b9e1cb5fa4cccc17, type: 3}
-  m_SortingOrder: 0
-  m_WorldSpaceSizeMode: 1
-  m_WorldSpaceWidth: 1920
-  m_WorldSpaceHeight: 1080
 --- !u!4 &222657676
 Transform:
   m_ObjectHideFlags: 0
@@ -188,11 +168,11 @@ MonoBehaviour:
   Width: 6
   Height: 6
   ItemPool:
-  - {fileID: 11400000, guid: e083ca9a015f2d04f96d6152657d0b0a, type: 2}
-  - {fileID: 11400000, guid: 413d4706439c9b240b0c79d5ebbcd20a, type: 2}
-  - {fileID: 11400000, guid: a43ea40ed6e53a645a41abeb59ef83d7, type: 2}
-  - {fileID: 11400000, guid: 44ff854078fca954bab48e75302cefc4, type: 2}
-  ShowDebug: 1
+  - {fileID: 11400000, guid: 01f0e19f34e84624abc429800071b2de, type: 2}
+  - {fileID: 11400000, guid: c45e0665c7ad6ed419bdce7f6bb1b199, type: 2}
+  - {fileID: 11400000, guid: fdb055965725fcc4ba60b1dc66c7fc0e, type: 2}
+  - {fileID: 11400000, guid: ac2619ab72b3b474a84eaa82188b81ee, type: 2}
+  ShowDebug: 0
 --- !u!114 &222657679
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -311,6 +291,77 @@ MonoBehaviour:
   m_DefaultActionMap: Player
   m_SplitScreenIndex: -1
   m_Camera: {fileID: 0}
+--- !u!1 &926186296
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 926186297}
+  - component: {fileID: 926186298}
+  - component: {fileID: 926186299}
+  m_Layer: 0
+  m_Name: AccessioningController
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &926186297
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 926186296}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0.024772242, y: -0.22035775, z: 0.047831696}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &926186298
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 926186296}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 19102, guid: 0000000000000000e000000000000000, type: 0}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_PanelSettings: {fileID: 11400000, guid: 615c61a35094fc64a9b0d97b71b2365e, type: 2}
+  m_ParentUI: {fileID: 0}
+  sourceAsset: {fileID: 9197481963319205126, guid: b70eee19de233764b9e1cb5fa4cccc17, type: 3}
+  m_SortingOrder: 0
+  m_WorldSpaceSizeMode: 1
+  m_WorldSpaceWidth: 1920
+  m_WorldSpaceHeight: 1080
+--- !u!114 &926186299
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 926186296}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 045e8d52657bf9d44bee33c8e8498286, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _sceneController: {fileID: 11400000, guid: 1701d00df2ba8de43b7d010724f47cea, type: 2}
+  _maxItems: 5
+  _transitionsList:
+  - Style: 2
+    DurationMS: 500
+    ClassName: accessioning-column--slide-in
+  _transition: 2
 --- !u!1 &941369010
 GameObject:
   m_ObjectHideFlags: 0
@@ -723,4 +774,5 @@ SceneRoots:
   m_Roots:
   - {fileID: 941369013}
   - {fileID: 222657676}
+  - {fileID: 926186297}
   - {fileID: 1330562875}

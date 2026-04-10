@@ -3,14 +3,23 @@ using UnityEngine.UIElements;
 using System.Collections.Generic;
 using Random = UnityEngine.Random;
 
+public enum ItemState
+{
+    InAccessioning,
+    InInventory,
+}
+
 [UxmlElement]
 public partial class Item : VisualElement
 {
     // Fields
-
     private PlaceableItemSO _itemSO;
+    private float _width;
+    private float _height;
 
     // Properties
+
+    public ItemState CurrentState;
 
     /// <summary>
     /// The rotation of this item before it was clicked
@@ -30,12 +39,12 @@ public partial class Item : VisualElement
     /// <summary>
     /// The width of this item in tiles
     /// </summary>
-    public int Width { get; set; }
+    public int WidthInTiles { get; set; }
 
     /// <summary>
     /// The height of this item in tiles
     /// </summary>
-    public int Height { get; set; }
+    public int HeightInTiles { get; set; }
 
     /// <summary>
     /// Contains information about this item
@@ -58,27 +67,22 @@ public partial class Item : VisualElement
     /// </summary>
     public Vector2Int RootGridIndex { get; private set; }
 
-    public bool IsPlaced;
     public bool IsHovering;
 
     public Item()
     {
         pickingMode = PickingMode.Ignore;
+        CurrentState = ItemState.InAccessioning;
     }
 
     /// <summary>
-    /// Builds out a randomly generated item in multiple, sliced tiles
+    /// Builds out a list of sliced tiles based on the item's shape
     /// </summary>
-    private void ConstructItem()
+    private void GenerateItemTiles()
     {
         // How big each individual tile should be
         float tileWidth = InventoryController.Instance.ItemTileSize.x;
         float tileHeight = InventoryController.Instance.ItemTileSize.y;
-
-        // Parent container should be as big as the item is (totally)
-        style.width = _itemSO.BaseWidth * tileWidth;
-        style.height = _itemSO.BaseHeight * tileHeight;
-        style.backgroundImage = _itemSO.Sprite.texture;
 
         Tiles = new List<ItemTile>();
         for (int row = 0; row < _itemSO.BaseHeight; row++)
@@ -148,11 +152,11 @@ public partial class Item : VisualElement
         {
             if (dir >= 0) // clockwise
             {
-                tile.SetIndex(tile.Index.y, Height - 1 - tile.Index.x);
+                tile.SetIndex(tile.Index.y, HeightInTiles - 1 - tile.Index.x);
             }
             else // counter-clockwise
             {
-                tile.SetIndex(Width - 1 - tile.Index.y, tile.Index.x);
+                tile.SetIndex(WidthInTiles - 1 - tile.Index.y, tile.Index.x);
             }
 
             // Keep debug label orientation
@@ -161,6 +165,9 @@ public partial class Item : VisualElement
         }
 
         _itemSO.RotateItemShape(this, dir);
+        float oldWidth = _width;
+        _width = _height;
+        _height = oldWidth;
 
     }
 
@@ -195,35 +202,40 @@ public partial class Item : VisualElement
         // Generate random item from current item pool
         if (InventoryController.Instance.ItemPool.Length > 0)
         {
-            _itemSO = InventoryController.Instance.ItemPool[Random.Range(0, InventoryController.Instance.ItemPool.Length)];
+            _itemSO = InventoryController.Instance.ItemPool[Random.Range(0, InventoryController.Instance.ItemPool.Length)];           
             name = _itemSO.Name;
-            Width = _itemSO.BaseWidth;
-            Height = _itemSO.BaseHeight;
+
+            WidthInTiles = _itemSO.BaseWidth;
+            HeightInTiles = _itemSO.BaseHeight;
+
+            _itemSO.GenerateShape();
             Shape = _itemSO.BaseShape;
 
-            ConstructItem();
+            GenerateItemTiles();
         }
 
-        schedule.Execute(() =>
-        {
-            float x = Random.Range(box.Min.x, box.Max.x - resolvedStyle.width);
-            float y = Random.Range(box.Min.y, box.Max.y - resolvedStyle.height);
+        // Parent container should be as big as the item is (totally)
+        _width = _itemSO.BaseWidth * InventoryController.Instance.ItemTileSize.x;
+        _height = _itemSO.BaseHeight * InventoryController.Instance.ItemTileSize.y;
 
-            style.left = x;
-            style.top = y;
-            style.opacity = 100;
-        });
+        Vector2 pos = box.GetRandomPoint(_width, _height);
+
+        style.left = pos.x;
+        style.top = pos.y;
+        style.width = _width;
+        style.height = _height;
+
+        style.backgroundImage = _itemSO.Sprite.texture;
+        style.opacity = 100;
+
     }
 
     /// <summary>
     /// Places the dragged item into a slot
     /// </summary>
     /// <param name="startSlot">The slot that the user places the item in</param>
-    public void Place(VisualElement dest, Slot startSlot)
+    public void PlaceInSlot(VisualElement dest, Slot startSlot)
     {
-        // TO-DO:
-        // Move to seperate function so this is only called after
-        // taking an item from accessioniong
         RemoveFromHierarchy(); // Remove from accessioning box 
         RemoveFromClassList("item");
         AddToClassList("item-slotted");
@@ -235,7 +247,7 @@ public partial class Item : VisualElement
         float drawOffset = 0;
         if (Rotation % 180 != 0)
         {
-            drawOffset = (Width - Height) * InventoryController.Instance.ItemTileSize.x / 2;
+            drawOffset = (WidthInTiles - HeightInTiles) * InventoryController.Instance.ItemTileSize.x / 2;
         }
 
         style.left = startSlot.resolvedStyle.left - colOffset + drawOffset;
@@ -253,7 +265,58 @@ public partial class Item : VisualElement
         RootGridIndex = GetRootGridPosition();
 
         dest.Add(this);
-        IsPlaced = true;
+        CurrentState = ItemState.InInventory;
+    }
+
+    public void PlaceInBox(Accessioning box, Vector2 mouse)
+    {
+        RemoveFromHierarchy(); // Remove from inventory
+        RemoveFromClassList("item-slotted");
+        AddToClassList("item");
+        box.Add(this);
+
+        Vector2 mousePos = UIHelpers.SetItemPivotToMouse(Pivot, mouse);
+        Vector2 itemPos = mousePos - new Vector2(box.worldBound.x, box.worldBound.y);
+        style.left = itemPos.x;
+        style.top = itemPos.y;
+
+        schedule.Execute(() =>
+        {
+            Debug.Log("the item's max is: " + worldBound.max.x);
+            Debug.Log("the box's max is: " + box.worldBound.max.x);
+
+            // Scooch back into box if placed outside
+            if (worldBound.min.x < box.worldBound.min.x)
+            {
+                style.left = itemPos.x + Mathf.Abs(worldBound.min.x - box.worldBound.min.x);
+            }
+
+            if (worldBound.min.y < box.worldBound.min.y)
+            {
+                style.top = itemPos.y + Mathf.Abs(worldBound.min.y - box.worldBound.min.y);
+            }
+
+            if (worldBound.max.x > box.worldBound.max.x)
+            {
+                style.left = itemPos.x - Mathf.Abs(worldBound.max.x - box.worldBound.max.x);
+            }
+
+            if (worldBound.max.y > box.worldBound.max.y)
+            {
+                style.top = itemPos.y - Mathf.Abs(worldBound.max.y - box.worldBound.max.y);
+            }
+
+            //if (worldBound.max)
+        });
+        //Debug.Log("item pos: " + worldBound.position);
+
+        /*Vector2 pos = box.GetRandomPoint(_width, _height);
+
+        style.left = pos.x;
+        style.top = pos.y;*/
+
+        
+        CurrentState = ItemState.InAccessioning;
     }
 
     public void SetScale(Vector2 scale)
@@ -285,5 +348,24 @@ public partial class Item : VisualElement
     {
         Pivot.RemoveFromClassList("pivot");
         Pivot = null;
+    }
+
+    public void SetState(ItemState newState)
+    {
+        if (CurrentState == newState)
+        {
+            return;
+        }  
+
+        if (CurrentState == ItemState.InAccessioning && newState == ItemState.InInventory) // moving from accessioning to inventory
+        {
+            AccessioningController.Instance.TakeDonation();
+        }
+        else if (CurrentState == ItemState.InInventory && newState == ItemState.InAccessioning) // moving from inventory to accessioning
+        {
+            AccessioningController.Instance.ReturnDonation();
+        }
+
+        CurrentState = newState;
     }
 }

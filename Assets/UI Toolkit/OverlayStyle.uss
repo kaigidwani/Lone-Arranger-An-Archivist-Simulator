@@ -1,0 +1,16 @@
+.overlay {
+	width: 100%;
+	height: 100%;
+	
+}
+
+.overlay.overlay--basic-fade {
+	background-color: black;
+	opacity: 0;
+	transition-property: opacity;
+	transition-duration: 500ms;
+}
+
+.overlay.overlay--active.overlay--basic-fade {
+	opacity: 1;
+}
