@@ -40,4 +40,9 @@ public class Patron : MonoBehaviour
         // - Check if the player has taken the request yet
         // - Then: Check if the request has been completed yet
     }
+
+    private void GenerateRequest()
+    {
+        //PatronRequest req = new PatronRequest();
+    }
 }

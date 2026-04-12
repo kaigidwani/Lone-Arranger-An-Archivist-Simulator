@@ -1,12 +1,18 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+
+public struct PatronRequestItem
+{
+    public SlotColor Color;
+    public string ItemName;
+}
+
 public class PatronRequest : MonoBehaviour
 {
     // === Fields ===
 
     [SerializeField] private List<Item> _itemsList;
-    [SerializeField] private List<string> _colorsList;
     [SerializeField] private int _reqNum;
     [SerializeField] private Patron _patronRef;
     [SerializeField] private int _itemAmount;
@@ -21,19 +27,9 @@ public class PatronRequest : MonoBehaviour
     public List<Item> ItemsList { get { return _itemsList; } }
 
     /// <summary>
-    /// Get the colors list of a request
-    /// </summary>
-    public List<string> ColorsList { get { return _colorsList; } }
-
-    /// <summary>
     /// Get the request's number
     /// </summary>
     public int ReqNum { get { return _reqNum; } }
-
-    /// <summary>
-    /// Gets or sets the patron ref of this request
-    /// </summary>
-    public Patron PatronRef { get { return _patronRef; } set { value = _patronRef; } }
 
     /// <summary>
     /// Gets or sets the bool that this request is completed

@@ -1,0 +1,13 @@
+<ui:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="project://database/Assets/UI%20Toolkit/ReadingRoom.uss?fileID=7433441132597879392&amp;guid=f168fe7c3fcd0da45a4d0a3bc4610e45&amp;type=3#ReadingRoom" />
+    <ui:VisualElement name="Screens" style="flex-grow: 1;">
+        <ui:VisualElement name="ReadingRoom" class="screen screen--visible" style="flex-grow: 1;">
+            <ui:Label text="READING ROOM" class="room-label" />
+            <ui:Button text="&gt;" name="NextRoomBttn" class="next-room-button" style="left: 90%;" />
+        </ui:VisualElement>
+        <ui:VisualElement name="Archive" class="screen screen--hidden-right" style="flex-grow: 1;">
+            <ui:Label text="ARCHIVE" class="room-label" />
+            <ui:Button text="&lt;" name="NextRoomBttn" class="next-room-button" style="left: 10%;" />
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

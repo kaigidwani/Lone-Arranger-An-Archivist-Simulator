@@ -6,8 +6,8 @@ public enum Scene
 {
     MainMenu,
     Accessioning,
+    ReadingRoom,
     Inventory,
-    ReferenceInterviews,
 }
 
 [CreateAssetMenu(fileName = "SceneController", menuName = "Scriptable Objects/Managers/SceneController")]
@@ -28,6 +28,11 @@ public class SceneController : ScriptableObject
 
             case Scene.Inventory:
                 await SceneManager.LoadSceneAsync("Inventory");
+
+                break;
+
+            case Scene.ReadingRoom:
+                await SceneManager.LoadSceneAsync("ReadingRoom");
 
                 break;
         }
