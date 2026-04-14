@@ -1,13 +1,25 @@
 <ui:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
     <Style src="project://database/Assets/UI%20Toolkit/ReadingRoom.uss?fileID=7433441132597879392&amp;guid=f168fe7c3fcd0da45a4d0a3bc4610e45&amp;type=3#ReadingRoom" />
     <ui:VisualElement name="Screens" style="flex-grow: 1;">
-        <ui:VisualElement name="ReadingRoom" class="screen screen--visible" style="flex-grow: 1;">
-            <ui:Label text="READING ROOM" class="room-label" />
-            <ui:Button text="&gt;" name="NextRoomBttn" class="next-room-button" style="left: 90%;" />
+        <ui:VisualElement name="ReadingRoom" picking-mode="Ignore" class="screen" style="flex-grow: 1; background-image: url(&quot;project://database/Assets/Art/reading-room-bg.png?fileID=2800000&amp;guid=e134513439f3a3d4fa0a58ebad6596c2&amp;type=3#reading-room-bg&quot;);">
+            <ui:Button text="&gt;" name="NextRoomBttn" class="next-room-button" style="right: 0;" />
+            <ui:VisualElement name="PatronLayer" picking-mode="Ignore" style="flex-grow: 1; position: absolute; width: 100%; height: 100%;">
+                <ui:VisualElement name="TestPatron" class="patron hidden-left">
+                    <ui:VisualElement name="Request" class="request">
+                        <ui:VisualElement name="Shadow" class="shadow" />
+                        <ui:VisualElement name="TextBox" class="request-text-box">
+                            <ui:Label text="..." name="Label" class="request-label" />
+                            <ui:VisualElement name="ItemList" class="item-list" />
+                        </ui:VisualElement>
+                        <ui:Button text="Got it!" name="CloseBttn" class="menu-button-secondary take-order-button menu-button hidden" />
+                    </ui:VisualElement>
+                </ui:VisualElement>
+            </ui:VisualElement>
+            <ui:VisualElement name="Desk" picking-mode="Ignore" style="flex-grow: 1; background-image: url(&quot;project://database/Assets/Art/reading-room-desk.png?fileID=2800000&amp;guid=03a0c0f41d060bf4f814346acaabe0a4&amp;type=3#reading-room-desk&quot;);" />
         </ui:VisualElement>
-        <ui:VisualElement name="Archive" class="screen screen--hidden-right" style="flex-grow: 1;">
+        <ui:VisualElement name="Archive" class="screen hidden-right" style="flex-grow: 1;">
             <ui:Label text="ARCHIVE" class="room-label" />
-            <ui:Button text="&lt;" name="NextRoomBttn" class="next-room-button" style="left: 10%;" />
+            <ui:Button text="&lt;" name="NextRoomBttn" class="next-room-button" style="left: 0;" />
         </ui:VisualElement>
     </ui:VisualElement>
 </ui:UXML>

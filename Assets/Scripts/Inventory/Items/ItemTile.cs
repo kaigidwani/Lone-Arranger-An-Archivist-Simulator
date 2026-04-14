@@ -6,16 +6,6 @@ using System;
 [UxmlElement]
 public partial class ItemTile : VisualElement
 {
-    // Fields
-
-    private static List<Color> COLOR_CODES = new List<Color>
-    {
-        new Color(0, 0, 0, 0),
-        new Color(153/255f, 9/255f, 9/255f, 0.51f),
-        new Color(38/255f, 91/255f, 30/255f, 0.51f),
-        new Color(58/255f, 89/255f, 151/255f, 0.51f)
-    };
-
     // Properties
 
     public Label DebugLabel { get; set; }
@@ -128,13 +118,13 @@ public partial class ItemTile : VisualElement
     {
         schedule.Execute(() =>
         {
-            style.backgroundColor = COLOR_CODES[(int)GridSlot.Color];
+            style.backgroundColor = ParentItem.SO.COLOR_CODES[(int)GridSlot.Color];
         });
         
     }
 
     public void RemoveColor()
     {
-        style.backgroundColor = COLOR_CODES[(int)SlotColor.None];
+        style.backgroundColor = ParentItem.SO.COLOR_CODES[(int)SlotColor.None];
     }
 }

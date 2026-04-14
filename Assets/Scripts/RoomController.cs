@@ -9,8 +9,9 @@ public enum RoomType
 
 public class RoomController : MonoBehaviour
 {
-    private const string HIDDEN_LEFT_CLS = "screen--hidden-left";
-    private const string HIDDEN_RIGHT_CLS = "screen--hidden-right";
+    // Fields
+    private const string HIDDEN_LEFT_CLS = "hidden-left";
+    private const string HIDDEN_RIGHT_CLS = "hidden-right";
 
     private VisualElement _root;
 
@@ -21,6 +22,12 @@ public class RoomController : MonoBehaviour
     private Button _toReadingRoomBttn;
 
     private RoomType _currRoomType;
+
+    // Properties
+
+    public VisualElement ReadingRoom { get { return _readingRoom; } }
+
+    public VisualElement ArchiveRoom { get { return _archive; } }
 
     public static RoomController Instance;
 
@@ -41,6 +48,11 @@ public class RoomController : MonoBehaviour
         _readingRoom = _root.Q("ReadingRoom");
         _toArchiveBttn = _readingRoom.Q<Button>("NextRoomBttn");
         _toArchiveBttn.clicked += OnSwitchRoomClick;
+    }
+
+    private void Start()
+    {
+        DayManager.Instance.StartDay();
     }
 
     public void OnSwitchRoomClick()

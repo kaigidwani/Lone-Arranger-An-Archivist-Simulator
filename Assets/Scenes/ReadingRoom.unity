@@ -130,7 +130,7 @@ GameObject:
   - component: {fileID: 841752587}
   - component: {fileID: 841752588}
   m_Layer: 0
-  m_Name: InterviewManager
+  m_Name: PatronManager
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -160,16 +160,57 @@ MonoBehaviour:
   m_GameObject: {fileID: 841752586}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f0972e77226175243986977996029b3e, type: 3}
+  m_Script: {fileID: 11500000, guid: 322e79c470772794d994e0daeea38bd6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _patronsAmount: 3
   _minReqItemAmount: 1
-  _maxReqItemAmount: 3
-  _requestsList: []
-  _patronsList: []
-  requestsContainer: {fileID: 2129872236}
+  _maxReqItemAmount: 4
+  requestsContainer: {fileID: 0}
   requestPrefab: {fileID: 0}
+--- !u!1 &908067476
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 908067477}
+  - component: {fileID: 908067478}
+  m_Layer: 0
+  m_Name: DayManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &908067477
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 908067476}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -1.166854, y: -0.10267851, z: 0.081991844}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &908067478
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 908067476}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f9f70b6a2e9127743af8a6ccd2b2407a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &945673452
 GameObject:
   m_ObjectHideFlags: 0
@@ -187,7 +228,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!212 &945673453
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -270,9 +311,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f06be11685af6a74d8161526cbf1e803, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _colorsList: []
-  _reqNum: 0
-  _patronRef: {fileID: 0}
   _itemAmount: 0
   _isComplete: 0
 --- !u!1 &1731338299
@@ -516,3 +554,4 @@ SceneRoots:
   - {fileID: 2129872237}
   - {fileID: 945673454}
   - {fileID: 1731338301}
+  - {fileID: 908067477}

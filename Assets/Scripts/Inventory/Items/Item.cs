@@ -308,12 +308,6 @@ public partial class Item : VisualElement
 
             //if (worldBound.max)
         });
-        //Debug.Log("item pos: " + worldBound.position);
-
-        /*Vector2 pos = box.GetRandomPoint(_width, _height);
-
-        style.left = pos.x;
-        style.top = pos.y;*/
 
         
         CurrentState = ItemState.InAccessioning;
