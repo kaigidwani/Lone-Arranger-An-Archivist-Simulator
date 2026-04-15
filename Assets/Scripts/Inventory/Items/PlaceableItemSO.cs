@@ -1,6 +1,4 @@
-using System.Collections.Generic;
 using UnityEngine;
-using static UnityEngine.Rendering.ProbeAdjustmentVolume;
 
 [CreateAssetMenu(fileName = "New Item", menuName = "Scriptable Objects/Item")]
 public class PlaceableItemSO : ScriptableObject
@@ -33,8 +31,8 @@ public class PlaceableItemSO : ScriptableObject
     public void RotateItemShape(Item item, int dir)
     {
         // Swap width and height
-        int newWidth = item.Height;
-        int newHeight = item.Width;
+        int newWidth = item.HeightInTiles;
+        int newHeight = item.WidthInTiles;
         
         int[][] rotatedShape = new int[newHeight][];
         
@@ -64,8 +62,8 @@ public class PlaceableItemSO : ScriptableObject
         }
 
         // update item's properties
-        item.Width = newWidth;
-        item.Height = newHeight;
+        item.WidthInTiles = newWidth;
+        item.HeightInTiles = newHeight;
         item.Shape = rotatedShape;
     }
 
@@ -76,7 +74,11 @@ public class PlaceableItemSO : ScriptableObject
         {
             _activeTiles = new string[_baseHeight];
         }
+    }
 
+    public void GenerateShape()
+    {
+        // Converts the each row's string array of active tiles to a jagged array of integers
         BaseShape = ParseActiveTiles(_activeTiles, _baseWidth, _baseHeight);
     }
 
