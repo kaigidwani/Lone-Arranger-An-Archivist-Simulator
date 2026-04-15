@@ -18,5 +18,5 @@ MonoBehaviour:
   - 1, 1
   Name: 2x1
   Description: This is a test of a 2x1 Item
-  Sprite: {fileID: 8502630405890745519, guid: fbc1762c1a95019469ecde8653f6e4a3, type: 3}
+  Sprite: {fileID: 1188552794, guid: 95cc1589ef4295f4f9d19779c2e07010, type: 3}
   Weight: 1

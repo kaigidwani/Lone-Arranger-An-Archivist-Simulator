@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: 6b9774ecfbabb5142a9f3a97210f2081
+guid: 95cc1589ef4295f4f9d19779c2e07010
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: 1533351559893994954
-    second: Lone Arranger 2x2_0
+      213: -3310700931081549102
+    second: Lone Arranger 2x1_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -152,51 +152,7 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: Lone Arranger 2x2_0
-      rect:
-        serializedVersion: 2
-        x: 0
-        y: 100
-        width: 100
-        height: 100
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: acdc543ae1f874510800000000000000
-      internalID: 1533351559893994954
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: Lone Arranger 2x2_1
-      rect:
-        serializedVersion: 2
-        x: 100
-        y: 100
-        width: 100
-        height: 100
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: a9c409bca1cc08a4d9f1f41883b7d425
-      internalID: 152112265
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: Lone Arranger 2x2_2
+      name: 2x1-Item_0
       rect:
         serializedVersion: 2
         x: 0
@@ -211,14 +167,14 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 8072ce2a70f87734784599e8549ecfa4
-      internalID: -2086283503
+      spriteID: 2ca3242e4db8a4642a522881e562b2e8
+      internalID: 1188552794
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Lone Arranger 2x2_3
+      name: 2x1-Item_1
       rect:
         serializedVersion: 2
         x: 100
@@ -233,8 +189,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 4d5d080d2edff6e46a5f0815d16e09e8
-      internalID: -1714059083
+      spriteID: a8bfe9f7c81452042ad3abc5b22d5bbd
+      internalID: -1806562129
       vertices: []
       indices: 
       edges: []
@@ -243,7 +199,7 @@ TextureImporter:
     customData: 
     physicsShape: []
     bones: []
-    spriteID: c984c56984b78c646b6d35861281eea6
+    spriteID: 6a8299a7e677b7d40bdff3f6a97467b2
     internalID: 0
     vertices: []
     indices: 
@@ -253,10 +209,8 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      Lone Arranger 2x2_0: 1533351559893994954
-      Lone Arranger 2x2_1: 152112265
-      Lone Arranger 2x2_2: -2086283503
-      Lone Arranger 2x2_3: -1714059083
+      2x1-Item_0: 1188552794
+      2x1-Item_1: -1806562129
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
