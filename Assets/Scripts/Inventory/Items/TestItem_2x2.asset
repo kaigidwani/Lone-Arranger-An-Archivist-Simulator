@@ -10,15 +10,14 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 32b81e9028c679343ac9b213bc9974fe, type: 3}
-  m_Name: TestItem_L
+  m_Name: TestItem_2x2
   m_EditorClassIdentifier: 
   _baseWidth: 2
-  _baseHeight: 3
+  _baseHeight: 2
   _activeTiles:
-  - 1, 0
-  - 1, 0
   - 1, 1
-  Name: L
-  Description: This is a test of an L-shaped item
-  Sprite: {fileID: 2056127321, guid: 44c72d36055ace24191ad3584014a4f9, type: 3}
-  Weight: 2
+  - 1, 1
+  Name: 2x2
+  Description: This is a test of an 2x2-shaped item
+  Sprite: {fileID: 7867353, guid: 6c380cac756b5e041b4d0e6c02134aab, type: 3}
+  Weight: 1
