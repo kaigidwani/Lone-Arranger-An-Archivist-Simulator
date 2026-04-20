@@ -20,5 +20,5 @@ MonoBehaviour:
   - 1, 1
   Name: L
   Description: This is a test of an L-shaped item
-  Sprite: {fileID: -831967173, guid: fc6d74f3db08b0f45ab3517e395de8ee, type: 3}
+  Sprite: {fileID: 2056127321, guid: 44c72d36055ace24191ad3584014a4f9, type: 3}
   Weight: 2
