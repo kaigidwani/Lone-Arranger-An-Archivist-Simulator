@@ -13,9 +13,12 @@ public enum Scene
 [CreateAssetMenu(fileName = "SceneController", menuName = "Scriptable Objects/Managers/SceneController")]
 public class SceneController : ScriptableObject
 {
-    public async UniTask ChangeScene(Scene newScene)
+    public async UniTask ChangeScene(Scene newScene, string trackName)
     {
-        Debug.Log("changing scene...");
+        if (trackName != MusicManager.Instance.CurrentTrack)
+        {
+            MusicManager.Instance.PlayTrack(trackName);
+        }
 
         await OverlayManager.Instance.DisplayOverlay();
 
