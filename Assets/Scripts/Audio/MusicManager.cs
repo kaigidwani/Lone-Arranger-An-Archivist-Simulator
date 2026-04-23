@@ -13,7 +13,7 @@ public class MusicManager : MonoBehaviour
 
     public static MusicManager Instance;
 
-    public string CurrentTrack = "None";
+    public float Volume = 0.95f; // will be used later for settings
 
     private void Awake()
     {
@@ -28,10 +28,14 @@ public class MusicManager : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Plays a song if it exists in the music library
+    /// </summary>
+    /// <param name="trackName">The name of the track to play</param>
+    /// <param name="fadeDuration">How long to fade out/in</param>
     public void PlayTrack(string trackName, float fadeDuration = 0.5f)
     {
         StartCoroutine(CrossfadeTrack(_musicLibrary.GetClip(trackName), fadeDuration));
-        CurrentTrack = trackName;
     }
 
     private IEnumerator CrossfadeTrack(AudioClip nextTrack, float fadeDuration = 0.5f)
@@ -42,7 +46,7 @@ public class MusicManager : MonoBehaviour
         while (percent < 1)
         {
             percent += Time.deltaTime * 1 / fadeDuration;
-            _musicSource.volume = Mathf.Lerp(1f, 0, percent);
+            _musicSource.volume = Mathf.Lerp(Volume, 0, percent);
             yield return null;
         }
 
@@ -58,7 +62,7 @@ public class MusicManager : MonoBehaviour
             while (percent < 1)
             {
                 percent += Time.deltaTime * 1 / fadeDuration;
-                _musicSource.volume = Mathf.Lerp(0, 1f, percent);
+                _musicSource.volume = Mathf.Lerp(0, Volume, percent);
                 yield return null;
             }
         }

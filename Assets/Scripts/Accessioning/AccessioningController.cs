@@ -82,7 +82,7 @@ public class AccessioningController : MonoBehaviour
 
         // Play VFX/SFX;
 
-        await _sceneController.ChangeScene(Scene.MainMenu, "None");
+        await _sceneController.ChangeScene(Scene.MainMenu);
     }
 
     #endregion
