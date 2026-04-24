@@ -106,3 +106,9 @@
     margin-left: 200px;
     margin-right: 175px;
 }
+
+.inventory-grid {
+    flex-grow: 0;
+    width: 720px;
+    height: 720px;
+}

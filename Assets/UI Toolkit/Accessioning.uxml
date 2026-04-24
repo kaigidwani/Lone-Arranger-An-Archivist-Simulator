@@ -13,7 +13,7 @@
                 </ui:VisualElement>
                 <Accessioning name="Accessioning" class="accessioning-box" />
             </ui:VisualElement>
-            <ui:Instance template="Inventory" name="Inventory" class="inventory-container" />
+            <ui:Instance template="Inventory" name="InventoryContainer" class="inventory-container" />
         </ui:VisualElement>
         <GhostIcon />
     </ui:VisualElement>

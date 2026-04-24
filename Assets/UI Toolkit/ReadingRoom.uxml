@@ -29,11 +29,10 @@
             </ui:VisualElement>
         </ui:VisualElement>
         <ui:VisualElement name="Archive" class="screen hidden-right" style="background-image: none; background-color: rgb(73, 81, 96);">
-            <ui:Label text="ARCHIVE" class="room-label" style="top: 32px; left: 1666px;" />
             <ui:VisualElement picking-mode="Ignore" name="Inventories" style="flex-grow: 1; flex-direction: row; align-self: auto; align-content: auto; justify-content: center; align-items: center;">
-                <ui:Instance template="Inventory" name="Inventory" class="inventory-container" style="margin-left: 100px;" />
-                <ui:VisualElement name="Box" style="width: 360px; height: 600px;">
-                    <ui:VisualElement name="SlotLayer2" style="flex-grow: 1; flex-wrap: wrap;">
+                <ui:Instance template="Inventory" name="InventoryContainer" class="inventory-container" style="margin-left: 100px;" />
+                <Grid name="DonationBox" class="donation-box-grid">
+                    <ui:VisualElement name="SlotLayer" style="flex-grow: 1; flex-wrap: wrap;">
                         <ui:VisualElement class="inventory-slot inventory-slot-default" style="flex-grow: 1;" />
                         <ui:VisualElement class="inventory-slot inventory-slot-default" style="flex-grow: 1;" />
                         <ui:VisualElement class="inventory-slot inventory-slot-default" style="flex-grow: 1;" />
@@ -50,10 +49,15 @@
                         <ui:VisualElement class="inventory-slot inventory-slot-default" style="flex-grow: 1;" />
                         <ui:VisualElement class="inventory-slot inventory-slot-default" style="flex-grow: 1;" />
                     </ui:VisualElement>
-                </ui:VisualElement>
+                    <ui:VisualElement name="ItemLayer" picking-mode="Ignore" style="flex-grow: 0; align-items: flex-start; align-self: flex-start; flex-shrink: 0; width: 0; height: 0; position: absolute;" />
+                </Grid>
             </ui:VisualElement>
             <GhostIcon class="ghost-icon" />
             <ui:Button text="&lt;" name="NextRoomBttn" class="next-room-button" style="left: 0;" />
+            <ui:VisualElement class="bottom-bar" style="flex-grow: 1;">
+                <ui:Button text="Send" name="SendBttn" class="bottom-bar-button bottom-bar-element" />
+                <ui:Button text="Select Box" name="SelectBoxBttn" class="bottom-bar-button bottom-bar-element bottom-bar-button--locked" />
+            </ui:VisualElement>
         </ui:VisualElement>
     </ui:VisualElement>
     <ui:Instance template="TopBar" name="TopBar" class="top-bar" />

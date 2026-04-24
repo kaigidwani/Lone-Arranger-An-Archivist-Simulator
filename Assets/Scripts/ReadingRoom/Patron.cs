@@ -119,19 +119,13 @@ public class Patron : VisualElement
         _itemList.RemoveFromClassList("hidden");
         _textBox.Add(_itemList);
 
-        /*if (_request == null)
+        if (_request == null)
         {
             GenerateRequest();
         }
         else 
         {
-
-        }*/
-
-        if (_request != null)
-        {
-            _request = null;
-
+            // Reset item list to display animation
             List<VisualElement> childrenToRemove = new List<VisualElement>();
             foreach (VisualElement child in _itemList.Children())
             {
@@ -144,12 +138,30 @@ public class Patron : VisualElement
             }
         }
 
-        GenerateRequest();
-      
         for (int i = 0; i < _request.Count; i++)
         {
             VisualElement itemContainer = new VisualElement();
             itemContainer.AddToClassList("item-display-bg");
+
+            switch (_request[i].Color)
+            {
+                case SlotColor.Red:
+                    itemContainer.AddToClassList("item-display-bg-red");
+                    break;
+
+                case SlotColor.Green:
+                    itemContainer.AddToClassList("item-display-bg-green");
+                    break;
+
+                case SlotColor.Blue:
+                    itemContainer.AddToClassList("item-display-bg-blue");
+                    break;
+
+                default:
+                    itemContainer.AddToClassList("item-display-bg-none");
+                    break;
+            }
+
             itemContainer.AddToClassList("hidden");
 
             PlaceableItemSO so = _request[i].Item;
@@ -177,31 +189,6 @@ public class Patron : VisualElement
             StyleLength tileWidth = Length.Percent(width.value.value / so.BaseWidth);
             StyleLength tileHeight = Length.Percent(height.value.value / so.BaseHeight);
             Debug.Log(tileWidth + ", " + tileHeight);
-
-            /*for (int row = 0; row < so.BaseHeight; row++)
-            {
-                Debug.Log(so.BaseHeight);
-                for (int col = 0; col < so.BaseWidth; col++)
-                {
-
-                    Debug.Log(so.BaseWidth);
-                    /* Empty parts of the shape don't get "made"
-                    if (so.BaseShape[row][col] == 0)
-                    {
-                        continue;
-                    }
-
-                    VisualElement tile = new VisualElement();
-                    tile.style.width = tileWidth;
-                    tile.style.height = tileHeight;
-                    tile.style.left = col * tileWidth.value.value;
-                    tile.style.top = row * tileHeight.value.value;
-
-                    itemVisual.Add(tile);
-
-                    tile.style.backgroundColor = so.COLOR_CODES[(int)_request[i].Color];
-                }
-            }*/
 
             itemContainer.Add(itemVisual);
             _itemList.Add(itemContainer);

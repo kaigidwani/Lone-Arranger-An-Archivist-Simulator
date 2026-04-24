@@ -7,6 +7,7 @@ public enum ItemState
 {
     InAccessioning,
     InInventory,
+    InDonationBox,
 }
 
 [UxmlElement]
@@ -247,6 +248,7 @@ public partial class Item : VisualElement
     {
         RemoveFromHierarchy(); // Remove from accessioning box 
         RemoveFromClassList("item");
+        ResetTileColors();
         AddToClassList("item-slotted");
         // ------------------------------
 
@@ -290,11 +292,12 @@ public partial class Item : VisualElement
         CurrentState = ItemState.InInventory;
     }
 
-    public void PlaceInBox(Accessioning box, Vector2 mouse)
+    public void ReturnToAccessioning(Accessioning box, Vector2 mouse)
     {
         RemoveFromHierarchy(); // Remove from inventory
         RemoveFromClassList("item-slotted");
         AddToClassList("item");
+        ResetTileColors();
         box.Add(this);
 
         Vector2 mousePos = UIHelpers.SetItemPivotToMouse(Pivot, mouse);

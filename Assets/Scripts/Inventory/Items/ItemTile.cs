@@ -30,7 +30,20 @@ public partial class ItemTile : VisualElement
     /// <summary>
     /// The slot containing this tile on the grid
     /// </summary>
-    public Slot GridSlot { get { return GameObject.Find("UIDoc").GetComponent<InventoryController>().GetSlot(Position.x, Position.y); } }
+    public Slot GridSlot { 
+        get 
+        { 
+            if (ParentItem.CurrentState == ItemState.InInventory)
+            {
+                return GameObject.Find("UIDoc").GetComponent<InventoryController>().Inventory.GetSlot(Position.x, Position.y);
+            }
+            else
+            {
+                return GameObject.Find("UIDoc").GetComponent<InventoryController>().DonationBox.GetSlot(Position.x, Position.y);
+            }
+            
+        }
+    }
 
     public event Action<Vector2, Item> OnStartDrag = delegate { };
 
@@ -85,7 +98,6 @@ public partial class ItemTile : VisualElement
             return;
         }
 
-        ParentItem.ResetTileColors();
         ParentItem.StoredRotation = ParentItem.Rotation;
         OnStartDrag.Invoke(evt.position, ParentItem);
         evt.StopPropagation();

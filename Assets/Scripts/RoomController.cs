@@ -1,5 +1,6 @@
 using UnityEngine.UIElements;
 using UnityEngine;
+using System;
 
 public enum RoomType
 {
@@ -20,6 +21,8 @@ public class RoomController : MonoBehaviour
 
     private Button _toArchiveBttn;
     private Button _toReadingRoomBttn;
+
+    private Button _sendBttn;
 
     private RoomType _currRoomType;
 
@@ -43,11 +46,21 @@ public class RoomController : MonoBehaviour
 
         _archive = _root.Q("Archive");
         _toReadingRoomBttn = _archive.Q<Button>("NextRoomBttn");
-        _toReadingRoomBttn.clicked += OnSwitchRoomClick;
+        _toReadingRoomBttn.clicked += SwitchRoom;
 
         _readingRoom = _root.Q("ReadingRoom");
         _toArchiveBttn = _readingRoom.Q<Button>("NextRoomBttn");
-        _toArchiveBttn.clicked += OnSwitchRoomClick;
+        _toArchiveBttn.clicked += SwitchRoom;
+
+        _sendBttn = _archive.Q<Button>("SendBttn");
+        _sendBttn.clicked += FulfillRequest; 
+    }
+
+    private void FulfillRequest()
+    {
+        SwitchRoom();
+
+        // Calculate Results
     }
 
     private void Start()
@@ -55,7 +68,7 @@ public class RoomController : MonoBehaviour
         DayManager.Instance.StartDay();
     }
 
-    public void OnSwitchRoomClick()
+    public void SwitchRoom()
     {
         switch (_currRoomType)
         {
