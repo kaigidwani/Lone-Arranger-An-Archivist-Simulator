@@ -16,9 +16,11 @@ public class Patron : VisualElement
     private VisualElement _shadow;
     private VisualElement _textBox;
     private VisualElement _horizontalLine;
-    private Label _requestLabel;
+    private Label _requestHeader;
+    private Label _requestDescription;
     private VisualElement _itemList;
     private Button _closeButton;
+    private bool isComplete = false;
 
     // === Properties ===
 
@@ -52,10 +54,14 @@ public class Patron : VisualElement
         _textBox.RegisterCallback<MouseLeaveEvent>(OnRequestHoverExit);
         _requestContainer.Add(_textBox);
 
-        _requestLabel = new Label();
-        _requestLabel.AddToClassList("request-label");
-        _requestLabel.text = "...";
-        _textBox.Add(_requestLabel);
+        _requestHeader = new Label();
+        _requestHeader.AddToClassList("request-label");
+        _requestHeader.text = "...";
+        _textBox.Add(_requestHeader);
+
+        _requestDescription = new Label();
+        _requestDescription.AddToClassList("request-label");
+        _requestDescription.AddToClassList("hidden");
 
         _horizontalLine = new VisualElement();
         _horizontalLine.AddToClassList("horizontal-line");
@@ -85,17 +91,7 @@ public class Patron : VisualElement
 
     private async void OnRequestClick(MouseDownEvent evt)
     {
-        _requestContainer.AddToClassList("request--active");
-        _requestContainer.pickingMode = PickingMode.Ignore;
-
-        _textBox.RemoveFromClassList("text-box--hover");
-        _shadow.RemoveFromClassList("shadow--hover");
-        _textBox.UnregisterCallback<MouseDownEvent>(OnRequestClick);
-        _textBox.UnregisterCallback<MouseEnterEvent>(OnRequestHover);
-        _textBox.UnregisterCallback<MouseLeaveEvent>(OnRequestHoverExit);
-
-        _requestLabel.AddToClassList("hidden");
-
+        await EnlargeTextBox("I'm looking for...", isComplete);
         await DisplayRequest();
         await UniTask.WaitForSeconds(1);
 
@@ -105,16 +101,9 @@ public class Patron : VisualElement
 
     private async UniTask DisplayRequest()
     {
-        await UniTask.WaitForSeconds(1);
+        AddToClassList("selected");
 
-        _requestLabel.text = "I'm looking for...";
-        _requestLabel.RemoveFromClassList("hidden");
-        _requestLabel.AddToClassList("request-label--active");
-
-        await UniTask.Delay(100);
-        _horizontalLine.AddToClassList("horizontal-line--active");
-
-        await UniTask.Delay(100);
+        
 
         _itemList.RemoveFromClassList("hidden");
         _textBox.Add(_itemList);
@@ -198,12 +187,45 @@ public class Patron : VisualElement
         }
     }
 
+    private async UniTask EnlargeTextBox(string header, bool complete)
+    {
+        if (complete)
+        {
+            _requestContainer.AddToClassList("request--complete");
+        }
+        else
+        {
+            _requestContainer.AddToClassList("request--active");
+        }
+        
+        _requestContainer.pickingMode = PickingMode.Ignore;
+
+        _textBox.RemoveFromClassList("text-box--hover");
+        _shadow.RemoveFromClassList("shadow--hover");
+        _textBox.UnregisterCallback<MouseDownEvent>(OnRequestClick);
+        _textBox.UnregisterCallback<MouseEnterEvent>(OnRequestHover);
+        _textBox.UnregisterCallback<MouseLeaveEvent>(OnRequestHoverExit);
+
+        _requestHeader.AddToClassList("hidden");
+
+        await UniTask.WaitForSeconds(1);
+
+        _requestHeader.text = header;
+        _requestHeader.RemoveFromClassList("hidden");
+        _requestHeader.AddToClassList("request-label--active");
+
+        await UniTask.Delay(100);
+        _horizontalLine.AddToClassList("horizontal-line--active");
+
+        await UniTask.Delay(100);
+    }
+
     private async void HideRequest()
     {
         _requestContainer.RemoveFromClassList("request--active");
 
-        _requestLabel.AddToClassList("hidden");
-        _requestLabel.RemoveFromClassList("request-label--active");
+        _requestHeader.AddToClassList("hidden");
+        _requestHeader.RemoveFromClassList("request-label--active");
         _horizontalLine.RemoveFromClassList("horizontal-line--active");
 
         _itemList.AddToClassList("hidden");
@@ -213,8 +235,8 @@ public class Patron : VisualElement
 
         await UniTask.Delay(700);
 
-        _requestLabel.RemoveFromClassList("hidden");
-        _requestLabel.text = "...";
+        _requestHeader.RemoveFromClassList("hidden");
+        _requestHeader.text = "...";
         
         _closeButton.clicked -= HideRequest;
         _textBox.RegisterCallback<MouseDownEvent>(OnRequestClick);
@@ -238,6 +260,29 @@ public class Patron : VisualElement
 
     }
 
+    public async void CompleteRequest()
+    {
+        isComplete = true;
+
+        if (_requestContainer.ClassListContains("request--active"))
+        {
+            HideRequest();
+        }
+
+        await EnlargeTextBox("Thank you.", isComplete); // customize for good or bad score (maybe)
+
+        _textBox.Add(_requestDescription);
+        _requestDescription.text = "This is exactly what I was looking for!";
+        _requestDescription.RemoveFromClassList("hidden");
+
+        await UniTask.Delay(1200);
+        _requestContainer.AddToClassList("hidden");
+
+        await UniTask.Delay(750);
+        AddToClassList("hidden-left");
+
+    }
+
     private void GenerateRequest()
     {
         _request = new List<(SlotColor Color, PlaceableItemSO Item)>();
@@ -252,5 +297,7 @@ public class Patron : VisualElement
             Debug.Log($"gimme a {itemColor} {item}");
         }
     }
+
+    
 }
  

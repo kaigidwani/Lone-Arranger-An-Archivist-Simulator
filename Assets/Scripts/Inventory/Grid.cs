@@ -13,9 +13,9 @@ public partial class Grid : VisualElement
 
     // Properties
 
-    public int Width = 6;
+    public int Width;
 
-    public int Height = 6;
+    public int Height;
 
     public VisualElement SlotLayer;
     public List<Slot> SlotList;
@@ -38,8 +38,11 @@ public partial class Grid : VisualElement
         return _grid[x][y];
     }
 
-    public void Setup()
+    public void Setup(int width, int height)
     {
+        Width = width;
+        Height = height;
+
         SlotLayer = this.Q("SlotLayer");
         ItemLayer = this.Q("ItemLayer");
 
@@ -75,6 +78,7 @@ public partial class Grid : VisualElement
 
             slot.DebugLabel.visible = GameObject.Find("UIDoc")
                 .GetComponent<InventoryController>().ShowDebug;
+            
         }
     }
 

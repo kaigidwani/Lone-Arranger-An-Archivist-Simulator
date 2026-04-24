@@ -244,11 +244,10 @@ public partial class Item : VisualElement
     /// Places the dragged item into a slot
     /// </summary>
     /// <param name="startSlot">The slot that the user places the item in</param>
-    public void PlaceInSlot(InventoryController inv, VisualElement layer, Slot startSlot)
+    public void PlaceInSlot(InventoryController inv, VisualElement dest, Slot startSlot)
     {
         RemoveFromHierarchy(); // Remove from accessioning box 
         RemoveFromClassList("item");
-        ResetTileColors();
         AddToClassList("item-slotted");
         // ------------------------------
 
@@ -259,8 +258,6 @@ public partial class Item : VisualElement
             rowOffset = Pivot.Index.x * inv.SlotSize.y;
             colOffset = Pivot.Index.y * inv.SlotSize.x;
         }
-
-        
 
         float drawOffset = 0;
         if (Rotation % 180 != 0)
@@ -283,13 +280,19 @@ public partial class Item : VisualElement
             }
 
             tile.SetGridSlot(gridRow, gridCol);
-            tile.SetColor();
+            
+            // Make sure players can see what color items they have in the box
+            if (CurrentState != ItemState.InDonationBox)
+            {
+                ResetTileColors();
+                tile.SetColor();
+            }
+            
         }
 
         RootGridIndex = GetRootGridPosition();
 
-        layer.Add(this);
-        CurrentState = ItemState.InInventory;
+        dest.Add(this);
     }
 
     public void ReturnToAccessioning(Accessioning box, Vector2 mouse)
@@ -330,12 +333,7 @@ public partial class Item : VisualElement
             {
                 style.top = itemPos.y - Mathf.Abs(worldBound.max.y - box.worldBound.max.y);
             }
-
-            //if (worldBound.max)
         });
-
-        
-        CurrentState = ItemState.InAccessioning;
     }
 
     public void SetScale(Vector2 scale)

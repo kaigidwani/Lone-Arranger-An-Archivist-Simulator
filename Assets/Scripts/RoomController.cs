@@ -26,6 +26,8 @@ public class RoomController : MonoBehaviour
 
     private RoomType _currRoomType;
 
+    private Patron _selectedPatron;
+
     // Properties
 
     public VisualElement ReadingRoom { get { return _readingRoom; } }
@@ -60,7 +62,11 @@ public class RoomController : MonoBehaviour
     {
         SwitchRoom();
 
-        // Calculate Results
+        _selectedPatron = _root.Q<Patron>(className: "selected");
+
+        _selectedPatron.CompleteRequest();
+
+        // To Do: Calculate Results
     }
 
     private void Start()

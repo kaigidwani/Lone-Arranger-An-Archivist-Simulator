@@ -4,6 +4,7 @@ using System.Linq;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.UIElements;
+using static UnityEngine.Rendering.DebugUI.Table;
 using Cursor = UnityEngine.Cursor;
 
 
@@ -18,14 +19,11 @@ public class InventoryController : MonoBehaviour
     private static GhostIcon _ghostIcon;
     private static Accessioning _accBox;
 
-    private static bool _isOverBox;
+    private static bool _isOverAccessioning;
     private static bool _isDragging;
     private static Item _draggedItem;
 
     // Properties
-
-    public int Width = 6;
-    public int Height = 6;
 
     public Grid Inventory;
     public Grid DonationBox;
@@ -96,7 +94,7 @@ public class InventoryController : MonoBehaviour
         _draggedItem = item;
         _accBox.pickingMode = PickingMode.Position;
 
-        if (_draggedItem.CurrentState == ItemState.InInventory)
+        if (_draggedItem.CurrentState == ItemState.InInventory || _draggedItem.CurrentState == ItemState.InDonationBox)
         {
             foreach (ItemTile tile in _draggedItem.Tiles)
             {
@@ -137,9 +135,9 @@ public class InventoryController : MonoBehaviour
         _ghostIcon.SetToMousePosition(_draggedItem.Pivot, _mousePos);
 
         Rect r = _accBox.worldBound;
-        _isOverBox = r.Contains(_mousePos);
+        _isOverAccessioning = r.Contains(_mousePos);
 
-        if (_isOverBox)
+        if (_isOverAccessioning)
         {
             _accBox.AddToClassList("accessioning-box--active");
         }
@@ -160,21 +158,8 @@ public class InventoryController : MonoBehaviour
         _isDragging = false;
 
         Cursor.visible = true;
-        
-        _draggedItem.style.visibility = Visibility.Visible;
 
-        Slot hoveredSlot = null;
-
-        foreach (Slot s in Inventory.SlotList) 
-        {
-            Rect r = s.worldBound;
-            if (r.Contains(_mousePos))
-            {
-                hoveredSlot = s;
-            }
-        }
-
-        if (_isOverBox)
+        if (_isOverAccessioning)
         {
             _draggedItem.SetState(ItemState.InAccessioning);
             _draggedItem.ReturnToAccessioning(_accBox, _mousePos);
@@ -182,15 +167,54 @@ public class InventoryController : MonoBehaviour
 
             GameManager.Instance.StoredItems.Remove(_draggedItem);
         }
-        else if (CanPlace(hoveredSlot))
-        {
-            _draggedItem.SetState(ItemState.InInventory);
-            _draggedItem.PlaceInSlot(this, Inventory.ItemLayer, hoveredSlot);
 
-            if (!GameManager.Instance.StoredItems.Contains(_draggedItem))
+        Slot hoveredSlot = null;
+        Grid hoveredGrid = null;
+
+        foreach (Slot s in Inventory.SlotList)
+        {
+            Rect r = s.worldBound;
+            if (r.Contains(_mousePos))
             {
-                GameManager.Instance.StoredItems.Add(_draggedItem);
+                hoveredSlot = s;
+                hoveredGrid = Inventory;
+                break;
             }
+        }
+
+        if (hoveredSlot == null && DonationBox != null)
+        {
+            foreach (Slot s in DonationBox.SlotList)
+            {
+                Rect r = s.worldBound;
+                if (r.Contains(_mousePos))
+                {
+                    hoveredSlot = s;
+                    hoveredGrid = DonationBox;
+                    break;
+                }
+            }
+        }
+
+        _draggedItem.style.visibility = Visibility.Visible;
+        
+        if (CanPlace(hoveredGrid, hoveredSlot))
+        {
+            if (hoveredGrid == Inventory)
+            {
+                _draggedItem.SetState(ItemState.InInventory);
+
+                if (!GameManager.Instance.StoredItems.Contains(_draggedItem))
+                {
+                    GameManager.Instance.StoredItems.Add(_draggedItem);
+                }
+            }
+            else
+            {
+                _draggedItem.SetState(ItemState.InDonationBox);
+            }
+
+            _draggedItem.PlaceInSlot(this, hoveredGrid.ItemLayer, hoveredSlot);
         }
         else // Couldn't place
         {
@@ -200,7 +224,14 @@ public class InventoryController : MonoBehaviour
             {
                 _draggedItem.PlaceInSlot(this, Inventory.ItemLayer, _draggedItem.Pivot.GridSlot);
             }
+
+            if (_draggedItem.CurrentState == ItemState.InDonationBox)
+            {
+                _draggedItem.PlaceInSlot(this, DonationBox.ItemLayer, _draggedItem.Pivot.GridSlot);
+            }
         }
+
+        Debug.Log(_draggedItem.CurrentState);
 
         _accBox.pickingMode = PickingMode.Ignore;
         _ghostIcon.ResetVisual();
@@ -245,7 +276,7 @@ public class InventoryController : MonoBehaviour
     /// </summary>
     /// <param name="startSlot">The slot the user places the item in</param>
     /// <returns>Whether the item can be placed in the given slot</returns>
-    private bool CanPlace(Slot startSlot)
+    private bool CanPlace(Grid grid, Slot startSlot)
     {
         if (startSlot == null)
         {
@@ -257,15 +288,17 @@ public class InventoryController : MonoBehaviour
             int gridRow = startSlot.GridIndex.x + (tile.Index.x - _draggedItem.Pivot.Index.x);
             int gridCol = startSlot.GridIndex.y + (tile.Index.y - _draggedItem.Pivot.Index.y);
 
+            //Debug.Log($"tile supposedly at {gridRow}, {gridCol}");
+
             // Bounds logic
-            if (gridRow < 0 || gridRow >= Height ||
-                gridCol < 0 || gridCol >= Width)
+            if (gridRow < 0 || gridRow >= grid.Height ||
+                gridCol < 0 || gridCol >= grid.Width)
             {
                 return false;
             }
 
             // Occupancy logic
-            if (!Inventory.GetSlot(gridRow, gridCol).IsFree)
+            if (!grid.GetSlot(gridRow, gridCol).IsFree)
             {
                 return false;
             }
@@ -298,12 +331,12 @@ public class InventoryController : MonoBehaviour
     private async void SetupInventories()
     {
         await UniTask.WaitUntil(Inventory.TryGetDimensions);
-        Inventory.Setup();
+        Inventory.Setup(6, 6);
 
         if (DonationBox != null)
         {
             await UniTask.WaitUntil(DonationBox.TryGetDimensions);
-            DonationBox.Setup();
+            DonationBox.Setup(3, 5);
         }
 
         // Adding items to inventory if already had some
