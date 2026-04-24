@@ -41,4 +41,14 @@ public class GameManager : MonoBehaviour
     {
         StoredItems = new List<Item>();
     }
+
+    public void ResetInventory()
+    {
+        foreach (Item item in StoredItems)
+        {
+            item.RemoveFromHierarchy();
+        }
+
+        StoredItems = new List<Item>();
+    }
 }

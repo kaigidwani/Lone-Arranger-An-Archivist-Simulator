@@ -9,7 +9,7 @@ public class PatronManager : MonoBehaviour
     [SerializeField] private int _minReqItemAmount = 1;
     [SerializeField] private int _maxReqItemAmount = 4;
 
-    private List<VisualElement> _patronsList;
+    
     private VisualElement _patronLayer;
     private VisualElement _requestLayer;
 
@@ -20,6 +20,8 @@ public class PatronManager : MonoBehaviour
     // === Properties ===
 
     public static PatronManager Instance;
+
+    public Queue<Patron> PatronQueue;
 
     /// <summary>
     /// The lower inclusive value of the randomized amount of items in a patron's request
@@ -43,24 +45,26 @@ public class PatronManager : MonoBehaviour
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
-        _patronsList = new List<VisualElement>();
+        PatronQueue = new Queue<Patron>();
         _patronLayer = RoomController.Instance.ReadingRoom.Q("PatronLayer");
         _requestLayer = RoomController.Instance.ReadingRoom.Q("RequestLayer");
     }
 
-    public void StartSpawning()
-    {
-        SpawnPatron();
-    }
-
-    private async void SpawnPatron()
+    public async void SpawnPatron()
     {
         Patron patron = new Patron();
-        _patronsList.Add(patron);
+        PatronQueue.Enqueue(patron);
         _requestLayer.Add(patron.RequestElem);
         _patronLayer.Add(patron);
 
         await patron.Spawn();
+    }
+
+    public void RemovePatron()
+    {
+        Patron selectedPatron = PatronQueue.Dequeue();
+        selectedPatron.RemoveFromHierarchy();
+        selectedPatron.RequestElem.RemoveFromHierarchy();
     }
 
     // Update is called once per frame

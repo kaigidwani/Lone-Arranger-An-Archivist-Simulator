@@ -281,6 +281,9 @@ public class Patron : VisualElement
         await UniTask.Delay(750);
         AddToClassList("hidden-left");
 
+        await UniTask.Delay(1000);
+
+        PatronManager.Instance.RemovePatron();
     }
 
     private void GenerateRequest()

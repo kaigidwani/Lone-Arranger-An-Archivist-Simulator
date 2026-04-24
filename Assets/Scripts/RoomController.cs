@@ -86,7 +86,7 @@ public class RoomController : MonoBehaviour
 
     private void Start()
     {
-        DayManager.Instance.StartDay();
+        StartCoroutine(DayManager.Instance.StartDay());
     }
 
     public void SwitchRoom()
