@@ -28,6 +28,9 @@ public class RoomController : MonoBehaviour
 
     private Patron _selectedPatron;
 
+    private Label _dayLabel;
+    private Label _satisfactionLabel;
+
     // Properties
 
     public VisualElement ReadingRoom { get { return _readingRoom; } }
@@ -55,7 +58,10 @@ public class RoomController : MonoBehaviour
         _toArchiveBttn.clicked += SwitchRoom;
 
         _sendBttn = _archive.Q<Button>("SendBttn");
-        _sendBttn.clicked += FulfillRequest; 
+        _sendBttn.clicked += FulfillRequest;
+
+        _dayLabel = _root.Q<Label>("DayCounterLabel");
+        _satisfactionLabel = _root.Q<Label>("SatisfactionCounterLabel");
     }
 
     private void FulfillRequest()
@@ -87,6 +93,7 @@ public class RoomController : MonoBehaviour
     private void Start()
     {
         StartCoroutine(DayManager.Instance.StartDay());
+        _dayLabel.text = $"Day {DayManager.Instance.CurrentDay}";
     }
 
     public void SwitchRoom()

@@ -23,6 +23,10 @@ public class AccessioningController : MonoBehaviour
 
     private Button _startDayBttn;
 
+    private Label _dayLabel;
+    private Label _satisfactionLabel;
+
+
     [SerializeField] private List<Transition> _transitionsList;
     [SerializeField] private TransitionStyle _transition;
     private Transition _transitionInfo;
@@ -41,6 +45,9 @@ public class AccessioningController : MonoBehaviour
 
         _startDayBttn = _root.Q<Button>("Start");
         _startDayBttn.clicked += OnStartDayClick;
+
+        _dayLabel = _root.Q<Label>("DayCounterLabel");
+        _satisfactionLabel = _root.Q<Label>("SatisfactionCounterLabel");
 
         _transitionInfo = _transitionsList.Find(t => t.Style == _transition);
         _wrapper.AddToClassList(_transitionInfo.ClassName);
@@ -69,9 +76,17 @@ public class AccessioningController : MonoBehaviour
 
     private async void Start()
     {
+        if (DayManager.Instance != null)
+        {
+            _dayLabel.text = $"Day {DayManager.Instance.CurrentDay}";
+        }
+        else
+        {
+            _dayLabel.text = $"Day 1";
+        }
+
         await DisplayAccessioning();
 
-        // Turn on player controls
     }
 
     #region Events
