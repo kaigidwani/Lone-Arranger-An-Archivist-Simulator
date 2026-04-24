@@ -56,7 +56,7 @@
             <GhostIcon class="ghost-icon" />
             <ui:Button text="&lt;" name="NextRoomBttn" class="next-room-button" style="left: 0;" />
             <ui:VisualElement class="bottom-bar" style="flex-grow: 1;">
-                <ui:Button text="Send" name="SendBttn" class="bottom-bar-button bottom-bar-element" />
+                <ui:Button text="Send" name="SendBttn" class="bottom-bar-button bottom-bar-element bottom-bar-button--active" />
                 <ui:Button text="Select Box" name="SelectBoxBttn" class="bottom-bar-button bottom-bar-element bottom-bar-button--locked" />
             </ui:VisualElement>
         </ui:VisualElement>

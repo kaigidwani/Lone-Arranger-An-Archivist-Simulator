@@ -1,6 +1,6 @@
 using UnityEngine.UIElements;
 using UnityEngine;
-using System;
+using System.Collections.Generic;
 
 public enum RoomType
 {
@@ -66,7 +66,22 @@ public class RoomController : MonoBehaviour
 
         _selectedPatron.CompleteRequest();
 
+        List<Item> itemsDonated = new List<Item>();
+        foreach (Item item in GameManager.Instance.StoredItems)
+        {
+            if (item.CurrentState == ItemState.InDonationBox)
+            {
+                itemsDonated.Add(item);
+            }
+        }
+
         // To Do: Calculate Results
+
+        for (int i = 0; i < itemsDonated.Count; i++)
+        {
+            itemsDonated[i].RemoveFromHierarchy();
+            GameManager.Instance.StoredItems.Remove(itemsDonated[i]);
+        }
     }
 
     private void Start()
