@@ -1,25 +1,60 @@
 <ui:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <ui:Template name="Inventory" src="project://database/Assets/UI%20Toolkit/Elements/Inventory.uxml?fileID=9197481963319205126&amp;guid=425a6f07c75cb5e4097df1834e1033e0&amp;type=3#Inventory" />
+    <ui:Template name="TopBar" src="project://database/Assets/UI%20Toolkit/Elements/TopBar.uxml?fileID=9197481963319205126&amp;guid=3512c72a59a36af4293c3d897a5657bc&amp;type=3#TopBar" />
     <Style src="project://database/Assets/UI%20Toolkit/ReadingRoom.uss?fileID=7433441132597879392&amp;guid=f168fe7c3fcd0da45a4d0a3bc4610e45&amp;type=3#ReadingRoom" />
+    <Style src="project://database/Assets/UI%20Toolkit/InventoryStyle.uss?fileID=7433441132597879392&amp;guid=e9341e650ecdb744ba0708bb339af7f7&amp;type=3#InventoryStyle" />
+    <Style src="project://database/Assets/UI%20Toolkit/AccessioningStyle.uss?fileID=7433441132597879392&amp;guid=8b41c21d683bf894884c559a7034be59&amp;type=3#AccessioningStyle" />
     <ui:VisualElement name="Screens" style="flex-grow: 1;">
         <ui:VisualElement name="ReadingRoom" picking-mode="Ignore" class="screen" style="flex-grow: 1; background-image: url(&quot;project://database/Assets/Art/reading-room-bg.png?fileID=2800000&amp;guid=e134513439f3a3d4fa0a58ebad6596c2&amp;type=3#reading-room-bg&quot;);">
             <ui:Button text="&gt;" name="NextRoomBttn" class="next-room-button" style="right: 0;" />
-            <ui:VisualElement name="PatronLayer" picking-mode="Ignore" style="flex-grow: 1; position: absolute; width: 100%; height: 100%;">
-                <ui:VisualElement name="TestPatron" class="patron hidden-left">
-                    <ui:VisualElement name="Request" class="request">
-                        <ui:VisualElement name="Shadow" class="shadow" />
-                        <ui:VisualElement name="TextBox" class="request-text-box">
-                            <ui:Label text="..." name="Label" class="request-label" />
-                            <ui:VisualElement name="ItemList" class="item-list" />
+            <ui:VisualElement name="PatronLayer" picking-mode="Ignore" class="object-layer">
+                <ui:VisualElement name="TestPatron" class="patron hidden-left" />
+            </ui:VisualElement>
+            <ui:VisualElement name="Desk" picking-mode="Ignore" style="flex-grow: 1; background-image: url(&quot;project://database/Assets/Art/reading-room-desk.png?fileID=2800000&amp;guid=03a0c0f41d060bf4f814346acaabe0a4&amp;type=3#reading-room-desk&quot;); position: absolute; bottom: 0; width: 100%; height: 100%;" />
+            <ui:VisualElement name="RequestLayer" picking-mode="Ignore" class="object-layer">
+                <ui:VisualElement name="Request" class="request hidden-left request--active">
+                    <ui:VisualElement class="shadow" style="flex-grow: 1;" />
+                    <ui:VisualElement name="TextBox" class="request-text-box">
+                        <ui:Label text="..." name="Label" class="request-label request-label--active" />
+                        <ui:VisualElement name="HR" class="horizontal-line" />
+                        <ui:VisualElement name="ItemList" class="item-list">
+                            <ui:VisualElement class="item-display-bg" style="flex-grow: 1;" />
+                            <ui:VisualElement class="item-display-bg" style="flex-grow: 1;" />
+                            <ui:VisualElement class="item-display-bg" style="flex-grow: 1;" />
+                            <ui:VisualElement class="item-display-bg" style="flex-grow: 1;" />
                         </ui:VisualElement>
-                        <ui:Button text="Got it!" name="CloseBttn" class="menu-button-secondary take-order-button menu-button hidden" />
+                    </ui:VisualElement>
+                    <ui:Button text="Got it!" name="CloseBttn" class="close-button" />
+                </ui:VisualElement>
+            </ui:VisualElement>
+        </ui:VisualElement>
+        <ui:VisualElement name="Archive" class="screen hidden-right" style="background-image: none; background-color: rgb(73, 81, 96);">
+            <ui:Label text="ARCHIVE" class="room-label" style="top: 32px; left: 1666px;" />
+            <ui:VisualElement picking-mode="Ignore" name="Inventories" style="flex-grow: 1; flex-direction: row; align-self: auto; align-content: auto; justify-content: center; align-items: center;">
+                <ui:Instance template="Inventory" name="Inventory" class="inventory-container" style="margin-left: 100px;" />
+                <ui:VisualElement name="Box" style="width: 360px; height: 600px;">
+                    <ui:VisualElement name="SlotLayer2" style="flex-grow: 1; flex-wrap: wrap;">
+                        <ui:VisualElement class="inventory-slot inventory-slot-default" style="flex-grow: 1;" />
+                        <ui:VisualElement class="inventory-slot inventory-slot-default" style="flex-grow: 1;" />
+                        <ui:VisualElement class="inventory-slot inventory-slot-default" style="flex-grow: 1;" />
+                        <ui:VisualElement class="inventory-slot inventory-slot-default" style="flex-grow: 1;" />
+                        <ui:VisualElement class="inventory-slot inventory-slot-default" style="flex-grow: 1;" />
+                        <ui:VisualElement class="inventory-slot inventory-slot-default" style="flex-grow: 1;" />
+                        <ui:VisualElement class="inventory-slot inventory-slot-default" style="flex-grow: 1;" />
+                        <ui:VisualElement class="inventory-slot inventory-slot-default" style="flex-grow: 1;" />
+                        <ui:VisualElement class="inventory-slot inventory-slot-default" style="flex-grow: 1;" />
+                        <ui:VisualElement class="inventory-slot inventory-slot-default" style="flex-grow: 1;" />
+                        <ui:VisualElement class="inventory-slot inventory-slot-default" style="flex-grow: 1;" />
+                        <ui:VisualElement class="inventory-slot inventory-slot-default" style="flex-grow: 1;" />
+                        <ui:VisualElement class="inventory-slot inventory-slot-default" style="flex-grow: 1;" />
+                        <ui:VisualElement class="inventory-slot inventory-slot-default" style="flex-grow: 1;" />
+                        <ui:VisualElement class="inventory-slot inventory-slot-default" style="flex-grow: 1;" />
                     </ui:VisualElement>
                 </ui:VisualElement>
             </ui:VisualElement>
-            <ui:VisualElement name="Desk" picking-mode="Ignore" style="flex-grow: 1; background-image: url(&quot;project://database/Assets/Art/reading-room-desk.png?fileID=2800000&amp;guid=03a0c0f41d060bf4f814346acaabe0a4&amp;type=3#reading-room-desk&quot;);" />
-        </ui:VisualElement>
-        <ui:VisualElement name="Archive" class="screen hidden-right" style="flex-grow: 1;">
-            <ui:Label text="ARCHIVE" class="room-label" />
+            <GhostIcon class="ghost-icon" />
             <ui:Button text="&lt;" name="NextRoomBttn" class="next-room-button" style="left: 0;" />
         </ui:VisualElement>
     </ui:VisualElement>
+    <ui:Instance template="TopBar" name="TopBar" class="top-bar" />
 </ui:UXML>

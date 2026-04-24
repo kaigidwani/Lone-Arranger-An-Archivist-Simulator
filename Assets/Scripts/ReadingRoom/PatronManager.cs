@@ -11,6 +11,7 @@ public class PatronManager : MonoBehaviour
 
     private List<VisualElement> _patronsList;
     private VisualElement _patronLayer;
+    private VisualElement _requestLayer;
 
     [SerializeField] private GameObject requestsContainer;
     [SerializeField] private GameObject requestPrefab;
@@ -44,6 +45,7 @@ public class PatronManager : MonoBehaviour
     {
         _patronsList = new List<VisualElement>();
         _patronLayer = RoomController.Instance.ReadingRoom.Q("PatronLayer");
+        _requestLayer = RoomController.Instance.ReadingRoom.Q("RequestLayer");
     }
 
     public void StartSpawning()
@@ -55,6 +57,7 @@ public class PatronManager : MonoBehaviour
     {
         Patron patron = new Patron();
         _patronsList.Add(patron);
+        _requestLayer.Add(patron.RequestElem);
         _patronLayer.Add(patron);
 
         await patron.Spawn();

@@ -30,7 +30,7 @@ public partial class ItemTile : VisualElement
     /// <summary>
     /// The slot containing this tile on the grid
     /// </summary>
-    public Slot GridSlot { get { return InventoryController.Instance.GetSlot(Position.x, Position.y); } }
+    public Slot GridSlot { get { return GameObject.Find("UIDoc").GetComponent<InventoryController>().GetSlot(Position.x, Position.y); } }
 
     public event Action<Vector2, Item> OnStartDrag = delegate { };
 
@@ -40,7 +40,7 @@ public partial class ItemTile : VisualElement
         RegisterCallback<MouseLeaveEvent>(OnHoverExit);
         RegisterCallback<PointerDownEvent>(OnPointerDown);
 
-        OnStartDrag += InventoryController.Instance.OnPointerDown;
+        OnStartDrag += GameObject.Find("UIDoc").GetComponent<InventoryController>().OnPointerDown;
 
         DebugLabel = new Label("");
         DebugLabel.AddToClassList("debug-text");

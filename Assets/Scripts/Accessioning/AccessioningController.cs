@@ -91,7 +91,7 @@ public class AccessioningController : MonoBehaviour
     {
         await UniTask.WaitUntil(_box.TryGetDimensions);
 
-        await UniTask.WaitForSeconds(0.75f);
+        await UniTask.Delay(750);
 
         _box.GetDimensions();
         SpawnItems();

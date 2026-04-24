@@ -57,8 +57,6 @@ public class RoomController : MonoBehaviour
 
     public void OnSwitchRoomClick()
     {
-        Debug.Log("switching rooms");
-
         switch (_currRoomType)
         {
             case RoomType.Archive:

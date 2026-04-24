@@ -12,7 +12,7 @@ public class InventoryController : MonoBehaviour
     private Vector2 _mousePos;
 
     private VisualElement _root;
-    private VisualElement _itemContainer;
+    private VisualElement _itemLayer;
     private float _itemScale = 1;
 
     private List<Slot> _slotList;
@@ -26,11 +26,8 @@ public class InventoryController : MonoBehaviour
 
     // Properties
 
-    public static InventoryController Instance;
     public int Width = 6;
     public int Height = 6;
-
-    public PlaceableItemSO[] ItemPool;
 
     [HideInInspector] public bool ShowDebug;
 
@@ -57,8 +54,8 @@ public class InventoryController : MonoBehaviour
 
     private void OnEnable()
     {
-        _root = GameObject.Find("AccessioningController").GetComponent<UIDocument>().rootVisualElement;
-        _itemContainer = _root.Q("ItemLayer");
+        _root = GetComponent<UIDocument>().rootVisualElement;
+        _itemLayer = _root.Q("ItemLayer");
         _ghostIcon = _root.Q<GhostIcon>();
 
         _slotList = _root.Query<Slot>().ToList();
@@ -76,16 +73,6 @@ public class InventoryController : MonoBehaviour
 
     private void Awake()
     {
-        // Singleton pattern
-        if (Instance == null)
-        {
-            Instance = this;
-            DontDestroyOnLoad(gameObject);
-        }
-        else if (Instance != this)
-        {
-            Destroy(gameObject);
-        }
     }
 
     void Start()
@@ -118,11 +105,22 @@ public class InventoryController : MonoBehaviour
         {
             VisualElement slotLayer = _root.Q("SlotLayer");
 
-            _itemContainer.style.width = slotLayer.resolvedStyle.width;
-            _itemContainer.style.height = slotLayer.resolvedStyle.height;
+            _itemLayer.style.width = slotLayer.resolvedStyle.width;
+            _itemLayer.style.height = slotLayer.resolvedStyle.height;
 
-            _itemContainer.style.left = slotLayer.resolvedStyle.left;
-            _itemContainer.style.top = slotLayer.resolvedStyle.top;
+            _itemLayer.style.left = slotLayer.resolvedStyle.left;
+            _itemLayer.style.top = slotLayer.resolvedStyle.top;
+
+            // Adding items to inventory if already had some
+
+            Debug.Log($"There should be {GameManager.Instance.StoredItems.Count} items in inv");
+            if (GameManager.Instance.StoredItems.Count > 0)
+            {
+                foreach (Item item in GameManager.Instance.StoredItems)
+                {
+                    item.PlaceInSlot(this, _itemLayer, GetSlot(item.RootGridIndex.x, item.RootGridIndex.y));
+                }
+            }
         });
         
         _root.RegisterCallback<PointerMoveEvent>(OnPointerMove);
@@ -231,11 +229,18 @@ public class InventoryController : MonoBehaviour
             _draggedItem.SetState(ItemState.InAccessioning);
             _draggedItem.PlaceInBox(_accBox, _mousePos);
             _accBox.RemoveFromClassList("accessioning-box--active");
+
+            GameManager.Instance.StoredItems.Remove(_draggedItem);
         }
         else if (CanPlace(hoveredSlot))
         {
             _draggedItem.SetState(ItemState.InInventory);
-            _draggedItem.PlaceInSlot(_itemContainer, hoveredSlot);
+            _draggedItem.PlaceInSlot(this, _itemLayer, hoveredSlot);
+
+            if (!GameManager.Instance.StoredItems.Contains(_draggedItem))
+            {
+                GameManager.Instance.StoredItems.Add(_draggedItem);
+            }
         }
         else // Couldn't place
         {
@@ -243,7 +248,7 @@ public class InventoryController : MonoBehaviour
 
             if (_draggedItem.CurrentState == ItemState.InInventory)
             {
-                _draggedItem.PlaceInSlot(_itemContainer, _draggedItem.Pivot.GridSlot);
+                _draggedItem.PlaceInSlot(this, _itemLayer, _draggedItem.Pivot.GridSlot);
             }
         }
 
@@ -319,7 +324,7 @@ public class InventoryController : MonoBehaviour
     /// </summary>
     private void ReorderItems()
     {
-        List<Item> items = _itemContainer.Children().OfType<Item>()
+        List<Item> items = _itemLayer.Children().OfType<Item>()
             .OrderBy(x => x.RootGridIndex.x)
             .OrderBy(y => y.RootGridIndex.y).ToList();
 
@@ -331,7 +336,7 @@ public class InventoryController : MonoBehaviour
 
         foreach (Item item in items)
         {
-            _itemContainer.Add(item);
+            _itemLayer.Add(item);
         }
     }
 

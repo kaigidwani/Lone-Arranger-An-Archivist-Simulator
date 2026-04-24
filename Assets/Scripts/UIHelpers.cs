@@ -5,8 +5,8 @@ public static class UIHelpers
 {
     public static Vector2 SetItemPivotToMouse(ItemTile pivot, Vector2 mousePos)
     {
-        float tileWidth = InventoryController.Instance.ItemTileSize.x;
-        float tileHeight = InventoryController.Instance.ItemTileSize.y;
+        float tileWidth = GameObject.Find("UIDoc").GetComponent<InventoryController>().ItemTileSize.x;
+        float tileHeight = GameObject.Find("UIDoc").GetComponent<InventoryController>().ItemTileSize.y;
 
         // Find offset from pivot
         float rowOffset = tileHeight * pivot.Index.x;
@@ -32,9 +32,9 @@ public static class UIHelpers
 
     public static PlaceableItemSO GetRandomItem()
     {
-        int rand = UnityEngine.Random.Range(0, InventoryController.Instance.ItemPool.Length);
+        int rand = UnityEngine.Random.Range(0, GameManager.Instance.ItemPool.Length);
 
-        return InventoryController.Instance.ItemPool[rand];
+        return GameManager.Instance.ItemPool[rand];
     }
 }
  

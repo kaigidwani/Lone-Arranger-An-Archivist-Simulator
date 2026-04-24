@@ -1,0 +1,5 @@
+<ui:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="project://database/Assets/UI%20Toolkit/AccessioningStyle.uss?fileID=7433441132597879392&amp;guid=8b41c21d683bf894884c559a7034be59&amp;type=3#AccessioningStyle" />
+    <ui:Button name="Start" text="Start Day" class="bottom-bar-element bottom-bar-button bottom-bar-button--active" />
+    <ui:Button name="Upgrades" text="Upgrades" class="bottom-bar-element bottom-bar-button bottom-bar-button--locked" />
+</ui:UXML>
