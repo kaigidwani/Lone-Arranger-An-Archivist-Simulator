@@ -89,15 +89,14 @@ public class DayManager : MonoBehaviour
         {
             _dayProgress += Time.deltaTime;
             Debug.Log($"time left in day = {_dayLength - _dayProgress}");
-
         }
     }
 
     public IEnumerator StartDay()
     {
         _isDayComplete = false;
-        _dayLength = Random.Range(10 + (CurrentDay * _dayLengthMultiplier),
-            20 + (CurrentDay * _dayLengthMultiplier));
+        _dayLength = Random.Range(_baseDayLengthMin + (CurrentDay * _dayLengthMultiplier),
+            _baseDayLengthMax + (CurrentDay * _dayLengthMultiplier));
 
         while (true)
         {
