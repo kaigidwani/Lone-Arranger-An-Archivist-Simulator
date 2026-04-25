@@ -81,12 +81,8 @@ public class DayManager : MonoBehaviour
         _satisfactionContainer = _root.Q("SatisfactionGained");
         _satisfactionLabel = _satisfactionContainer.Q<Label>("Amount");
 
-        _satisfactionBeforeDay = GameManager.Instance.Satisfaction = 150;
-
         _mainMenuBttn = _root.Q<Button>("Menu");
         _mainMenuBttn.clicked += OnMenuButtonClick;
-
-
     }
 
     private void Update()
@@ -101,6 +97,7 @@ public class DayManager : MonoBehaviour
 
     public IEnumerator StartDay()
     {
+        _satisfactionBeforeDay = GameManager.Instance.Satisfaction;
         _isDayComplete = false;
         _dayLength = Random.Range(_baseDayLengthMin + (CurrentDay * _dayLengthMultiplier),
             _baseDayLengthMax + (CurrentDay * _dayLengthMultiplier));

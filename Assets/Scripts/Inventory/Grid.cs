@@ -1,7 +1,6 @@
 using UnityEngine;
 using System.Collections.Generic;
 using UnityEngine.UIElements;
-using UnityEditor.Search;
 
 [UxmlElement]
 public partial class Grid : VisualElement

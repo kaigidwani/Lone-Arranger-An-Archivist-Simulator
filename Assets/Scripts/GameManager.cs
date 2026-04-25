@@ -52,5 +52,6 @@ public class GameManager : MonoBehaviour
         }
 
         StoredItems = new List<Item>();
+        Satisfaction = 150;
     }
 }
