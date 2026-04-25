@@ -5,7 +5,7 @@
     <Style src="project://database/Assets/UI%20Toolkit/AccessioningStyle.uss?fileID=7433441132597879392&amp;guid=8b41c21d683bf894884c559a7034be59&amp;type=3#AccessioningStyle" />
     <Style src="project://database/Assets/UI%20Toolkit/InventoryStyle.uss?fileID=7433441132597879392&amp;guid=e9341e650ecdb744ba0708bb339af7f7&amp;type=3#InventoryStyle" />
     <ui:Instance template="TopBar" name="TopBar" class="top-bar" />
-    <ui:VisualElement name="Container" class="content">
+    <ui:VisualElement name="Container" class="content" style="background-image: url(&quot;project://database/Assets/Art/archive-bg.png?fileID=2800000&amp;guid=a5806e0e16cf51741a76f16903e7203c&amp;type=3#archive-bg&quot;); -unity-background-scale-mode: scale-and-crop;">
         <ui:VisualElement name="Inventories" style="justify-content: center; flex-direction: row; flex-shrink: 0; flex-basis: auto; align-items: center; width: 100%; padding-top: 20px; padding-right: 0; padding-bottom: 20px; padding-left: 0; height: 76%;">
             <ui:VisualElement name="DonationColumn" class="accessioning-column" style="flex-grow: 1; flex-direction: column-reverse;">
                 <ui:VisualElement name="VisualElement" style="background-color: rgb(156, 116, 61); border-top-width: 3px; border-right-width: 3px; border-bottom-width: 3px; border-left-width: 3px; border-top-left-radius: 14%; border-top-right-radius: 14%; border-bottom-right-radius: 14%; border-bottom-left-radius: 14%; border-left-color: rgb(0, 0, 0); border-right-color: rgb(0, 0, 0); border-top-color: rgb(0, 0, 0); border-bottom-color: rgb(0, 0, 0); width: 49%; align-self: center; translate: 0 -19%; height: 15%; align-items: center; justify-content: center;">
