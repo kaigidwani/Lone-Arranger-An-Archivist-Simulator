@@ -1,13 +1,10 @@
 <ui:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
     <Style src="project://database/Assets/UI%20Toolkit/MainMenuStyle.uss?fileID=7433441132597879392&amp;guid=965efb360fc620e458f257988c5110a3&amp;type=3#MainMenuStyle" />
-    <ui:VisualElement style="flex-grow: 1; background-color: rgb(255, 231, 205);">
-        <ui:VisualElement name="Title" style="flex-grow: 1; justify-content: center; align-self: auto; align-content: center; align-items: center; min-height: auto;">
-            <ui:Label text="Lone Arranger" name="title" class="h1" />
-            <ui:Label text="An Archivist Simulator" name="subtitle" class="h2" />
-        </ui:VisualElement>
+    <ui:VisualElement name="VisualElement" style="flex-grow: 1; background-image: url(&quot;project://database/Assets/Art/Compiled_ReadingRoomBG.png?fileID=2800000&amp;guid=3aad965ce485d31408ecaeba07dd1261&amp;type=3#Compiled_ReadingRoomBG&quot;); -unity-background-scale-mode: scale-and-crop;">
+        <ui:VisualElement style="flex-grow: 1; opacity: 0.2; position: absolute; background-color: rgb(255, 231, 205); right: 0%; left: 0%; top: 0%; bottom: 0%;" />
+        <ui:VisualElement name="Title" style="flex-grow: 1; justify-content: center; align-self: auto; align-content: center; align-items: center; min-height: auto; background-image: url(&quot;project://database/Assets/Art/Subtitle_Logo.png?fileID=2800000&amp;guid=f7c2628a04b0ef345aee229cf3114121&amp;type=3#Subtitle_Logo&quot;); -unity-background-scale-mode: scale-to-fit; margin-top: 6%;" />
         <ui:VisualElement name="Buttons" style="flex-grow: 1; justify-content: center; align-self: auto; align-content: center; align-items: center;">
             <ui:Button text="Start" name="Start" class="menu-button menu-button-primary" />
-            <ui:Button text="Options" name="Options" class="secondary-button menu-button menu-button-secondary" />
             <ui:Button text="Quit" name="Quit" class="secondary-button menu-button menu-button-secondary" />
         </ui:VisualElement>
     </ui:VisualElement>
