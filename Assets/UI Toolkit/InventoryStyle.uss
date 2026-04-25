@@ -30,19 +30,19 @@
 }
 
 .inventory-slot-red {
-    background-color: rgba(120, 24, 24, 0.51);
+    background-color: rgba(120, 24, 24, 0.7);
 }
 
 .inventory-slot-green {
-    background-color: rgba(34, 99, 28, 0.51);
+    background-color: rgba(34, 99, 28, 0.7);
 }
 
 .inventory-slot-blue {
-    background-color: rgba(0, 32, 108, 0.51);
+    background-color: rgba(0, 32, 108, 0.7);
 }
 
 .inventory-slot-default {
-    background-color: rgba(99, 99, 99, 0.51);
+    background-color: rgba(99, 99, 99, 0.7);
 }
 
 .item {

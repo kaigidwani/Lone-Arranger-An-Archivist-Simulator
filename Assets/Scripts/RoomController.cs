@@ -68,9 +68,7 @@ public class RoomController : MonoBehaviour
     {
         SwitchRoom();
 
-        _selectedPatron = _root.Q<Patron>(className: "selected");
-
-        _selectedPatron.CompleteRequest();
+        _selectedPatron = PatronManager.Instance.PatronQueue.Peek();
 
         List<Item> itemsDonated = new List<Item>();
         foreach (Item item in GameManager.Instance.StoredItems)
@@ -81,19 +79,20 @@ public class RoomController : MonoBehaviour
             }
         }
 
-        // To Do: Calculate Results
+        _selectedPatron.CompleteRequest(itemsDonated);
 
-        for (int i = 0; i < itemsDonated.Count; i++)
-        {
-            itemsDonated[i].RemoveFromHierarchy();
-            GameManager.Instance.StoredItems.Remove(itemsDonated[i]);
-        }
+        // To Do: Calculate Results
     }
 
     private void Start()
     {
         StartCoroutine(DayManager.Instance.StartDay());
         _dayLabel.text = $"Day {DayManager.Instance.CurrentDay}";
+    }
+
+    private void Update()
+    {
+        _satisfactionLabel.text = $"{GameManager.Instance.Satisfaction}";
     }
 
     public void SwitchRoom()

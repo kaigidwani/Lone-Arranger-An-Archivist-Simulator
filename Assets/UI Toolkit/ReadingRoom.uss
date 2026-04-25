@@ -10,21 +10,38 @@
 }
 
 .patron {
-    position: absolute;
     transform-origin: bottom;
-    bottom: 10%;
-    left: 27%;
     border-radius: 20px;
     border-top-left-radius: 20px;
     border-top-right-radius: 20px;
     border-bottom-right-radius: 0;
     border-bottom-left-radius: 0;
-    transition-property: left, opacity;
-    transition-duration: 800ms, 400ms;
-    transition-timing-function: ease-in, ease;
+    opacity: 0;
+    transition-property: left, bottom;
+    transition-duration: 1000ms, 500ms;
+    transition-timing-function: ease, ease;
     background-image: url("project://database/Assets/Art/patron-1.png?fileID=2800000&guid=84ba38275e233ca4a90faa89894a0a42&type=3#patron-1");
     width: 654px;
     height: 962px;
+    position: absolute;
+}
+
+.position-3 {
+    left: -800px;
+    bottom: 5%;
+}
+
+.position-2 {
+    left: -100px;
+    bottom: 5%;
+    opacity: 1;
+}
+
+.position-1 {
+    position: absolute;
+    left: 515px;
+    bottom: 10%;
+    opacity: 1;
 }
 
 .room-label {

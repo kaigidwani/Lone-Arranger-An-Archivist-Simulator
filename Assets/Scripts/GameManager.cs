@@ -12,6 +12,8 @@ public class GameManager : MonoBehaviour
     public PlaceableItemSO[] ItemPool;
     public List<Item> StoredItems;
 
+    public int Satisfaction = 150;
+
     private void OnEnable()
     {
         

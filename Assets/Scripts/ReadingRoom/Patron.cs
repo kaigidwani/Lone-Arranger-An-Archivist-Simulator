@@ -103,8 +103,6 @@ public class Patron : VisualElement
     {
         AddToClassList("selected");
 
-        
-
         _itemList.RemoveFromClassList("hidden");
         _textBox.Add(_itemList);
 
@@ -244,12 +242,8 @@ public class Patron : VisualElement
         _textBox.RegisterCallback<MouseLeaveEvent>(OnRequestHoverExit);
     }
 
-    public async UniTask Spawn()
+    public async void ShowThoughtBubble()
     {
-        await UniTask.WaitForSeconds(1);
-
-        RemoveFromClassList("hidden-left");
-
         await UniTask.Delay(800);
 
         _requestContainer.RemoveFromClassList("hidden");
@@ -257,10 +251,16 @@ public class Patron : VisualElement
         await UniTask.Delay(200);
 
         _requestContainer.pickingMode = PickingMode.Position;
-
     }
 
-    public async void CompleteRequest()
+    public async UniTask Spawn()
+    {
+        await UniTask.WaitForSeconds(1);
+
+        RemoveFromClassList("hidden-left");
+    }
+
+    public async void CompleteRequest(List<Item> itemsDonated)
     {
         isComplete = true;
 
@@ -268,6 +268,8 @@ public class Patron : VisualElement
         {
             HideRequest();
         }
+
+        GameManager.Instance.Satisfaction += Random.Range(20, 50);
 
         await EnlargeTextBox("Thank you.", isComplete); // customize for good or bad score (maybe)
 

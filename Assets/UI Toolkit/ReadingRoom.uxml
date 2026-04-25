@@ -8,7 +8,7 @@
         <ui:VisualElement name="ReadingRoom" picking-mode="Ignore" class="screen" style="flex-grow: 1; background-image: url(&quot;project://database/Assets/Art/reading-room-bg.png?fileID=2800000&amp;guid=e134513439f3a3d4fa0a58ebad6596c2&amp;type=3#reading-room-bg&quot;);">
             <ui:Button text="&gt;" name="NextRoomBttn" class="next-room-button" style="right: 0;" />
             <ui:VisualElement name="PatronLayer" picking-mode="Ignore" class="object-layer">
-                <ui:VisualElement name="TestPatron" class="patron hidden-left" />
+                <ui:VisualElement name="TestPatron" class="patron position-3" />
             </ui:VisualElement>
             <ui:VisualElement name="Desk" picking-mode="Ignore" style="flex-grow: 1; background-image: url(&quot;project://database/Assets/Art/reading-room-desk.png?fileID=2800000&amp;guid=03a0c0f41d060bf4f814346acaabe0a4&amp;type=3#reading-room-desk&quot;); position: absolute; bottom: 0; width: 100%; height: 100%;" />
             <ui:VisualElement name="RequestLayer" picking-mode="Ignore" class="object-layer">
@@ -29,7 +29,7 @@
                 </ui:VisualElement>
             </ui:VisualElement>
         </ui:VisualElement>
-        <ui:VisualElement name="Archive" class="screen hidden-right" style="background-image: none; background-color: rgb(73, 81, 96);">
+        <ui:VisualElement name="Archive" class="screen hidden-right" style="background-image: url(&quot;project://database/Assets/Art/archive-bg.png?fileID=2800000&amp;guid=a5806e0e16cf51741a76f16903e7203c&amp;type=3#archive-bg&quot;);">
             <ui:VisualElement picking-mode="Ignore" name="Inventories" style="flex-grow: 1; flex-direction: row; align-self: auto; align-content: auto; justify-content: center; align-items: center;">
                 <ui:Instance template="Inventory" name="InventoryContainer" class="inventory-container" style="margin-left: 100px;" />
                 <Grid name="DonationBox" class="donation-box-grid">

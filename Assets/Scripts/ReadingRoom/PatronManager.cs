@@ -1,4 +1,7 @@
+using Cysharp.Threading.Tasks;
+using System;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -54,15 +57,74 @@ public class PatronManager : MonoBehaviour
     {
         Patron patron = new Patron();
         PatronQueue.Enqueue(patron);
-        _requestLayer.Add(patron.RequestElem);
+        
         _patronLayer.Add(patron);
 
+        // LEFT: 27, BTM: 10
+
+        if (PatronQueue.Peek() == patron)
+        {
+            patron.AddToClassList("position-1");
+        }
+        else
+        {
+            int index = Array.IndexOf(PatronQueue.ToArray(), patron);
+            if (index == 1)
+            {
+                patron.AddToClassList("position-2");
+            }
+            else
+            {
+                patron.AddToClassList("position-3");
+            }
+        }
+
         await patron.Spawn();
+
+        if (PatronQueue.Count == 1)
+        {
+            ShowFrontRequest();
+        }
     }
 
-    public void RemovePatron()
+    public async void RemovePatron()
     {
         Patron selectedPatron = PatronQueue.Dequeue();
+        selectedPatron.RemoveFromClassList("position-1");
+        selectedPatron.RemoveFromClassList("position-2");
+        selectedPatron.RemoveFromClassList("position-3");
+
+        // Shift everyone in the queue over
+        if (PatronQueue.Count > 0)
+        {
+            foreach (Patron p in PatronQueue)
+            {
+                p.RemoveFromClassList("position-1");
+                p.RemoveFromClassList("position-2");
+                p.RemoveFromClassList("position-3");
+
+                int index = Array.IndexOf(PatronQueue.ToArray(), p);
+                if (index > 1)
+                {
+                    p.AddToClassList("position-3");
+                    continue;
+                }
+
+                if (index == 1)
+                {
+                    p.AddToClassList("position-2");
+                }       
+
+                if (index == 0)
+                {
+                    p.AddToClassList("position-1");
+                }
+            }
+
+            ShowFrontRequest();
+        }
+
+        await UniTask.Delay(400);
         selectedPatron.RemoveFromHierarchy();
         selectedPatron.RequestElem.RemoveFromHierarchy();
     }
@@ -70,6 +132,12 @@ public class PatronManager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        
+    }
+
+    private void ShowFrontRequest()
+    {
+        Patron patronInFront = PatronQueue.Peek();
+        _requestLayer.Add(patronInFront.RequestElem);
+        patronInFront.ShowThoughtBubble();
     }
 }

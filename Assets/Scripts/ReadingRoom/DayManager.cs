@@ -36,6 +36,8 @@ public class DayManager : MonoBehaviour
     private float _dayLength;
     private float _dayProgress;
 
+    private float _satisfactionBeforeDay;
+
     // Properties 
 
     public static DayManager Instance;
@@ -79,8 +81,12 @@ public class DayManager : MonoBehaviour
         _satisfactionContainer = _root.Q("SatisfactionGained");
         _satisfactionLabel = _satisfactionContainer.Q<Label>("Amount");
 
+        _satisfactionBeforeDay = GameManager.Instance.Satisfaction = 150;
+
         _mainMenuBttn = _root.Q<Button>("Menu");
         _mainMenuBttn.clicked += OnMenuButtonClick;
+
+
     }
 
     private void Update()
@@ -88,8 +94,9 @@ public class DayManager : MonoBehaviour
         if (!_isDayComplete)
         {
             _dayProgress += Time.deltaTime;
-            Debug.Log($"time left in day = {_dayLength - _dayProgress}");
         }
+
+        _satisfactionLabel.text = $"{GameManager.Instance.Satisfaction}";
     }
 
     public IEnumerator StartDay()
@@ -174,7 +181,7 @@ public class DayManager : MonoBehaviour
 
         await UniTask.Delay(300);
 
-        _satisfactionLabel.text = $"{_numPatronsHelped}";
+        _satisfactionLabel.text = $"{GameManager.Instance.Satisfaction - _satisfactionBeforeDay}";
         _satisfactionLabel.RemoveFromClassList("hidden");
 
         await UniTask.Delay(800);

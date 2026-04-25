@@ -89,6 +89,11 @@ public class AccessioningController : MonoBehaviour
 
     }
 
+    private void Update()
+    {
+        _satisfactionLabel.text = $"{GameManager.Instance.Satisfaction}";
+    }
+
     #region Events
 
     public async void OnStartDayClick()
