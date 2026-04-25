@@ -9,7 +9,7 @@ public class MainMenuController : MonoBehaviour
     private VisualElement _root;
 
     private Button _startBttn;
-    private Button _optionsBttn;
+    //private Button _optionsBttn;
     private Button _quitBttn;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
@@ -25,10 +25,10 @@ public class MainMenuController : MonoBehaviour
         _startBttn.RegisterCallback<MouseEnterEvent>(ButtonBehavior.OnMouseEnter);
         _startBttn.RegisterCallback<MouseLeaveEvent>(ButtonBehavior.OnMouseExit);
 
-        _optionsBttn = _root.Query<Button>("Options");
+        /*_optionsBttn = _root.Query<Button>("Options");
         _optionsBttn.clicked += OnOptionsButtonClicked;
         _optionsBttn.RegisterCallback<MouseEnterEvent>(ButtonBehavior.OnMouseEnter);
-        _optionsBttn.RegisterCallback<MouseLeaveEvent>(ButtonBehavior.OnMouseExit);
+        _optionsBttn.RegisterCallback<MouseLeaveEvent>(ButtonBehavior.OnMouseExit);*/
 
         _quitBttn = _root.Query<Button>("Quit");
         _quitBttn.clicked += OnQuitButtonClicked;
@@ -42,9 +42,9 @@ public class MainMenuController : MonoBehaviour
         _startBttn.UnregisterCallback<MouseEnterEvent>(ButtonBehavior.OnMouseEnter);
         _startBttn.UnregisterCallback<MouseLeaveEvent>(ButtonBehavior.OnMouseExit);
 
-        _optionsBttn.clicked -= OnOptionsButtonClicked;
+        /*_optionsBttn.clicked -= OnOptionsButtonClicked;
         _optionsBttn.UnregisterCallback<MouseEnterEvent>(ButtonBehavior.OnMouseEnter);
-        _optionsBttn.UnregisterCallback<MouseLeaveEvent>(ButtonBehavior.OnMouseExit);
+        _optionsBttn.UnregisterCallback<MouseLeaveEvent>(ButtonBehavior.OnMouseExit);*/
 
         _quitBttn.clicked -= OnQuitButtonClicked;
         _quitBttn.RegisterCallback<MouseEnterEvent>(ButtonBehavior.OnMouseEnter);
