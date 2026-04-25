@@ -53,14 +53,13 @@
     border-right-color: rgb(0, 0, 0);
     border-top-color: rgb(0, 0, 0);
     border-bottom-color: rgb(0, 0, 0);
-    padding-right: 1%;
-    padding-left: 1%;
-    margin-right: 2%;
-    margin-top: 1.5%;
     -unity-text-align: middle-left;
     flex-direction: row;
     align-items: center;
     flex-basis: 14%;
+    height: 80%;
+    margin-left: 50px;
+    justify-content: center;
 }
 
 .bottom-bar-element {
@@ -77,13 +76,10 @@
     border-right-color: rgb(0, 0, 0);
     border-top-color: rgb(0, 0, 0);
     border-bottom-color: rgb(0, 0, 0);
-    padding-right: 1%;
-    padding-left: 1%;
-    margin-right: 4%;
     align-items: center;
     flex-basis: 14%;
-    margin-bottom: 1.5%;
-    margin-top: 1%;
+    margin-right: 40px;
+    height: 80px;
 }
 
 .bottom-bar-button {
@@ -92,7 +88,6 @@
     background-color: rgb(247, 247, 247);
     border-color: rgb(114, 100, 92);
     scale: 1 1;
-
     transition-property: scale, border-color, background-color;
     transition-duration: 100ms, 100ms, 100ms;
     transition-timing-function: ease, ease, ease;
@@ -109,4 +104,38 @@
 
 .bottom-bar-button--locked {
     background-color: rgba(100, 100, 100, 0.5);
+}
+
+.top-bar {
+    height: 12%;
+    width: 100%;
+    flex-direction: row;
+    align-self: auto;
+    align-items: flex-end;
+    position: absolute;
+    flex-shrink: 0;
+    top: 0;
+}
+
+.bottom-bar {
+    flex-direction: row-reverse;
+    padding-bottom: 0;
+    padding-left: 0;
+    padding-top: 0;
+    padding-right: 0;
+    align-items: center;
+    height: 12%;
+    width: 100%;
+    position: absolute;
+    bottom: 0;
+    flex-shrink: 0;
+}
+
+.content {
+    flex-grow: 1;
+    align-items: center;
+    align-self: auto;
+    align-content: auto;
+    flex-direction: column;
+    justify-content: center;
 }

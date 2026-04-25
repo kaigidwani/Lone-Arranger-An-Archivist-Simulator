@@ -43,6 +43,7 @@ public partial class Slot : VisualElement
         });
 
         DebugLabel = new Label("Empty");
+        DebugLabel.visible = false;
         DebugLabel.AddToClassList("debug-text");
 
         Add(DebugLabel);

@@ -7,6 +7,7 @@ public enum ItemState
 {
     InAccessioning,
     InInventory,
+    InDonationBox,
 }
 
 [UxmlElement]
@@ -81,8 +82,8 @@ public partial class Item : VisualElement
     private void GenerateItemTiles()
     {
         // How big each individual tile should be
-        float tileWidth = InventoryController.Instance.ItemTileSize.x;
-        float tileHeight = InventoryController.Instance.ItemTileSize.y;
+        float tileWidth = GameObject.Find("UIDoc").GetComponent<InventoryController>().ItemTileSize.x;
+        float tileHeight = GameObject.Find("UIDoc").GetComponent<InventoryController>().ItemTileSize.y;
 
         Tiles = new List<ItemTile>();
         for (int row = 0; row < _itemSO.BaseHeight; row++)
@@ -110,7 +111,7 @@ public partial class Item : VisualElement
                 Tiles.Add(tile);
 
                 tile.DebugLabel.text = $"({tile.Index.x}, {tile.Index.y})";
-                tile.DebugLabel.visible = InventoryController.Instance.ShowDebug;
+                tile.DebugLabel.visible = GameObject.Find("UIDoc").GetComponent<InventoryController>().ShowDebug;
             }
         }
     }
@@ -171,6 +172,15 @@ public partial class Item : VisualElement
 
     }
 
+    // Rotates the item to match a specific angle
+    public void RotateTo(int deg)
+    {
+        while (Rotation != deg)
+        {
+            Rotate(1);
+        }
+    }
+
     /// <summary>
     /// Resets the rotation of the item to its value before the user started rotating it.
     /// </summary>
@@ -200,9 +210,9 @@ public partial class Item : VisualElement
         AddToClassList("item");
 
         // Generate random item from current item pool
-        if (InventoryController.Instance.ItemPool.Length > 0)
+        if (GameManager.Instance.ItemPool.Length > 0)
         {
-            _itemSO = InventoryController.Instance.ItemPool[Random.Range(0, InventoryController.Instance.ItemPool.Length)];           
+            _itemSO = GameManager.Instance.ItemPool[Random.Range(0, GameManager.Instance.ItemPool.Length)];           
             name = _itemSO.Name;
 
             WidthInTiles = _itemSO.BaseWidth;
@@ -215,8 +225,8 @@ public partial class Item : VisualElement
         }
 
         // Parent container should be as big as the item is (totally)
-        _width = _itemSO.BaseWidth * InventoryController.Instance.ItemTileSize.x;
-        _height = _itemSO.BaseHeight * InventoryController.Instance.ItemTileSize.y;
+        _width = _itemSO.BaseWidth * GameObject.Find("UIDoc").GetComponent<InventoryController>().ItemTileSize.x;
+        _height = _itemSO.BaseHeight * GameObject.Find("UIDoc").GetComponent<InventoryController>().ItemTileSize.y;
 
         Vector2 pos = box.GetRandomPoint(_width, _height);
 
@@ -234,20 +244,25 @@ public partial class Item : VisualElement
     /// Places the dragged item into a slot
     /// </summary>
     /// <param name="startSlot">The slot that the user places the item in</param>
-    public void PlaceInSlot(VisualElement dest, Slot startSlot)
+    public void PlaceInSlot(InventoryController inv, VisualElement dest, Slot startSlot)
     {
         RemoveFromHierarchy(); // Remove from accessioning box 
         RemoveFromClassList("item");
         AddToClassList("item-slotted");
         // ------------------------------
 
-        float rowOffset = Pivot.Index.x * InventoryController.Instance.SlotSize.y;
-        float colOffset = Pivot.Index.y * InventoryController.Instance.SlotSize.x;
+        float rowOffset = 0;
+        float colOffset = 0;
+        if (Pivot != null)
+        {
+            rowOffset = Pivot.Index.x * inv.SlotSize.y;
+            colOffset = Pivot.Index.y * inv.SlotSize.x;
+        }
 
         float drawOffset = 0;
         if (Rotation % 180 != 0)
         {
-            drawOffset = (WidthInTiles - HeightInTiles) * InventoryController.Instance.ItemTileSize.x / 2;
+            drawOffset = (WidthInTiles - HeightInTiles) * inv.SlotSize.x / 2;
         }
 
         style.left = startSlot.resolvedStyle.left - colOffset + drawOffset;
@@ -255,24 +270,37 @@ public partial class Item : VisualElement
 
         foreach (ItemTile tile in Tiles)
         {
-            int gridRow = startSlot.GridIndex.x + (tile.Index.x - Pivot.Index.x);
-            int gridCol = startSlot.GridIndex.y + (tile.Index.y - Pivot.Index.y);
+            int gridRow = startSlot.GridIndex.x + tile.Index.x;
+            int gridCol = startSlot.GridIndex.y + tile.Index.y;
+
+            if (Pivot != null)
+            {
+                gridRow -= Pivot.Index.x;
+                gridCol -= Pivot.Index.y;
+            }
 
             tile.SetGridSlot(gridRow, gridCol);
-            tile.SetColor();
+            
+            // Make sure players can see what color items they have in the box
+            if (CurrentState != ItemState.InDonationBox)
+            {
+                ResetTileColors();
+                tile.SetColor();
+            }
+            
         }
 
         RootGridIndex = GetRootGridPosition();
 
         dest.Add(this);
-        CurrentState = ItemState.InInventory;
     }
 
-    public void PlaceInBox(Accessioning box, Vector2 mouse)
+    public void ReturnToAccessioning(Accessioning box, Vector2 mouse)
     {
         RemoveFromHierarchy(); // Remove from inventory
         RemoveFromClassList("item-slotted");
         AddToClassList("item");
+        ResetTileColors();
         box.Add(this);
 
         Vector2 mousePos = UIHelpers.SetItemPivotToMouse(Pivot, mouse);
@@ -305,18 +333,7 @@ public partial class Item : VisualElement
             {
                 style.top = itemPos.y - Mathf.Abs(worldBound.max.y - box.worldBound.max.y);
             }
-
-            //if (worldBound.max)
         });
-        //Debug.Log("item pos: " + worldBound.position);
-
-        /*Vector2 pos = box.GetRandomPoint(_width, _height);
-
-        style.left = pos.x;
-        style.top = pos.y;*/
-
-        
-        CurrentState = ItemState.InAccessioning;
     }
 
     public void SetScale(Vector2 scale)

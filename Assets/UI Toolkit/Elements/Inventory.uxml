@@ -1,0 +1,44 @@
+<ui:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="project://database/Assets/UI%20Toolkit/InventoryStyle.uss?fileID=7433441132597879392&amp;guid=e9341e650ecdb744ba0708bb339af7f7&amp;type=3#InventoryStyle" />
+    <Grid name="Inventory" class="inventory-grid">
+        <ui:VisualElement name="SlotLayer" style="flex-direction: row; flex-wrap: wrap; flex-shrink: 0; flex-grow: 0; align-content: center; width: 100%; align-self: center; justify-content: center; align-items: stretch;">
+            <Slot class="inventory-slot inventory-slot-red" />
+            <Slot class="inventory-slot inventory-slot-default" />
+            <Slot class="inventory-slot inventory-slot-default" />
+            <Slot class="inventory-slot inventory-slot-blue" />
+            <Slot class="inventory-slot inventory-slot-green" />
+            <Slot class="inventory-slot inventory-slot-green" />
+            <Slot class="inventory-slot inventory-slot-red" />
+            <Slot class="inventory-slot inventory-slot-default" />
+            <Slot class="inventory-slot inventory-slot-default" />
+            <Slot class="inventory-slot inventory-slot-blue" />
+            <Slot class="inventory-slot inventory-slot-green" />
+            <Slot class="inventory-slot inventory-slot-green" />
+            <Slot class="inventory-slot inventory-slot-red" />
+            <Slot class="inventory-slot inventory-slot-default" />
+            <Slot class="inventory-slot inventory-slot-default" />
+            <Slot class="inventory-slot inventory-slot-blue" />
+            <Slot class="inventory-slot inventory-slot-green" />
+            <Slot class="inventory-slot inventory-slot-green" />
+            <Slot class="inventory-slot inventory-slot-red" />
+            <Slot class="inventory-slot inventory-slot-default" />
+            <Slot class="inventory-slot inventory-slot-default" />
+            <Slot class="inventory-slot inventory-slot-blue" />
+            <Slot class="inventory-slot inventory-slot-green" />
+            <Slot class="inventory-slot inventory-slot-green" />
+            <Slot class="inventory-slot inventory-slot-red" />
+            <Slot class="inventory-slot inventory-slot-default" />
+            <Slot class="inventory-slot inventory-slot-default" />
+            <Slot class="inventory-slot inventory-slot-blue" />
+            <Slot class="inventory-slot inventory-slot-green" />
+            <Slot class="inventory-slot inventory-slot-green" />
+            <Slot class="inventory-slot inventory-slot-red" />
+            <Slot class="inventory-slot inventory-slot-default" />
+            <Slot class="inventory-slot inventory-slot-default" />
+            <Slot class="inventory-slot inventory-slot-blue" />
+            <Slot class="inventory-slot inventory-slot-green" />
+            <Slot class="inventory-slot inventory-slot-green" />
+        </ui:VisualElement>
+        <ui:VisualElement name="ItemLayer" picking-mode="Ignore" style="flex-grow: 0; position: absolute; align-self: flex-start; width: 0; height: 0; flex-shrink: 0; align-items: flex-start;" />
+    </Grid>
+</ui:UXML>

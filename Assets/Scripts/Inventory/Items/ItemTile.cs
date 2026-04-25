@@ -6,16 +6,6 @@ using System;
 [UxmlElement]
 public partial class ItemTile : VisualElement
 {
-    // Fields
-
-    private static List<Color> COLOR_CODES = new List<Color>
-    {
-        new Color(0, 0, 0, 0),
-        new Color(153/255f, 9/255f, 9/255f, 0.51f),
-        new Color(38/255f, 91/255f, 30/255f, 0.51f),
-        new Color(58/255f, 89/255f, 151/255f, 0.51f)
-    };
-
     // Properties
 
     public Label DebugLabel { get; set; }
@@ -40,7 +30,20 @@ public partial class ItemTile : VisualElement
     /// <summary>
     /// The slot containing this tile on the grid
     /// </summary>
-    public Slot GridSlot { get { return InventoryController.Instance.GetSlot(Position.x, Position.y); } }
+    public Slot GridSlot { 
+        get 
+        { 
+            if (ParentItem.CurrentState == ItemState.InInventory)
+            {
+                return GameObject.Find("UIDoc").GetComponent<InventoryController>().Inventory.GetSlot(Position.x, Position.y);
+            }
+            else
+            {
+                return GameObject.Find("UIDoc").GetComponent<InventoryController>().DonationBox.GetSlot(Position.x, Position.y);
+            }
+            
+        }
+    }
 
     public event Action<Vector2, Item> OnStartDrag = delegate { };
 
@@ -50,7 +53,7 @@ public partial class ItemTile : VisualElement
         RegisterCallback<MouseLeaveEvent>(OnHoverExit);
         RegisterCallback<PointerDownEvent>(OnPointerDown);
 
-        OnStartDrag += InventoryController.Instance.OnPointerDown;
+        OnStartDrag += GameObject.Find("UIDoc").GetComponent<InventoryController>().OnPointerDown;
 
         DebugLabel = new Label("");
         DebugLabel.AddToClassList("debug-text");
@@ -95,7 +98,6 @@ public partial class ItemTile : VisualElement
             return;
         }
 
-        ParentItem.ResetTileColors();
         ParentItem.StoredRotation = ParentItem.Rotation;
         OnStartDrag.Invoke(evt.position, ParentItem);
         evt.StopPropagation();
@@ -128,13 +130,13 @@ public partial class ItemTile : VisualElement
     {
         schedule.Execute(() =>
         {
-            style.backgroundColor = COLOR_CODES[(int)GridSlot.Color];
+            style.backgroundColor = ParentItem.SO.COLOR_CODES[(int)GridSlot.Color];
         });
         
     }
 
     public void RemoveColor()
     {
-        style.backgroundColor = COLOR_CODES[(int)SlotColor.None];
+        style.backgroundColor = ParentItem.SO.COLOR_CODES[(int)SlotColor.None];
     }
 }

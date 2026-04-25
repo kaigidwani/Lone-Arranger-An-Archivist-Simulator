@@ -1,9 +1,18 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 [CreateAssetMenu(fileName = "New Item", menuName = "Scriptable Objects/Item")]
 public class PlaceableItemSO : ScriptableObject
 {
     // Fields
+
+    public List<Color> COLOR_CODES = new List<Color>
+    {
+        new Color(0, 0, 0, 0),
+        new Color(153/255f, 9/255f, 9/255f, 0.51f),
+        new Color(38/255f, 91/255f, 30/255f, 0.51f),
+        new Color(58/255f, 89/255f, 151/255f, 0.51f)
+    };
 
     [SerializeField] private int _baseWidth;
     [SerializeField] private int _baseHeight;

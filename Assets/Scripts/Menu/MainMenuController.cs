@@ -59,7 +59,7 @@ public class MainMenuController : MonoBehaviour
 
     private void OnStartButtonClicked()
     {
-        _sceneController.ChangeScene(Scene.Inventory);
+        _sceneController.ChangeScene(Scene.Accessioning);
         MusicManager.Instance.PlayTrack("Gameplay");
     }
 
