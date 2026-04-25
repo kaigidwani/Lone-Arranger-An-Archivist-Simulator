@@ -18,6 +18,12 @@ public class MainMenuController : MonoBehaviour
         _root = GetComponent<UIDocument>().rootVisualElement;      
     }
 
+    private void Start()
+    {
+        // Whjenever you come back to the menu, the menu track plays
+        MusicManager.Instance.PlayTrack("Menu");
+    }
+
     private void OnEnable()
     {
         _startBttn = _root.Query<Button>("Start");
@@ -54,6 +60,7 @@ public class MainMenuController : MonoBehaviour
     private void OnStartButtonClicked()
     {
         _sceneController.ChangeScene(Scene.Inventory);
+        MusicManager.Instance.PlayTrack("Gameplay");
     }
 
     private void OnOptionsButtonClicked()
