@@ -14,8 +14,6 @@ public class SceneController : ScriptableObject
 {
     public async UniTask ChangeScene(Scene newScene)
     {
-        Debug.Log("changing scene...");
-
         await OverlayManager.Instance.DisplayOverlay();
 
         switch (newScene)
